@@ -24,6 +24,11 @@ export default function Register() {
       ...prev,
       [name]: value,
     }));
+
+
+    if (errors[name]) {
+      setErrors((prev) => ({...prev, [name]: ""}))
+    }
   };
 
   const validateForm = () => {
