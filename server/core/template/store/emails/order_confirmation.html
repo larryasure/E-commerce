@@ -1,0 +1,91 @@
+{% extends 'store/emails/base_email.html' %} {% block content %}
+
+<h2>Order Confirmed!</h2>
+
+<p>Hi <strong>{{ username }}</strong>,</p>
+
+<p>
+  Thank you for your order! We have received it and are currently processing it.
+  Here is a summary of your order:
+</p>
+
+<hr class="divider" />
+
+<table style="width: 100%; border-collapse: collapse; margin: 20px 0">
+  <tr>
+    <td style="padding: 8px 0; color: #888888">Order Number:</td>
+    <td style="padding: 8px 0; font-weight: bold; text-align: right">
+      #{{ order.id }}
+    </td>
+  </tr>
+  <tr>
+    <td style="padding: 8px 0; color: #888888">Order Date:</td>
+    <td style="padding: 8px 0; font-weight: bold; text-align: right">
+      {{ order.created_at|date:"F j, Y" }}
+    </td>
+  </tr>
+  <tr>
+    <td style="padding: 8px 0; color: #888888">Payment Status:</td>
+    <td style="padding: 8px 0; font-weight: bold; text-align: right">
+      {{ order.payment_status }}
+    </td>
+  </tr>
+  <tr>
+    <td style="padding: 8px 0; color: #888888">Shipping Address:</td>
+    <td style="padding: 8px 0; font-weight: bold; text-align: right">
+      {{ order.shipping_address }}
+    </td>
+  </tr>
+</table>
+
+<hr class="divider" />
+
+<!-- Order Items -->
+<h3 style="color: #1a1a2e">Items Ordered:</h3>
+
+<table style="width: 100%; border-collapse: collapse">
+  <thead>
+    <tr style="background-color: #1a1a2e; color: #ffffff">
+      <th style="padding: 10px; text-align: left">Product</th>
+      <th style="padding: 10px; text-align: center">Qty</th>
+      <th style="padding: 10px; text-align: right">Price</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in order.items.all %}
+    <tr style="border-bottom: 1px solid #eeeeee">
+      <td style="padding: 10px">{{ item.product.name }}</td>
+      <td style="padding: 10px; text-align: center">{{ item.quantity }}</td>
+      <td style="padding: 10px; text-align: right">${{ item.price }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+  <tfoot>
+    <tr style="background-color: #f4f4f4">
+      <td colspan="2" style="padding: 10px; font-weight: bold">Total</td>
+      <td
+        style="
+          padding: 10px;
+          text-align: right;
+          font-weight: bold;
+          color: #e94560;
+        "
+      >
+        ${{ order.total_Price }}
+      </td>
+    </tr>
+  </tfoot>
+</table>
+
+<hr class="divider" />
+
+<p style="text-align: center">
+  <a href="{{ order_url }}" class="btn">Track Your Order</a>
+</p>
+
+<p style="color: #888888; font-size: 13px">
+  You will receive another email when your order has been shipped. If you have
+  any questions about your order, feel free to reply to this email.
+</p>
+
+{% endblock %}

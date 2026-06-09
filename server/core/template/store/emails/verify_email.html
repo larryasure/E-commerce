@@ -1,0 +1,24 @@
+{% extends 'store/emails/base.html' %} {% block content %}
+
+<h2>Verify Your Email Address</h2>
+
+<p>Hi <strong>{{ username }}</strong>,</p>
+<p>
+  Thank you for registering with PrimePack! To complete your registration,
+  please verify your email address by clicking the link below
+</p>
+
+<p style="text-align: center">
+  <a href="{{verification_url}}" class="btn">Verify Email Address</a>
+</p>
+
+
+<hr class="divider">
+
+
+<p style="color: #888888; font-size: 13px;">
+    ⚠️ This link expires in <strong>24 hours</strong>. 
+    If you did not create an account with MyShop, you can safely ignore this email.
+</p>
+
+{%endblock %}

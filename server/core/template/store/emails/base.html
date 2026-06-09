@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #eef4ed;
+        }
+
+        .wrapper {
+            width: 100%;
+            background-color: #eef4ed;
+            padding: 40px 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background-color: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 6px 24px rgba(11, 37, 69, 0.12);
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #0b2545, #134074);
+            padding: 45px 30px;
+            text-align: center;
+            border-bottom: 3px solid #8da9c4;
+        }
+
+        .header h1 {
+            color: #eef4ed;
+            margin: 0;
+            font-size: 36px;
+            letter-spacing: 3px;
+            font-weight: 700;
+        }
+
+        .header h1 span {
+            color: #8da9c4;
+        }
+
+        .header-tagline {
+            color: #8da9c4;
+            font-size: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-top: 10px;
+            font-weight: 500;
+        }
+
+        /* Body */
+        .body {
+            padding: 40px 35px;
+            color: #0b2545;
+            line-height: 1.8;
+            font-size: 15px;
+        }
+
+        .body h2 {
+            color: #0b2545;
+            font-size: 24px;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .body p {
+            color: #134074;
+            margin: 15px 0;
+        }
+
+        .body strong {
+            color: #0b2545;
+            font-weight: 600;
+        }
+
+        /* Button */
+        .btn-wrapper {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 14px 40px;
+            background: linear-gradient(135deg, #134074, #0b2545);
+            color: #eef4ed !important;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+        }
+
+        /* Divider */
+        .divider {
+            border: none;
+            border-top: 2px solid #8da9c4;
+            margin: 40px 0;
+            text-align: center;
+        }
+
+        /* Info box */
+        .info-box {
+            background-color: #eef4ed;
+            border-left: 4px solid #8da9c4;
+            padding: 16px 20px;
+            border-radius: 0 6px 6px 0;
+            margin: 20px 0;
+            font-size: 13px;
+            color: #134074;
+            line-height: 1.7;
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, #0b2545, #134074);
+            padding: 30px 30px;
+            text-align: center;
+            color: #8da9c4;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        .footer a {
+            color: #eef4ed;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .footer p {
+            margin: 8px 0;
+        }
+
+        /* Table styles */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table th {
+            background-color: #0b2545;
+            color: #eef4ed;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        table td {
+            padding: 12px;
+            border-bottom: 1px solid #eef4ed;
+            color: #134074;
+        }
+
+        table tr:last-child td {
+            border-bottom: none;
+        }
+
+        table tfoot tr {
+            background-color: #eef4ed;
+        }
+
+        table tfoot td {
+            font-weight: 600;
+            color: #0b2545;
+        }
+
+        ul {
+            color: #134074;
+            line-height: 2;
+        }
+
+        ul li {
+            margin: 8px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="container">
+
+            <!-- Header -->
+            <div class="header">
+                <h1>Prime<span>Pack</span></h1>
+                <p class="header-tagline">Premium Logistics Solutions</p>
+            </div>
+
+            <!-- Body -->
+            <div class="body">
+                {% block content %}
+                {% endblock %}
+            </div>
+
+            <!-- Divider -->
+            <hr class="divider">
+
+            <!-- Footer -->
+            <div class="footer">
+                <p>© 2026 PrimePack. All rights reserved.</p>
+                <p style="margin-top: 12px;">
+                    <a href="#">Privacy Policy</a> &nbsp;|&nbsp;
+                    <a href="#">Terms of Service</a> &nbsp;|&nbsp;
+                    <a href="#">Contact Us</a>
+                </p>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>
