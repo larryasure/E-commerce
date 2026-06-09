@@ -5,6 +5,7 @@ import ErrorPage from "./components/ErrorPage.jsx";
 import Home from "./components/Home.jsx";
 import Login from "./components/Login.jsx";
 import Register from "./components/Register.jsx";
+import { AuthProvider } from "./context/AuthContext.jsx";
 import "./index.css";
 import RootLayout from "./root/RootLayout.jsx";
 
@@ -19,11 +20,24 @@ const router = createBrowserRouter([
       { path: "login", element: <Login /> },
       { path: "*", element: <ErrorPage /> },
     ],
+
+    // {
+    //   path: 'dashboard', 
+
+    // }
+
+
+
+
   },
+
+
 ]);
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </StrictMode>,
 );
