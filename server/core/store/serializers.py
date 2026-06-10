@@ -37,11 +37,12 @@ class UserSerializer(serializers.ModelSerializer):
   profile= UserProfileSerializer(read_only=True)
   password= serializers.CharField(write_only=True)
   email= serializers.EmailField(validators=[UniqueValidator(queryset=User.objects.all(), message="Registration could not be completed with the provided details.")])
+  is_staff= serializers.BooleanField(read_only=True)
   
   
   class Meta:
     model = User
-    fields= ['id', 'username', 'email', "password", 'profile']
+    fields= ['id', 'username', 'email', "password", 'profile', 'is_staff']
     
     
   def create(self, validated_data):
