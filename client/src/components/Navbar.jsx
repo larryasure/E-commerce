@@ -25,11 +25,7 @@ export default function Navbar() {
 
           {/* Center Nav */}
           <div className="hidden md:flex items-center gap-2 bg-slate-100/70 px-4 py-1 rounded-2xl">
-            <NavLink to="/" className={navLinkStyle}>
-              Home
-            </NavLink>
-
-            <NavLink to="/product" className={navLinkStyle}>
+            <NavLink to="/products" className={navLinkStyle}>
               Products
             </NavLink>
 
@@ -130,8 +126,12 @@ export default function Navbar() {
                   Cancel
                 </button>
                 <button
-                  onClick={() => { logout();  setIsModalOpen(false)}}
-                  className="border py-2 px-4 transition-all font-medium duration-300 active:scale-110 cursor-pointer rounded-xl shadow border-red-200 bg-red-50 text-red-600">
+                  onClick={() => {
+                    logout();
+                    setIsModalOpen(false);
+                  }}
+                  className="border py-2 px-4 transition-all font-medium duration-300 active:scale-110 cursor-pointer rounded-xl shadow border-red-200 bg-red-50 text-red-600"
+                >
                   Logout
                 </button>
               </div>
