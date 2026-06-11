@@ -14,7 +14,6 @@ import Profile from "./dashboard/Profile.jsx";
 import "./index.css";
 import ProtectedRoutes from "./protectionRoutes/ProtectedRoutes.jsx";
 import RootLayout from "./root/RootLayout.jsx";
-import Order from "./dashboard/Orders.jsx";
 import Orders from "./dashboard/Orders.jsx";
 import WishList from "./components/WishList.jsx";
 
@@ -24,7 +23,7 @@ const router = createBrowserRouter([
     element: <RootLayout />,
 
     children: [
-      { index: true, element: <Products /> },
+      { index: true, element: <Home /> },
       { path: "register", element: <Register /> },
       { path: "login", element: <Login /> },
       { path: "products", element: <Products /> },

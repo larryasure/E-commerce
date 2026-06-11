@@ -25,6 +25,9 @@ export default function Navbar() {
 
           {/* Center Nav */}
           <div className="hidden md:flex items-center gap-2 bg-slate-100/70 px-4 py-1 rounded-2xl">
+            <NavLink to="/" className={navLinkStyle}>
+              Home
+            </NavLink>
             <NavLink to="/products" className={navLinkStyle}>
               Products
             </NavLink>
