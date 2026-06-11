@@ -1,7 +1,10 @@
 import { Headset, Mail, Shield, Star, Truck } from "lucide-react";
+import { useContext } from "react";
 import { NavLink } from "react-router-dom";
+import { AuthContext } from "../context/AuthContext";
 
 export default function Footer() {
+  const {user} = useContext(AuthContext)
   const stars = [
     { id: 1, color: "text-green-600" },
     { id: 2, color: "text-green-600" },
@@ -29,6 +32,7 @@ export default function Footer() {
               <Mail className="absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
               <input
                 type="email"
+                value={user?.email}
                 placeholder="email@gmail.com"
                 className="w-full py-3 pl-10 pr-24 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none"
               />
