@@ -16,6 +16,7 @@ import ProtectedRoutes from "./protectionRoutes/ProtectedRoutes.jsx";
 import RootLayout from "./root/RootLayout.jsx";
 import Order from "./dashboard/Orders.jsx";
 import Orders from "./dashboard/Orders.jsx";
+import WishList from "./components/WishList.jsx";
 
 const router = createBrowserRouter([
   {
@@ -29,6 +30,7 @@ const router = createBrowserRouter([
       { path: "products", element: <Products /> },
       { path: "product/:id", element: <ProductDetails /> },
       { path: "cart", element: <Cart /> },
+      { path: "wishlist", element: <WishList /> },
 
       {
         path: "dashboard",

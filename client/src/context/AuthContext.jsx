@@ -55,6 +55,7 @@ export const AuthProvider = ({ children }) => {
       if (refreshToken) {
       await axiosInstance.post("logout/", { refresh: refreshToken });
       }
+
     } catch (error) {
       console.error({ "Logout error": error });
     } finally {
@@ -62,6 +63,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem("refresh_token");
       setUser(null);
       setIsAuthenticated(false);
+      
     }
   };
 
