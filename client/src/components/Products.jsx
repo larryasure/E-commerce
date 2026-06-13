@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import axiosInstance from "../api/axiosConfig";
-import HeroCarousel from "../hooks/HeroCarousel";
 
 export default function Products() {
   const [loading, setLoading] = useState(true);
@@ -25,18 +24,5 @@ export default function Products() {
     fetchHomeData();
   }, []);
 
-  return (
-    <>
-      <div className="shadow min-h-screen">
-        {/* Hero Banner Sec */}
-        <section>
-          <HeroCarousel />
-        </section>
-
-        
-
-
-      </div>
-    </>
-  );
+  return <></>;
 }
