@@ -25,5 +25,8 @@ export default function Home() {
     fetchHomeData();
   }, []);
 
+
+  
+
   return <div></div>;
 }
