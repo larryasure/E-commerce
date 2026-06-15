@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axiosInstance from "../api/axiosConfig";
-import HeroCarousel from "../hooks/HeroCarousel";
+import HeroCarousel from "../Carousel/HeroCarousel";
 
+import fallbackImg from "../assets/Hero banner/Fallback.jpg";
 import heroImg from "../assets/Hero banner/hero img.jfif";
-import fallbackImg from "../assets/Hero banner/Fallback.jpg"
+
 export default function Home() {
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
@@ -14,7 +15,7 @@ export default function Home() {
     const fetchHomeData = async () => {
       try {
         const [productsRes, categoriesRes] = await Promise.all([
-          axiosInstance.get("products/"),
+          axiosInstance.get("products/?limit=10"),
           axiosInstance.get("categories/"),
         ]);
 
@@ -30,12 +31,6 @@ export default function Home() {
     fetchHomeData();
   }, []);
 
-  const fallback = (
-    <div className="w-full h-full flex items-center justify-center">
-      <p>Fall back Image</p>
-    </div>
-  );
-
   return (
     <>
       <div className="shadow min-h-screen">
@@ -43,7 +38,7 @@ export default function Home() {
           <HeroCarousel />
         </section>
 
-        <section className="relative px-4 py-20 lg:py-28 sm:px-6 lg:px-8">
+        <section className="relative px-4 py-12 lg:py-16 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto ">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
               {/* Left Content */}
@@ -72,7 +67,7 @@ export default function Home() {
                   </Link>
                   <Link
                     to="/products"
-                    className="border-2 border-[#13315C] text-[#13315C] px-8 py-4 rounded-xl font-bold hover:bg-[#13315C] hover:text-white transition-all duration-300 text-center min-w-[160px]"
+                    className="border-2 border-[#13315C] text-[#13315C] px-5 py-3 rounded-xl font-bold hover:bg-[#13315C] hover:text-white transition-all duration-300 text-center min-w-40"
                   >
                     Explore All
                   </Link>
@@ -100,9 +95,9 @@ export default function Home() {
                   <img
                     src={heroImg}
                     alt="heroImg"
-                    className="w-full h-full object-cover  cursor-pointer rounded-2xl mix-blend-luminosity hover:mix-blend-normal transition-all duration-700 hover:scale-110"
+                    className="w-full h-full object-cover  cursor-pointer rounded-2xl mix-blend-luminosity hover:mix-blend-normal transition-all opacity-70 duration-700 hover:scale-110"
                     onError={(e) => {
-                      e.target.src = { fallback };
+                      e.target.src = fallbackImg;
                     }}
                   />
                 </div>
@@ -123,25 +118,27 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6  ">
+              <div className="grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 grid">
                 {categories.map((category) => (
                   <Link
                     key={category.id}
                     to={`/products?category=${category.id}`}
                     className="relative group h-44 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-[#13315c]"
                   >
-                    <div className="absolute inset bg-linear-t from-[#13315c] via-[#13315c]/40 to-transparent  z-10 opacity-80 group:opacity-90 transition-opacity"></div>
+                    <div className="absolute inset-0 bg-linear-t from-[#13315c] via-[#13315c]/40 to-transparent  z-10 opacity-80 group:opacity-90 transition-opacity"></div>
                     <img
                       src={category.image}
                       alt="categoryImg"
-                      className="h-full w-full object-cover transform hover:scale-110 transition-transform duration-300 "
+                      className="h-44 w-full object-cover transform hover:scale-110 transition-transform duration-300 "
                     />
-                    <div className="p-1 z-20 absolute bottom-1 left-1 ">
-                      <h3 className=" text-white py-0.5 rounded-xl px-4  text-lg hover:translate-x-1 transition-transform bg-[#13315c]">
-                        {category.name}
+                    <div className="p-2 z-20">
+                      <h3 className="absolute left-1 top-0 mt-2 rounded-lg bg-black px-4 py-0.5 text-sm text-white">
+                        <span className="inline-block transition-transform hover:translate-x-5">
+                          {category.name}
+                        </span>
                       </h3>
 
-                      <span className="text-xs text-sky-200 font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-300 block mt-1">
+                      <span className="absolute mb-1 bottom-0 left-0 mt-1  rounded-xl bg-black px-4 py-0.5 text-xs font-medium text-sky-200 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                         Browse Collection &rarr;
                       </span>
                     </div>
@@ -180,7 +177,7 @@ export default function Home() {
                     {/* Product Image */}
                     <div className="relative h-64 bg-gray-50 overflow-hidden">
                       <img
-                        src={product.image}
+                        src={product.image || fallbackImg}
                         alt={product.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
@@ -203,7 +200,10 @@ export default function Home() {
                       </p>
 
                       <div className="flex items-center justify-between pt-4 border-t border-gray-50 mt-auto">
-                        <button className="bg-[#155daf] hover:bg-[#13315C] text-white px-5 py-2 rounded-2xl font-semibold transition">
+                        <button
+                          onClick={() => console.log(product.id)}
+                          className="bg-[#155daf] hover:bg-[#13315C] text-white px-5 py-2 rounded-2xl font-semibold transition"
+                        >
                           Add to Cart
                         </button>
                         <Link

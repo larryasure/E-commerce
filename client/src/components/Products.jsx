@@ -2,27 +2,41 @@ import { useEffect, useState } from "react";
 import axiosInstance from "../api/axiosConfig";
 
 export default function Products() {
-  const [loading, setLoading] = useState(true);
+  const [products, setProducts] = useState();
   const [categories, setCategories] = useState([]);
-  const [featuredProducts, setFeaturedProducts] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTern] = useState("");
 
   useEffect(() => {
-    const fetchHomeData = async () => {
+    const fetchData = async () => {
       try {
-        const [categoriesRes, featuredRes] = await Promise.all([
-          axiosInstance.get("products/"),
+        const [categoriesRes, productRes] = await Promise.all([
           axiosInstance.get("categories/"),
+          axiosInstance.get("products/"),
         ]);
-        setFeaturedProducts(featuredRes.data);
         setCategories(categoriesRes.data);
+        setProducts(productRes.data);
       } catch (error) {
         console.error("Failed to load homepage", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchHomeData();
+    fetchData();
   }, []);
+
+
+
+
+  const filteredProducts = products.filter((product) => {
+    const matchesCategory =
+      !selectedCategory || product.category.id === selectedCategory;
+    const matchesSearch = product.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    return matchesCategory && matchesSearch;
+  });
 
   return <></>;
 }
