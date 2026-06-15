@@ -16,7 +16,7 @@ export default function ProtectedRoutes({ children }) {
   }
 
   if (!isAuthenticated) {
-    return navigate("/products");
+    return navigate("/");
   }
 
   return children;

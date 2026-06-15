@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axiosInstance from "../api/axiosConfig";
 import HeroCarousel from "../Carousel/HeroCarousel";
+import { formatCurrency } from "../utils/formatCurrency";
 
 import fallbackImg from "../assets/Hero banner/Fallback.jpg";
 import heroImg from "../assets/Hero banner/hero img.jfif";
@@ -164,11 +165,11 @@ export default function Home() {
             </div>
 
             {loading && featuredProducts.length === 0 ? (
-              <div className="flex justify-center items-center h-64">
+              <div className="flex justify-center items-center h-54">
                 <div className="h-12 w-12 border-t-3 rounded-full animate-spin border-[#13315C]"></div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 ">
                 {featuredProducts.map((product) => (
                   <div
                     key={product.id}
@@ -181,8 +182,8 @@ export default function Home() {
                         alt={product.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                       />
-                      <div className="absolute top-4 right-4 bg-[#13315C] text-white px-4 py-1.5 rounded-xl text-sm font-bold shadow-md">
-                        #{product.price}
+                      <div className="absolute top-4 right-4 bg-[#13315C] text-white px-2 tracking-wider py-1 text-xs  rounded-xl font-bold shadow-md">
+                        {formatCurrency(product.price)}
                       </div>
                     </div>
 

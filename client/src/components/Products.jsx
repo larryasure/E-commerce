@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 import axiosInstance from "../api/axiosConfig";
 import ProductCard from "./ProductCard";
 
@@ -8,6 +9,14 @@ export default function Products() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [searchParams ]= useSearchParams();
+  const categoryFromUrl = searchParams.get("category");
+  
+  useEffect(() => {
+    if (categoryFromUrl) {
+      setSelectedCategory(parseInt(categoryFromUrl));
+    }
+  }, [categoryFromUrl]); 
 
   useEffect(() => {
     const fetchData = async () => {
@@ -29,12 +38,14 @@ export default function Products() {
 
   const filteredProducts = products.filter((product) => {
     const matchesCategory =
-      !selectedCategory || product.category.id === selectedCategory;
+      !selectedCategory || product.category?.id === selectedCategory;
     const matchesSearch = product.name
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
   });
+
+
 
   return (
     <>
@@ -66,7 +77,7 @@ export default function Products() {
                   )
                 }
                 value={selectedCategory || ""}
-                className="px-4 py-3 border border-[#13315c] focus:outline-0 focus:ring-1 focus:ring-[#155daf] transition-all duration-300"
+                className="px-4 py-3 border border-[#13315c] focus:outline-none focus:ring-1 focus:ring-[#155daf] transition-all duration-300"
               >
                 <option value="">All categories</option>
                 {categories.map((cat) => (
@@ -78,11 +89,11 @@ export default function Products() {
             </div>
           </div>
 
-          {loading ? (
+         {loading ? (
             <div className="flex justify-center items-center h-64">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#155daf]"></div>
             </div>
-          ) : filteredProducts.length > 0 ? (
+          ): filteredProducts.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredProducts.map((product, index) => (
                 <ProductCard
