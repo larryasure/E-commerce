@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axiosInstance from "../api/axiosConfig";
-import heroImg from "../assets/Hero banner/hero img.jfif";
 import HeroCarousel from "../hooks/HeroCarousel";
 
+import heroImg from "../assets/Hero banner/hero img.jfif";
+import fallbackImg from "../assets/Hero banner/Fallback.jpg"
 export default function Home() {
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
@@ -12,19 +13,20 @@ export default function Home() {
   useEffect(() => {
     const fetchHomeData = async () => {
       try {
-        const [categoriesRes, featuredRes] = await Promise.all([
+        const [productsRes, categoriesRes] = await Promise.all([
           axiosInstance.get("products/"),
           axiosInstance.get("categories/"),
         ]);
-        setFeaturedProducts(featuredRes.data);
+
+        setFeaturedProducts(productsRes.data.slice(0, 7));
         setCategories(categoriesRes.data);
-        console.log(setCategories);
       } catch (error) {
-        console.error("Failed to load homepage", error);
+        console.error("Failed to fetch Homepage data", error);
       } finally {
         setLoading(false);
       }
     };
+
     fetchHomeData();
   }, []);
 
@@ -37,12 +39,10 @@ export default function Home() {
   return (
     <>
       <div className="shadow min-h-screen">
-        {/* Hero Banner Sec */}
         <section>
           <HeroCarousel />
         </section>
 
-        {/* Hero texts */}
         <section className="relative px-4 py-20 lg:py-28 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto ">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -94,7 +94,6 @@ export default function Home() {
                 </div>
               </div>
 
-              {/* Right Visual */}
               <div className="hidden lg:block lg:col-span-5 relative">
                 <div className="absolute inset-0 bg-linear-to-tr from-[#13315C]/20 to-transparent rounded-3xl filter blur-2xl -z-10 transform scale-95 translate-y-4"></div>
                 <div className="bg-linear-to-br from-[#13315C] to-[#155daf] rounded-3xl p-4 shadow-2xl overflow-hidden aspect-square flex items-center justify-center">
@@ -153,71 +152,74 @@ export default function Home() {
           </section>
         )}
 
-            <section className="py-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <span className="text-sm font-bold text-[#155daf] uppercase tracking-widest">Our Picks</span>
-            <h2 className="text-4xl font-black text-[#13315C] mt-2 tracking-tight">
-              Featured Products
-            </h2>
-            <p className="text-gray-500 text-lg mt-3 max-w-md mx-auto">
-              Handpicked selections of premium quality items just for you
-            </p>
+        <section className="py-20 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <div className="text-center mb-16">
+              <span className="text-sm font-bold text-[#155daf] uppercase tracking-widest">
+                Our Picks
+              </span>
+              <h2 className="text-4xl font-black text-[#13315C] mt-2 tracking-tight">
+                Featured Products
+              </h2>
+              <p className="text-gray-500 text-lg mt-3 max-w-md mx-auto">
+                Handpicked selections of premium quality items just for you
+              </p>
+            </div>
+
+            {loading && featuredProducts.length === 0 ? (
+              <div className="flex justify-center items-center h-64">
+                <div className="h-12 w-12 border-t-3 rounded-full animate-spin border-[#13315C]"></div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {featuredProducts.map((product) => (
+                  <div
+                    key={product.id}
+                    className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 flex flex-col h-full"
+                  >
+                    {/* Product Image */}
+                    <div className="relative h-64 bg-gray-50 overflow-hidden">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute top-4 right-4 bg-[#13315C] text-white px-4 py-1.5 rounded-xl text-sm font-bold shadow-md">
+                        #{product.price}
+                      </div>
+                    </div>
+
+                    {/* Product Info */}
+                    <div className="p-6 flex flex-col grow">
+                      <span className="text-xs text-[#155daf] font-bold tracking-wider uppercase mb-2 block">
+                        {product.category?.name || "Premium Line"}
+                      </span>
+                      <h3 className="text-lg font-bold text-[#13315C] mb-2 line-clamp-1 group-hover:text-[#155daf] transition-colors">
+                        {product.name}
+                      </h3>
+                      <p className="text-gray-500 text-sm mb-6 line-clamp-2 leading-relaxed grow">
+                        {product.description ||
+                          "Indulge in our carefully engineered premium items built for absolute comfort and longevity."}
+                      </p>
+
+                      <div className="flex items-center justify-between pt-4 border-t border-gray-50 mt-auto">
+                        <button className="bg-[#155daf] hover:bg-[#13315C] text-white px-5 py-2 rounded-2xl font-semibold transition">
+                          Add to Cart
+                        </button>
+                        <Link
+                          to={`/products/${product.id}`}
+                          className="text-sm font-bold text-[#13315C] hover:text-[#155daf] transition"
+                        >
+                          View Details
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-
-          {loading ? (
-            <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#13315C]"></div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {featuredProducts.map((product) => (
-                <div
-                  key={product.id}
-                  className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 flex flex-col h-full"
-                >
-                  {/* Product Image */}
-                  <div className="relative h-64 bg-gray-50 overflow-hidden">
-                    <img
-                      src={product.image }
-                      alt={product.name}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                    <div className="absolute top-4 right-4 bg-[#13315C] text-white px-4 py-1.5 rounded-xl text-sm font-bold shadow-md">
-                      #{product.price}
-                    </div>
-                  </div>
-
-                  {/* Product Info */}
-                  <div className="p-6 flex flex-col flex-grow">
-                    <span className="text-xs text-[#155daf] font-bold tracking-wider uppercase mb-2 block">
-                      {product.category?.name || "Premium Line"}
-                    </span>
-                    <h3 className="text-lg font-bold text-[#13315C] mb-2 line-clamp-1 group-hover:text-[#155daf] transition-colors">
-                      {product.name}
-                    </h3>
-                    <p className="text-gray-500 text-sm mb-6 line-clamp-2 leading-relaxed flex-grow">
-                      {product.description || "Indulge in our carefully engineered premium items built for absolute comfort and longevity."}
-                    </p>
-
-                    <div className="flex items-center justify-between pt-4 border-t border-gray-50 mt-auto">
-                      <button className="bg-[#155daf] hover:bg-[#13315C] text-white px-5 py-2 rounded-2xl font-semibold transition">
-                        Add to Cart
-                      </button>
-                      <Link
-                        to={`/products/${product.id}`}
-                        className="text-sm font-bold text-[#13315C] hover:text-[#155daf] transition"
-                      >
-                        View Details
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
+        </section>
       </div>
     </>
   );
