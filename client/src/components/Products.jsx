@@ -38,5 +38,9 @@ export default function Products() {
     return matchesCategory && matchesSearch;
   });
 
-  return <></>;
+  return <>
+    <div className="min-h-screen py-12">
+
+    </div>
+  </>;
 }
