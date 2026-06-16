@@ -9,14 +9,14 @@ export default function Products() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchParams ]= useSearchParams();
+  const [searchParams] = useSearchParams();
   const categoryFromUrl = searchParams.get("category");
-  
+
   useEffect(() => {
     if (categoryFromUrl) {
       setSelectedCategory(parseInt(categoryFromUrl));
     }
-  }, [categoryFromUrl]); 
+  }, [categoryFromUrl]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,8 +44,6 @@ export default function Products() {
       .includes(searchTerm.toLowerCase());
     return matchesCategory && matchesSearch;
   });
-
-
 
   return (
     <>
@@ -89,11 +87,11 @@ export default function Products() {
             </div>
           </div>
 
-         {loading ? (
+          {loading ? (
             <div className="flex justify-center items-center h-64">
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#155daf]"></div>
             </div>
-          ): filteredProducts.length > 0 ? (
+          ) : filteredProducts.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredProducts.map((product, index) => (
                 <ProductCard
