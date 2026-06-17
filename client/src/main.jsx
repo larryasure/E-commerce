@@ -57,7 +57,7 @@ const router = createBrowserRouter([
         ),
       },
       {
-        path: "order",
+        path: "orders",
         element: (
           <ProtectedRoutes>
             <Orders />
