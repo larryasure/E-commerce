@@ -92,6 +92,24 @@ export default function Login() {
             Login to your account
           </p>
 
+          <div className="mt-6">
+            {errors.password && (
+              <span className="text-xs text-red-500 ">{errors.password}</span>
+            )}
+
+            {success && (
+              <div className="mb-3 p-1 text-center bg-green-100 border border-green-200 rounded-lg shadow">
+                <p className="text-xs text-green-600">{success}</p>
+              </div>
+            )}
+
+            {errors.submit && (
+              <div className="mb-3 p-1 bg-red-100 text-center border-red-200 border shadow rounded-lg ">
+                <p className="text-xs text-red-600 ">{errors.submit}</p>
+              </div>
+            )}
+          </div>
+
           <form className="mt-7 space-y-7" onSubmit={handleSubmit}>
             <div>
               <label className="block mb-2 text-[#155daf] ">Username</label>
@@ -120,23 +138,7 @@ export default function Login() {
                 placeholder="Enter your Password"
                 className={`w-full px-4 py-2 rounded-lg border border-[#0b52b5] focus:outline-0 focus:ring-1 focus:ring-[#0b52b5] placeholder:text-sm transition-all duration-300 ${errors.password ? "border-red-400" : "border-[#0b52b5]"}`}
               />
-
-              {errors.password && (
-                <span className="text-xs text-red-500 ">{errors.password}</span>
-              )}
             </div>
-
-            {success && (
-              <div className="mb-3 p-1.5 text-center bg-green-100 border border-green-200 rounded-lg shadow">
-                <p className="text-xs text-green-600">{success}</p>
-              </div>
-            )}
-
-            {errors.submit && (
-              <div className="mb-3 p-1.5 bg-red-100 text-center border-red-200 border shadow rounded-lg ">
-                <p className="text-xs text-red-600 ">{errors.submit}</p>
-              </div>
-            )}
 
             <button
               type="submit"

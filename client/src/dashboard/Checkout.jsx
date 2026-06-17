@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axiosConfig";
 import { AuthContext } from "../context/AuthContext";
+import { formatCurrency } from "../utils/formatCurrency";
 
 export default function Checkout() {
   const navigate = useNavigate();
@@ -94,20 +95,124 @@ export default function Checkout() {
     <>
       <div className="min-h-screen py-12">
         <div className="mx-auto max-w-6xl px-4 md:px-6 lg:px-8 ">
-          <h2 className="text-3xl font-bold text-[#13315c] mb-8  ">Checkout </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          <h2 className="text-3xl font-bold text-[#13315c] mb-8  ">
+            Checkout{" "}
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
             <div className="lg:col-span-2">
               <div className="bg-white p-6 rounded-xl shadow-lg animate-fadeInOut">
                 <form className="space-y-4" onSubmit={handleSubmit}>
-                  
-                </form>
+                  <div>
+                    <label className="font-medium text-[#155daf] text-sm block mb-2 ">
+                      Shipping Address
+                    </label>
+                    <textarea
+                      value={formData.shippingAddress}
+                      onChange={handleChange}
+                      name="shippingAddress"
+                      rows="3"
+                      placeholder="Enter your shipping address"
+                      className={`px-4 py-2 w-full border focus-outline-none focus:ring transition-all duration-300 placeholder:text-sm ${errors.shippingAddress ? "border-red-500 focus:ring-red-500" : "border-[#155daf] focus:ring-[#155daf]"}`}
+                    ></textarea>
+                    {errors.shippingAddress && (
+                      <div className="text-xs text-red-500 mt-1">
+                        {errors.shippingAddress}
+                      </div>
+                    )}
+                  </div>
+                  <div className="pt-6 border-t border-[#13315c]">
+                    <h3 className="text-lg font-medium text-[#13315c] mb-4 ">
+                      Order Items
+                    </h3>
 
+                    <div className="space-y-3">
+                      {cartItems.map((item) => (
+                        <div
+                          className="flex items-center justify-between p-4 bg-sky-50 rounded-lg"
+                          key={item.id}
+                        >
+                          <div>
+                            <p className="text-sm font-medium text-[#13315c] ">
+                              {item.name}
+                            </p>
+
+                            <p className="text-sm text-gray-500 mt-0.5">
+                              Qty: {item.quantity}
+                            </p>
+                          </div>
+
+                          <p className="text-[#155daf] text-sm tracking-wider font-medium">
+                            {formatCurrency(item.price * item.quantity)}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  {errors.submit && (
+                    <div className="bg-red-100 text-red-500 p-1 px-2 rounded-lg border border-red-300 ">
+                      {errors.submit}
+                    </div>
+                  )}
+
+                  {success && (
+                    <p className="text-xs text-green-500 bg-green-100 p-0.5 ">
+                      {success}
+                    </p>
+                  )}
+
+                  <button
+                    className="w-full bg-[#155daf]  text-white py-4 rounded-lg font-bold text-lg hover:bg-[#13315C] disabled:bg-gray-400 transition-all duration-300 transform hover:scale-105 active:scale-95"
+                    disabled={checkoutLoading}
+                    type="submit"
+                  >
+                    {checkoutLoading ? "Processing" : "Place Order"}
+                  </button>
+                </form>
               </div>
-              
+            </div>
+            <div className="lg:col-span-2">
+              <div className="bg-white rounded-xl p-6 shadow-2xs  top-20 animate-fadeInUp">
+                <div>
+                  <h2 className="text-[#13315c] font-semibold text-lg ">
+                    Order Total
+                  </h2>
+                </div>
+                <div className="space-y-3 border-b pb-4   ">
+                  <div className="flex items-center justify-between text-gray-600">
+                    <span>Subtotal</span>
+                    <span className="text-[#13315c] font-medium text-sm tracking-wider]">
+                      {formatCurrency(total)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-gray-600">
+                    <span>Shipping</span>
+                    {total > 150000 ? (
+                      <span className="text-sm text-green-600 font-medium">
+                        Free
+                      </span>
+                    ) : (
+                      <span className="text-sm text-[#13315c] font-medium ">
+                        #3500.00
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex justify-between items-center pt-7 ">
+                    <span className="font-bold text-[#13315C]">Total</span>
+                    <span className="text-lg tracking-wider font-bold text-[#155daf]">
+                      {formatCurrency(total)}
+                    </span>
+                  </div>
+
+                  <div className="bg-[#155daf]/10 rounded-lg p-4 space-y-2 text-sm text-[#13315C] pt-7 ">
+                    <p className="text-sm font-medium">✓ Secure payment</p>
+                    <p className="text-sm font-medium">✓ Fast delivery</p>
+                    <p className="text-sm font-medium">✓ 30-day returns</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
-
       </div>
     </>
   );

@@ -17,6 +17,8 @@ import RootLayout from "./root/RootLayout.jsx";
 import Orders from "./dashboard/Orders.jsx";
 import WishList from "./components/WishList.jsx";
 import Checkout from "./dashboard/Checkout.jsx";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const router = createBrowserRouter([
   {
@@ -72,7 +74,9 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
+
     <AuthProvider>
+      <ToastContainer position="top-center " autoClose={ 3000}  />
       <RouterProvider router={router} />
     </AuthProvider>
   </StrictMode>,
