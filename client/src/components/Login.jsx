@@ -53,7 +53,7 @@ export default function Login() {
       if (result.success) {
         setSuccess("Login successful, Please wait...");
         setTimeout(() => {
-          navigate("/dashboard");
+          navigate("/");
         }, 2000);
       } else {
         if (result.error) {

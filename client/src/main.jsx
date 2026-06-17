@@ -16,12 +16,12 @@ import ProtectedRoutes from "./protectionRoutes/ProtectedRoutes.jsx";
 import RootLayout from "./root/RootLayout.jsx";
 import Orders from "./dashboard/Orders.jsx";
 import WishList from "./components/WishList.jsx";
+import Checkout from "./dashboard/Checkout.jsx";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <RootLayout />,
-
     children: [
       { index: true, element: <Home /> },
       { path: "register", element: <Register /> },
@@ -30,7 +30,16 @@ const router = createBrowserRouter([
       { path: "products/:id", element: <ProductDetails /> },
       { path: "cart", element: <Cart /> },
       { path: "wishlist", element: <WishList /> },
-
+      
+      // Protected routes
+      {
+        path: "checkout",
+        element: (
+          <ProtectedRoutes>
+            <Checkout />
+          </ProtectedRoutes>
+        ),
+      },
       {
         path: "dashboard",
         element: (
@@ -39,7 +48,6 @@ const router = createBrowserRouter([
           </ProtectedRoutes>
         ),
       },
-
       {
         path: "profile",
         element: (
@@ -48,9 +56,8 @@ const router = createBrowserRouter([
           </ProtectedRoutes>
         ),
       },
-
-        {
-        path: "orders",
+      {
+        path: "order",
         element: (
           <ProtectedRoutes>
             <Orders />
