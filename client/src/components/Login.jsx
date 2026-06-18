@@ -98,13 +98,13 @@ export default function Login() {
             )}
 
             {success && (
-              <div className="mb-3 p-0.5 text-center bg-green-100 border border-green-200 rounded-lg shadow">
+              <div className="mb-3 p-0.5 text-center bg-green-50 border border-green-200 rounded-md shadow">
                 <p className="text-xs text-green-600">{success}</p>
               </div>
             )}
 
             {errors.submit && (
-              <div className="mb-3 p-0.5 bg-red-100 text-center border-red-200 border shadow rounded-lg ">
+              <div className="mb-3 p-0.5 bg-red-50 text-center border-red-100 border shadow rounded-md ">
                 <p className="text-xs text-red-600 ">{errors.submit}</p>
               </div>
             )}
