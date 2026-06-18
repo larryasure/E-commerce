@@ -1,22 +1,21 @@
-import { Outlet, ScrollRestoration } from "react-router-dom";
+import { Outlet, ScrollRestoration, useLocation } from "react-router-dom";
 import Footer from "../components/Footer";
 import Navbar from "../components/Navbar";
 
 export default function RootLayout() {
+  const location = useLocation();
+  const isAdmin = location.pathname.startsWith("/admin");
+
   return (
     <>
-      <header>
-        <Navbar />
-      </header>
+      <header>{!isAdmin && <Navbar />}</header>
 
-      <main className="min-h-screen  px-6 py-7 ">
+      <main className="min-h-screen  ">
         <Outlet />
         <ScrollRestoration />
       </main>
 
-      <footer>
-        <Footer />
-      </footer>
+      <footer>{!isAdmin && <Footer />}</footer>
     </>
   );
 }

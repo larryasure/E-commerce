@@ -37,10 +37,12 @@ axiosInstance.interceptors.response.use(
         if (!refreshToken) {
           localStorage.removeItem("refresh_token");
           localStorage.removeItem("access_token");
-          window.location.href ="/login";
+          setTimeout(() => {
+            window.location.href = "/login";
+          }, 100);
           return Promise.reject(error);
         }
-        const response = await refreshApi.post(`token/refresh`, {
+        const response = await refreshApi.post(`token/refresh/`, {
           refresh: refreshToken,
         });
 
@@ -48,11 +50,15 @@ axiosInstance.interceptors.response.use(
         localStorage.setItem("access_token", newAccessToken);
 
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-        return axiosInstance(originalRequest);
+        return axios(originalRequest);
       } catch (refreshError) {
         localStorage.removeItem("refresh_token");
         localStorage.removeItem("access_token");
-        window.location.href ="/login";
+        
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 100);
+
         return Promise.reject(refreshError);
       }
     }
