@@ -8,7 +8,7 @@ import {
   X,
 } from "lucide-react";
 import { useContext, useState } from "react";
-import { Link, Outlet, useNavigate } from "react-router-dom";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import avatar from "../../assets/Hero banner/Avatar.jpg";
 import logoutImage from "../../assets/Hero banner/logout2.jpg";
 import { AuthContext } from "../../context/AuthContext";
@@ -23,6 +23,7 @@ export default function AdminLayout() {
   const handleLogout = async () => {
     await logout();
     navigate("/products");
+    setIsModalOpen(false);
   };
 
   const menuItems = [
@@ -53,6 +54,13 @@ export default function AdminLayout() {
     },
   ];
 
+const navClass = ({ isActive }) =>
+  `flex flex-col items-center px-4 py-1.5 rounded-lg hover:text-white transition-colors duration-300 text-sm font-medium ${
+    isActive ? "bg-white/10 text-white border border-white/20" : "text-[#8da9c4]"
+  }`;
+
+
+ 
   return (
     <>
       <div className="min-h-screen flex bg-gray-50">
@@ -63,7 +71,7 @@ export default function AdminLayout() {
         >
           <div className="py-4.5 px-3.5 border-b border-dashed border-[#155daf]">
             <div className="items-center flex justify-between ">
-              <Link
+              <NavLink
                 to="/"
                 className=" font-bold hover:opacity-85 transition-colors"
               >
@@ -72,7 +80,7 @@ export default function AdminLayout() {
                     Prime<span className="text-[#1e71d1]">Pack</span>
                   </span>
                 )}
-              </Link>
+              </NavLink>
 
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -94,13 +102,9 @@ export default function AdminLayout() {
               className={`flex flex-col gap-8 ${sidebarOpen ? "items-start" : "items-center"}`}
             >
               {menuItems.map((item) => (
-                <Link
-                  key={item.path}
-                  to={item.path}
-                  className="flex flex-col items-center rounded-lg hover:text-[#155daf] transition-colors duration-300 text-sm font-medium"
-                >
+                <NavLink end key={item.path} to={item.path} className={navClass}>
                   {sidebarOpen ? item.label : item.icon}
-                </Link>
+                </NavLink>
               ))}
             </div>
           </nav>
@@ -175,10 +179,7 @@ export default function AdminLayout() {
                   Cancel
                 </button>
                 <button
-                  onClick={() => {
-                    logout();
-                    setIsModalOpen(false);
-                  }}
+                  onClick={handleLogout}
                   className="border py-2 px-4 transition-all font-medium duration-300 active:scale-110 cursor-pointer rounded-xl shadow border-red-200 bg-red-50 text-red-600"
                 >
                   Logout

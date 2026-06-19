@@ -94,17 +94,17 @@ export default function Login() {
 
           <div className="mt-6">
             {errors.password && (
-              <span className="text-xs text-red-500 ">{errors.password}</span>
+              <span className="text-xs text-red-500">{errors.password}</span>
             )}
 
             {success && (
-              <div className="mb-3 p-0.5 text-center bg-green-50 border border-green-200 rounded-md shadow">
+              <div className="mb-3  text-center">
                 <p className="text-xs text-green-600">{success}</p>
               </div>
             )}
 
             {errors.submit && (
-              <div className="mb-3 p-0.5 bg-red-50 text-center border-red-100 border shadow rounded-md ">
+              <div className="mb-3   text-center  rounded-md  ">
                 <p className="text-xs text-red-600 ">{errors.submit}</p>
               </div>
             )}

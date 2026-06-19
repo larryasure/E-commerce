@@ -24,3 +24,25 @@ dist-ssr
 *.sw?
 *.env
 
+# --- Python Backend ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+
+# --- React Frontend ---
+client/node_modules/
+client/build/
+client/dist/
+.eslintcache
+
+# --- Editors and System ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+**/Untitled-1.*
