@@ -107,7 +107,7 @@ export default function AdminDashboard() {
 
             {/* 2. Changed to Link and 'to' */}
             <NavLink
-              to="/admin/categories/new"
+              to="/admin/categories/"
               className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition-colors font-semibold text-center"
             >
               Add New Category
