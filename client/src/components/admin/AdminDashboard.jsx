@@ -41,7 +41,7 @@ export default function AdminDashboard() {
           totalUsers: userRes.data.length,
         });
       } catch (error) {
-        console.error("Failed to load Stats", error);
+        console.error("Failed to load Stats", error)
       } finally {
         setLoading(false);
       }

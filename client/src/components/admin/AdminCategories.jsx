@@ -1,6 +1,6 @@
+import { X } from "lucide-react";
 import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axiosConfig";
-import {X, Menu} from "lucide-react"
 
 export default function AdminCategories() {
   const [loading, setLoading] = useState(false);
@@ -24,7 +24,7 @@ export default function AdminCategories() {
     } catch (error) {
       console.error(error);
       setError("Failed to load categories");
-    } 
+    }
   };
 
   const handleSubmitCat = async (e) => {
@@ -52,7 +52,6 @@ export default function AdminCategories() {
           },
         });
         setSuccess("Updated successfully!");
-
       } else {
         await axiosInstance.post("categories/", payload, {
           headers: {
@@ -80,7 +79,8 @@ export default function AdminCategories() {
   const handleDelete = async (id) => {
     try {
       await axiosInstance.delete(`categories/${id}/`);
-      setCategories(categories.filter((cat) => cat.id !== id));
+      setCategories((prev) => prev.filter((cat) => cat.id !== id));
+
       setShowDeleteModal(false);
     } catch (error) {
       console.error(error);
@@ -110,11 +110,6 @@ export default function AdminCategories() {
       </div>
     );
   }
-
-  // const filteredCategories = categories.filter((cat) => (
-  //   cat.toLowerCase()
-  // ))
-  
 
   return (
     <>
@@ -205,8 +200,15 @@ export default function AdminCategories() {
         <div className="fixed bg-black/50 backdrop-blur-sm inset-0 flex items-center justify-center z-50 ">
           <div className="bg-white items-center justify-center p-8 rounded-xl max-w-md w-full ">
             <div className="space-y-3">
+              <div className="items-center flex justify-between">
+
               <div className="text-xl font-bold text-[#13315c]">
                 {editingId ? "Edit Category" : "Add Category"}
+                </div>
+                <div onClick={() => setShowFormModal(false)}  className="w-7 h-7 bg-red-300  flex items-center justify-center rounded-md ">
+                <X className="text-red-500   "/>
+
+                </div>
               </div>
 
               <form className="space-y-6" onSubmit={handleSubmitCat}>
@@ -273,31 +275,42 @@ export default function AdminCategories() {
         </div>
       )}
 
-      {
-        showDeleteModal && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center z-50 ">
-            <div className="bg-white p-8  rounded-xl shadow max-w-sm w-full flex items-center flex-col gap-2">
-              <div onClick={() => setShowDeleteModal(null) } className="w-10 h-10 bg-red-300 rounded-full shadow flex items-center justify-center ">
-                <X className="text-red-500 cursor-pointer active:scale-105  "/>
-              </div>
-              <div className="">
-                  <h2 className="text-[#13315c] font-bold text-xl ">Delete Category!</h2>
-              </div>
-
-              <div className="mt-2 text-center ">
-                <p>Are you sure you want to delete this category?</p>
-              </div>
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center z-50 ">
+          <div className="bg-white p-8  rounded-xl shadow max-w-xs w-full flex items-center flex-col gap-2">
+            <div
+              onClick={() => setShowDeleteModal(false)}
+              className="w-10 h-10 bg-red-300 rounded-full shadow flex items-center justify-center "
+            >
+              <X className="text-red-500 cursor-pointer active:scale-105  " />
+            </div>
+            <div className="">
+              <h2 className="text-[#13315c] font-bold text-xl ">
+                Delete Category!
+              </h2>
             </div>
 
-            
-            <div className="mt-6 ">
-
+            <div className="mt-2 text-center ">
+              <p>Are you sure you want to delete this category?</p>
             </div>
-            
 
+            <div className="mt-4 grid gap-12 grid-cols-2 ">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="px-4 py-2 bg-[#155daf] hover:bg-[#13315c] active:scale-110 text-white font-medium rounded-md "
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDelete(selectedCategory.id)}
+                className="bg-red-300 text-red-500 font-medium rounded-md active:scale-110 hover:bg-red-400 hover:text-white transition-all duration-300 "
+              >
+                Delete
+              </button>
+            </div>
           </div>
-        )
-}
+        </div>
+      )}
     </>
   );
 }
