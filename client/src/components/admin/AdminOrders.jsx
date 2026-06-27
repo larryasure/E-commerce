@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
 import axiosInstance from "../../api/axiosConfig";
 
+import { NavLink } from "react-router-dom";
+import { formatCurrency } from "../../utils/formatCurrency";
+
 export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filterStatus, setFilterStatus] = useState("");
-
+   
   useEffect(() => {
     const fetchOrders = async () => {
       setLoading(true);
@@ -42,6 +45,15 @@ export default function AdminOrders() {
     }
   };
 
+  const handleDelete = async (id) => {
+    try {
+      await axiosInstance.delete(`orders/${id}/`);
+      setOrders((prev) => prev.filter((order) => order.id !== id));
+    } catch (error) {
+      console.error("Failed to delete Order");
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-96 ">
@@ -60,7 +72,7 @@ export default function AdminOrders() {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-4 py-3 border-2 border-[#155daf] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#155daf]"
+                className="px-6 py-3 border-2 border-[#155daf] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#155daf]"
               >
                 <option value="">All Orders</option>
                 <option value="PROCESSING">Processing</option>
@@ -71,7 +83,81 @@ export default function AdminOrders() {
             </div>
           </div>
 
-          
+          <div className="bg-gray-50 rounded-xl overflow-hidden shadow-md">
+            <table className="w-full">
+              <thead className="text-white bg-[#13315c]">
+                <tr>
+                  <th className="px-6 py-4 font-semibold text-left text-sm">
+                    Order ID
+                  </th>
+                  <th className="px-6 py-4 font-semibold text-left text-sm">
+                    Customer
+                  </th>
+                  <th className="px-6 py-4 font-semibold text-left text-sm">
+                    Total
+                  </th>
+                  <th className="px-6 py-4 font-semibold text-left text-sm">
+                    Status
+                  </th>
+                  <th className="px-6 py-4 font-semibold text-left text-sm">
+                    Date
+                  </th>
+                  <th className="px-6 py-4 font-semibold text-left text-sm">
+                    Action
+                  </th>
+                </tr>
+              </thead>
+
+              <tbody className="divide-y">
+                {filteredOrders.length > 0 ? (
+                  filteredOrders.map((order) => (
+                    <tr
+                      className="bg-gray hover:bg-gray-50 duration-300 transition-all"
+                      key={order.key}
+                    >
+                      <td className="text-[#13315c] py-4 px-6 font-medium">
+                        # {order.id}
+                      </td>
+                      <td className="text-gray-600 py-4 px-6 font-medium capitalize ">
+                        {order.user?.username || "Guest"}
+                      </td>
+                      <td className="text-[#155daf]">
+                        {formatCurrency(order.price)}
+                      </td>
+                      <td className="px-6 py-4">
+                        <span
+                          className={`px-3 py-1 rounded-md text-sm font-medium ${getStatusColor(
+                            order.order_status,
+                          )}`}
+                        >
+                          {order.order_status}
+                        </span>
+                      </td>
+
+                      <td className="px-6 py-4 text-gray-600">
+                        {new Date(order.created_at).toLocaleString()}
+                      </td>
+                      <td className="px-6 py-4">
+                        <NavLink
+                          end
+                          to={`/admin/orders/${order.id}`}
+                          className="text-[#155daf] hover:text-[#13315C] font-semibold"
+                        >
+                          View
+                        </NavLink>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan="6" className="px-6 py-4 text-[#13315c]">
+                      No Order found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </>

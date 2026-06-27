@@ -205,8 +205,8 @@ export default function AdminCategories() {
               <div className="text-xl font-bold text-[#13315c]">
                 {editingId ? "Edit Category" : "Add Category"}
                 </div>
-                <div onClick={() => setShowFormModal(false)}  className="w-7 h-7 bg-red-300  flex items-center justify-center rounded-md ">
-                <X className="text-red-500   "/>
+                <div onClick={() => setShowFormModal(false)}  className="w-7 h-7 bg-red-300   hover:bg-red-400 flex items-center justify-center rounded-md  duration-300 transition-all">
+                <X className="text-red-500  cursor-pointer  hover:text-white  active:scale-105 "/>
 
                 </div>
               </div>

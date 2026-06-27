@@ -92,12 +92,12 @@ export default function AdminProductForm() {
         alert("Product updated successfully");
       } else {
         await axiosInstance.post("/products/", data);
-        alert("Product created successfully");
+        navigate("admin/product")
       }
 
       navigate("/admin/products");
     } catch (error) {
-      alert("Failed to save product");
+      
       console.error(error);
     } finally {
       setLoading(false);
