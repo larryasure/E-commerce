@@ -18,6 +18,7 @@ export default function AdminProductForm() {
   });
   const [errors, setErrors] = useState({});
 
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -98,7 +99,7 @@ export default function AdminProductForm() {
       navigate("/admin/products");
     } catch (error) {
       console.log(error);
-
+      
       console.error(error.response?.data);
       console.log(error.response?.data);
     } finally {
