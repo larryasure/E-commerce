@@ -88,17 +88,19 @@ export default function AdminProductForm() {
       };
 
       if (id) {
-        await axiosInstance.put(`/products/${id}/`, data);
+        await axiosInstance.put(`products/${id}/`, data);
         alert("Product updated successfully");
       } else {
-        await axiosInstance.post("/products/", data);
-        navigate("admin/product")
+        await axiosInstance.post("products/", data);
+        navigate("admin/product");
       }
 
       navigate("/admin/products");
     } catch (error) {
-      
-      console.error(error);
+      console.log(error);
+
+      console.error(error.response?.data);
+      console.log(error.response?.data);
     } finally {
       setLoading(false);
     }
@@ -187,6 +189,9 @@ export default function AdminProductForm() {
 
             <input
               type="file"
+              onChange={(e) =>
+                setFormData((prev) => ({ ...prev, image: e.target.files[0] }))
+              }
               className="file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-[#155daf]/10 file:text-[#155daf] hover:file:bg-[#155daf]/20 text-sm text-gray-500 cursor-pointer"
             />
           </div>
@@ -219,11 +224,9 @@ export default function AdminProductForm() {
               onChange={handleChange}
               className={`w-full px-4 py-2 border border-[#13315c] focus:ring focus:outline-none transition-all duration-300 focus:ring-[#13315c] rounded-xl ${errors.stock ? "border-red-500 focus:ring-offset-red-500" : "focus:ring-[#155daf] border-[#155daf]"} `}
             />
-            {
-              errors.stock && (
-                <span className="text-xs text-red-500 mt-1 ">{ errors.stock}</span>
-              )
-            }
+            {errors.stock && (
+              <span className="text-xs text-red-500 mt-1 ">{errors.stock}</span>
+            )}
           </div>
 
           {/* Description */}
