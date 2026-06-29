@@ -151,7 +151,7 @@ export default function ProductDetails() {
             </div>
 
             {/* Price Card */}
-            <div className="bg-gradient-to-r from-[#13315C] to-[#155daf] rounded-3xl p-7 text-white shadow-xl">
+            <div className="bg-linear-to-r from-[#13315C] to-[#155daf] rounded-3xl p-7 text-white shadow-xl">
               <p className="uppercase tracking-widest text-sm opacity-80 mb-2">
                 Price
               </p>

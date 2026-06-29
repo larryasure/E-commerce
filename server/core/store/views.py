@@ -47,7 +47,6 @@ class UserProfileViewSet(viewsets.ModelViewSet):
   def perform_update(self, serializer):
     serializer.save(user= self.request.user)
       
-
 class UserViewSet(viewsets.ModelViewSet):
   queryset= User.objects.all()
   serializer_class=UserSerializer
@@ -66,8 +65,6 @@ class UserViewSet(viewsets.ModelViewSet):
     uid= urlsafe_base64_encode(force_bytes(user.pk))
     verification_url = f"http://localhost:3000/verify-email/{uid}/{token}/"
     send_verification_email(user, verification_url)
-
-
 class OrderViewSet(viewsets.ModelViewSet):
   serializer_class=OrderSerializer
   permission_classes=[permissions.IsAuthenticatedOrReadOnly]  
@@ -82,6 +79,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     send_order_confirmation_email(self.request.user, order)
    
    
+   
 class UserProfileUpdateView(generics.UpdateAPIView):
   serializer_class= UserProfileSerializer
   permission_classes= [permissions.IsAuthenticated]
@@ -90,6 +88,10 @@ class UserProfileUpdateView(generics.UpdateAPIView):
     return self.request.user.profile
   
    
+class UserViewSet(viewsets.ModelViewSet):
+  queryset = User.objects.all()
+  serializer_class = UserSerializer
+  permission_classes= [permissions.IsAdminUser]
     
 @api_view(['GET'])
 def get_current_user(request):

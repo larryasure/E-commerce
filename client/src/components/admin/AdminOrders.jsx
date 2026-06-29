@@ -22,7 +22,6 @@ export default function AdminOrders() {
         setLoading(false);
       }
     };
-
     fetchOrders();
   }, []);
 
@@ -135,7 +134,7 @@ export default function AdminOrders() {
                       </td>
 
                       <td className="px-6 py-4 text-gray-600">
-                        {new Date(order.created_at).toLocaleString()}
+                        {new Date (order.created_at).toDateString()}
                       </td>
                       <td className="px-6 py-4">
                         <NavLink

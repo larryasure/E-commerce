@@ -4,7 +4,6 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 
 
-
 class CategorySerializer(serializers.ModelSerializer):
   
   class Meta:
@@ -16,13 +15,16 @@ class CategorySerializer(serializers.ModelSerializer):
 class ProductSerializer(serializers.ModelSerializer):
   category= CategorySerializer(read_only=True)
   category_id = serializers.PrimaryKeyRelatedField(
-    queryset= Category.objects.all(), source= 'category', write_only= True
-  )
-  
+        queryset=Category.objects.all(),
+        source="category",
+        write_only=True
+    )
+
   class Meta:
     model=Product
-    fields= ['id', 'category', 'catogory_id', 'name', 'slug', 'description', 'price', 'image', 'created_at', 'stock', 'is_active']
+    fields= ['id', 'category', 'category_id', 'name', 'slug', 'description', 'price', 'image', 'created_at', 'stock', 'is_active']
     
+
     
     
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -37,7 +39,7 @@ class UserSerializer(serializers.ModelSerializer):
   profile= UserProfileSerializer(read_only=True)
   password= serializers.CharField(write_only=True)
   email= serializers.EmailField(validators=[UniqueValidator(queryset=User.objects.all(), message="Registration could not be completed with the provided details.")])
-  is_staff= serializers.BooleanField(read_only=True)
+  is_staff= serializers.BooleanField(required=False)
   
   
   class Meta:
@@ -49,9 +51,26 @@ class UserSerializer(serializers.ModelSerializer):
     user = User.objects.create_user(
       username=validated_data['username'],
       email= validated_data['email'],
-      password=validated_data['password']
+      password=validated_data['password'],
     )
+    
+    user.is_staff = self.is_staff
+    user.save()
     return user
+  
+  
+  def update(self, instance, validated_data):
+    
+    instance.username = validated_data.get("username", instance.username)
+    instance.email = validated_data.get("email", instance.email)
+    
+    
+    if "is_staff" in validated_data:
+      instance.is_staff = validated_data["is_staff"]
+      
+      
+    instance.save()
+    return instance
     
 class OrderItemSerializer(serializers.ModelSerializer):
   product = ProductSerializer(read_only=True)

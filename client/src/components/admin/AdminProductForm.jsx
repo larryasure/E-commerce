@@ -7,6 +7,7 @@ export default function AdminProductForm() {
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [openDeleteModal, setDeleteModal] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
     slug: "",
@@ -15,9 +16,9 @@ export default function AdminProductForm() {
     stock: "",
     category_id: "",
     is_active: true,
+    image: null,
   });
   const [errors, setErrors] = useState({});
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -35,6 +36,7 @@ export default function AdminProductForm() {
             stock: productRes.data.stock,
             category_id: productRes.data.category.id,
             is_active: productRes.data.is_active,
+            image: productRes.data.image,
           });
         }
       } catch (error) {
@@ -61,7 +63,6 @@ export default function AdminProductForm() {
     const newErrors = {};
     if (!formData.name.trim()) newErrors.name = "Product name is required";
     if (!formData.slug.trim()) newErrors.slug = "Slug is required";
-    if (!formData.stock.trim()) newErrors.stock = "Stock is required";
     if (!formData.price) newErrors.price = "Price is required";
     if (!formData.category_id) newErrors.category_id = "Category is required";
     if (!formData.description)
@@ -78,34 +79,42 @@ export default function AdminProductForm() {
     setLoading(true);
 
     try {
-      const data = {
-        name: formData.name,
-        slug: formData.slug,
-        description: formData.description,
-        price: formData.price,
-        stock: formData.stock || 0,
-        category: formData.category_id,
-        is_active: formData.is_active,
-      };
+      const payload = new FormData();
 
-      if (id) {
-        await axiosInstance.put(`products/${id}/`, data);
-        alert("Product updated successfully");
-      } else {
-        await axiosInstance.post("products/", data);
-        navigate("admin/product");
+      payload.append("name", formData.name);
+      payload.append("slug", formData.slug);
+      payload.append("description", formData.description);
+      payload.append("price", formData.price);
+      payload.append("stock", formData.stock || 0);
+      payload.append("category_id", formData.category_id);
+      payload.append("is_active", formData.is_active);
+
+      if (formData.image instanceof File) {
+        payload.append("image", formData.image);
       }
 
+      if (id) {
+        await axiosInstance.put(`/products/${id}/`, payload, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+      } else {
+        await axiosInstance.post(`/products/`, payload, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+      }
       navigate("/admin/products");
     } catch (error) {
-      console.log(error);
-      
-      console.error(error.response?.data);
-      console.log(error.response?.data);
+      console.log(error.response?.data || error);
+      console.error(error);
     } finally {
       setLoading(false);
     }
   };
+
 
   return (
     <>
@@ -230,7 +239,6 @@ export default function AdminProductForm() {
             )}
           </div>
 
-          {/* Description */}
           <div>
             <label className="block text-[#155daf] font-semibold mb-2">
               Description
@@ -249,7 +257,6 @@ export default function AdminProductForm() {
             )}
           </div>
 
-          {/* Active */}
           <div className="flex items-center gap-3">
             <input
               type="checkbox"
@@ -263,7 +270,6 @@ export default function AdminProductForm() {
             </label>
           </div>
 
-          {/* Submit */}
           <div className="flex gap-4 pt-6">
             <button
               type="submit"
@@ -282,6 +288,9 @@ export default function AdminProductForm() {
           </div>
         </form>
       </div>
+
+
+  
     </>
   );
 }

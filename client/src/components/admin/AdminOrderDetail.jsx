@@ -69,11 +69,10 @@ export default function AdminOrderDetail() {
             Order #{order.id}
           </h1>
           <p className="text-gray-600">
-            {new Date(order.created_at).toLocaleDateString()}
+            {new Date(order.created_at).toLocaleTimeString()}
           </p>
         </div>
 
-        {/* Customer Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
           <div>
             <h3 className="text-lg font-bold text-[#13315C] mb-4">Customer</h3>
@@ -114,7 +113,6 @@ export default function AdminOrderDetail() {
           </div>
         </div>
 
-        {/* Status Update */}
         <div className="border-t pt-8">
           <h3 className="text-lg font-bold text-[#13315C] mb-4">
             Update Status
@@ -140,7 +138,6 @@ export default function AdminOrderDetail() {
           </div>
         </div>
 
-        {/* Total */}
         <div className="border-t pt-8 mt-8">
           <div className="flex justify-between items-center">
             <span className="text-xl font-bold text-[#13315C]">Total</span>
