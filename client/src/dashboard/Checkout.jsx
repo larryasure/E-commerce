@@ -3,6 +3,9 @@ import { useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axiosConfig";
 import { AuthContext } from "../context/AuthContext";
 import { formatCurrency } from "../utils/formatCurrency";
+import { clearCart, getCart } from "../utils/cart";
+
+
 
 export default function Checkout() {
   const navigate = useNavigate();
@@ -14,10 +17,11 @@ export default function Checkout() {
   const [errors, setErrors] = useState({});
   const [isReady, setIsReady] = useState(false);
   const [success, setSuccess] = useState("");
+  
+
 
   useEffect(() => {
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    setCartItems(cart);
+    setCartItems(getCart());
   }, []);
 
   useEffect(() => {
@@ -32,7 +36,7 @@ export default function Checkout() {
   const total = cartItems.reduce((sum, item) => item.price * item.quantity, 0);
 
   const handleChange = (e) => {
-    const { name, value } = e.taget.value;
+    const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
@@ -60,8 +64,8 @@ export default function Checkout() {
         shipping_address: formData.shippingAddress,
       };
 
-      await axiosInstance.get("cart/", orderTotal);
-      localStorage.removeItem("cart");
+      await axiosInstance.get("orders/", orderTotal);
+      clearCart(cartItems)
       setSuccess("Order placed successfully");
       navigate("/orders");
     } catch (error) {

@@ -104,7 +104,7 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <AuthProvider>
-      <ToastContainer position="top-center " autoClose={3000} />
+      <ToastContainer position="top-center" autoClose={2000} theme="dark" />
       <RouterProvider router={router} />
     </AuthProvider>
   </StrictMode>,

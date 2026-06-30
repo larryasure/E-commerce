@@ -8,7 +8,6 @@ export default function AdminUsers() {
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
 
-
   const currentUser = { id: 99, is_staff: true };
 
   useEffect(() => {
@@ -34,7 +33,7 @@ export default function AdminUsers() {
       const search = searchTerm.toLowerCase();
       return name.includes(search) || email.includes(search);
     });
-  }, [users,  searchTerm]);
+  }, [users, searchTerm]);
 
   const handleDelete = async (id) => {
     try {
@@ -132,6 +131,7 @@ export default function AdminUsers() {
                         </button>
                       </div>
                     </td>
+
                     <td className="p-4 text-right">
                       {currentUser?.is_staff ? (
                         <button
@@ -156,7 +156,7 @@ export default function AdminUsers() {
 
       {userToDelete !== null && (
         <div className="fixed bg-black/50 backdrop-blur-sm flex items-center justify-center inset-0 z-50">
-          <div className="bg-white p-6 rounded-xl shadow-xl max-w-sm w-full mx-4">
+          <div className="bg-white p-6 rounded-xl shadow-xl max-w-sm w-full ">
             <h3 className="text-xl font-bold text-gray-900">Delete User</h3>
             <p className="text-gray-600 mt-2 text-sm">
               Are you sure you want to delete this user? This action cannot be

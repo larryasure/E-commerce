@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axiosInstance from "../../api/axiosConfig";
+import { formatCurrency } from "../../utils/formatCurrency";
 
 export default function AdminOrderDetail() {
   const { id } = useParams();
@@ -107,7 +108,9 @@ export default function AdminOrderDetail() {
                   </p>
                   <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
                 </div>
-                <p className="font-bold text-[#155daf]">${item.price}</p>
+                <p className="font-bold text-[#155daf]">
+                  {formatCurrency(item.price)}
+                </p>
               </div>
             ))}
           </div>
@@ -142,7 +145,7 @@ export default function AdminOrderDetail() {
           <div className="flex justify-between items-center">
             <span className="text-xl font-bold text-[#13315C]">Total</span>
             <span className="text-3xl font-bold text-[#155daf]">
-              ${order.total_Price}
+              {formatCurrency(order.total_Price)}
             </span>
           </div>
         </div>

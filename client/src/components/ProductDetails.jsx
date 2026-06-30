@@ -27,7 +27,6 @@ export default function ProductDetails() {
         setLoading(false);
       }
     };
-
     fetchProduct();
   }, [id]);
 
@@ -177,7 +176,6 @@ export default function ProductDetails() {
               </p>
             </div>
 
-            {/* Quantity + Actions */}
             {product.stock > 0 && (
               <div className="bg-gray-50 border border-gray-100 rounded-3xl p-7 space-y-6">
                 {/* Quantity */}
@@ -213,7 +211,6 @@ export default function ProductDetails() {
                   </div>
                 </div>
 
-                {/* Add to Cart */}
                 <button
                   onClick={handleAddToCart}
                   className="w-full bg-[#155daf] hover:bg-[#13315C] text-white py-4 rounded-2xl font-bold text-lg transition-all duration-300 hover:shadow-xl active:scale-[0.98]"

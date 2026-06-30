@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { toast } from "react-toastify";
 import axiosInstance from "../api/axiosConfig";
-import HeroCarousel from "../Carousel/HeroCarousel";
-import { formatCurrency } from "../utils/formatCurrency";
-
 import fallbackImg from "../assets/Hero banner/Fallback.jpg";
 import heroImg from "../assets/Hero banner/hero img.jfif";
+import HeroCarousel from "../Carousel/HeroCarousel";
+import { addToCart, getCart } from "../utils/cart";
+import { formatCurrency } from "../utils/formatCurrency";
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
@@ -31,6 +32,11 @@ export default function Home() {
 
     fetchHomeData();
   }, []);
+
+  // featuredProducts.map((product) => {
+  //   const cart = getCart()
+  //   const cartItem = cart.find(item => item.id === product.id)
+  // })
 
   return (
     <>
@@ -169,54 +175,72 @@ export default function Home() {
                 <div className="h-12 w-12 border-t-3 rounded-full animate-spin border-[#13315C]"></div>
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 ">
-                {featuredProducts.map((product) => (
-                  <div
-                    key={product.id}
-                    className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 flex flex-col h-full"
-                  >
-                    {/* Product Image */}
-                    <div className="relative h-64 bg-gray-50 overflow-hidden">
-                      <img
-                        src={product.image || fallbackImg}
-                        alt={product.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <div className="absolute top-4 right-4 bg-[#13315C] text-white px-2 tracking-wider py-1 text-xs  rounded-xl font-bold shadow-md">
-                        {formatCurrency(product.price)}
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-8">
+                {featuredProducts.map((product) => {
+                  const cart = getCart();
+                  const cartItem = cart.find((item) => item.id === product.id);
+
+                  return (
+                    <div
+                      key={product.id}
+                      className="group bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-200 flex flex-col"
+                    >
+                      {/* Product Image */}
+                      <div className="relative h-48 bg-gray-50 overflow-hidden">
+                        <img
+                          src={product.image}
+                          alt={product.name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-all duration-300 cursor-pointer"
+                        />
+
+                        <span className="absolute top-3 right-3 text-white tracking-widest px-2 py-1 rounded-lg font-medium bg-[#155daf] shadow-md text-xs">
+                          {formatCurrency(product.price)}
+                        </span>
+                      </div>
+
+                      {/* Product Info */}
+                      <div className="p-4 flex flex-col grow">
+                        <span className="text-xs text-[#155daf] font-bold tracking-wider uppercase mb-2">
+                          {product.category?.name || "Premium Line"}
+                        </span>
+
+                        <h3 className="text-lg font-bold text-[#13315C] mb-2 line-clamp-1 group-hover:text-[#155daf] transition-colors">
+                          {product.name}
+                        </h3>
+
+                        <p className="text-gray-500 text-sm mb-6 line-clamp-2 leading-relaxed flex-grow">
+                          {product.description ||
+                            "Indulge in our carefully engineered premium items built for absolute comfort and longevity."}
+                        </p>
+
+                        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                          <button
+                            className={`px-5 py-2 rounded-lg font-semibold transition cursor-pointer ${
+                              cartItem
+                                ? "bg-green-600 hover:bg-green-700 text-white"
+                                : "bg-[#155daf] hover:bg-[#13315C] text-white"
+                            }`}
+                            onClick={() => {
+                              addToCart(product, 1);
+                              toast.success(`${product.name} added to cart`);
+                            }}
+                          >
+                            {cartItem
+                              ? `Added (${cartItem.quantity})`
+                              : "Add to Cart"}
+                          </button>
+
+                          <Link
+                            to={`/products/${product.id}`}
+                            className="text-sm font-bold text-[#13315C] hover:text-[#155daf] transition"
+                          >
+                            View Details
+                          </Link>
+                        </div>
                       </div>
                     </div>
-
-                    {/* Product Info */}
-                    <div className="p-6 flex flex-col grow">
-                      <span className="text-xs text-[#155daf] font-bold tracking-wider uppercase mb-2 block">
-                        {product.category?.name || "Premium Line"}
-                      </span>
-                      <h3 className="text-lg font-bold text-[#13315C] mb-2 line-clamp-1 group-hover:text-[#155daf] transition-colors">
-                        {product.name}
-                      </h3>
-                      <p className="text-gray-500 text-sm mb-6 line-clamp-2 leading-relaxed grow">
-                        {product.description ||
-                          "Indulge in our carefully engineered premium items built for absolute comfort and longevity."}
-                      </p>
-
-                      <div className="flex items-center justify-between pt-4 border-t border-gray-50 mt-auto">
-                        <button
-                          onClick={() => console.log(product.id)}
-                          className="bg-[#155daf] hover:bg-[#13315C] text-white px-5 py-2 rounded-2xl font-semibold transition"
-                        >
-                          Add to Cart
-                        </button>
-                        <Link
-                          to={`/products/${product.id}`}
-                          className="text-sm font-bold text-[#13315C] hover:text-[#155daf] transition"
-                        >
-                          View Details
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>
