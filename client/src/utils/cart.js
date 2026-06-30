@@ -25,8 +25,8 @@ export const addToCart = (product, quantity = 1) => {
     });
   }
 
-  saveCart(cart);
-  return cart;
+  localStorage.setItem("cart", JSON.stringify(cart));
+  window.dispatchEvent(new Event("cartUpdated"));
 };
 
 export const removeFromCart = (id) => {

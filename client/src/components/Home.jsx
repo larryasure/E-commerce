@@ -5,13 +5,16 @@ import axiosInstance from "../api/axiosConfig";
 import fallbackImg from "../assets/Hero banner/Fallback.jpg";
 import heroImg from "../assets/Hero banner/hero img.jfif";
 import HeroCarousel from "../Carousel/HeroCarousel";
-import { addToCart, getCart } from "../utils/cart";
+import { useCart } from "../context/CartContext";
+import { addToCart } from "../utils/cart";
 import { formatCurrency } from "../utils/formatCurrency";
+
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
   const [featuredProducts, setFeaturedProducts] = useState([]);
+  const { cart } = useCart();
 
   useEffect(() => {
     const fetchHomeData = async () => {
@@ -32,11 +35,6 @@ export default function Home() {
 
     fetchHomeData();
   }, []);
-
-  // featuredProducts.map((product) => {
-  //   const cart = getCart()
-  //   const cartItem = cart.find(item => item.id === product.id)
-  // })
 
   return (
     <>
@@ -177,7 +175,6 @@ export default function Home() {
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-8">
                 {featuredProducts.map((product) => {
-                  const cart = getCart();
                   const cartItem = cart.find((item) => item.id === product.id);
 
                   return (
@@ -198,7 +195,6 @@ export default function Home() {
                         </span>
                       </div>
 
-                      {/* Product Info */}
                       <div className="p-4 flex flex-col grow">
                         <span className="text-xs text-[#155daf] font-bold tracking-wider uppercase mb-2">
                           {product.category?.name || "Premium Line"}
@@ -224,6 +220,7 @@ export default function Home() {
                               addToCart(product, 1);
                               toast.success(`${product.name} added to cart`);
                             }}
+                            
                           >
                             {cartItem
                               ? `Added (${cartItem.quantity})`

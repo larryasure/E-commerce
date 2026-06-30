@@ -6,6 +6,7 @@ import "react-toastify/dist/ReactToastify.css";
 import AdminCategories from "./components/admin/AdminCategories.jsx";
 import AdminDashboard from "./components/admin/AdminDashboard.jsx";
 import AdminLayout from "./components/admin/AdminLayout.jsx";
+import AdminOrderDetail from "./components/admin/AdminOrderDetail.jsx";
 import AdminOrders from "./components/admin/AdminOrders.jsx";
 import AdminProductForm from "./components/admin/AdminProductForm.jsx";
 import AdminProducts from "./components/admin/AdminProducts.jsx";
@@ -19,6 +20,7 @@ import Products from "./components/Products.jsx";
 import Register from "./components/Register.jsx";
 import WishList from "./components/WishList.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
+import { CartProvider } from "./context/CartContext.jsx";
 import Checkout from "./dashboard/Checkout.jsx";
 import Dashboard from "./dashboard/Dashboard.jsx";
 import Orders from "./dashboard/Orders.jsx";
@@ -27,7 +29,6 @@ import "./index.css";
 import AdminProtectedRoutes from "./protectionRoutes/AdminProtectedRoutes.jsx";
 import ProtectedRoutes from "./protectionRoutes/ProtectedRoutes.jsx";
 import RootLayout from "./root/RootLayout.jsx";
-import AdminOrderDetail from "./components/admin/AdminOrderDetail.jsx";
 
 const router = createBrowserRouter([
   {
@@ -104,8 +105,10 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <AuthProvider>
-      <ToastContainer position="top-center" autoClose={2000} theme="dark" />
-      <RouterProvider router={router} />
+      <CartProvider>
+        <ToastContainer position="top-center" autoClose={2000} theme="dark" />
+        <RouterProvider router={router} />
+      </CartProvider>
     </AuthProvider>
   </StrictMode>,
 );

@@ -1,36 +1,16 @@
 import { Heart, ShoppingCart, X } from "lucide-react";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import { getCart } from "../utils/cart";
+import { useCart } from "../context/CartContext";
 
 export default function Navbar() {
   const { isAuthenticated, user, logout } = useContext(AuthContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [cartCount, setCartCount] = useState(0);
 
-  const admin = user?.is_staff.True
-  
+  const { cart } = useCart();
 
-  console.log(admin);
-  
-  useEffect(() => {
-    const updateCart = () => {
-      const cart = getCart();
-
-      const total = cart.reduce((sum, item) => sum + item.quantity, 0);
-
-      setCartCount(total);
-    };
-
-    updateCart();
-
-    window.addEventListener("storage", updateCart);
-
-    return () => {
-      window.removeEventListener("storage", updateCart);
-    };
-  }, []);
+  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   const textLinkStyle = ({ isActive }) =>
     `px-3 py-2 text-sm font-medium transition-colors duration-200
