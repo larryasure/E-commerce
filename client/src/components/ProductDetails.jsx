@@ -1,9 +1,10 @@
-import { useContext, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axiosInstance from "../api/axiosConfig";
 import fallback from "../assets/Hero banner/Fallback.jpg";
-import { AuthContext } from "../context/AuthContext";
 import { formatCurrency } from "../utils/formatCurrency";
+
+import { CornerDownLeft, Lock, Van } from "lucide-react";
 
 export default function ProductDetails() {
   const { id } = useParams();
@@ -13,8 +14,6 @@ export default function ProductDetails() {
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
   const [addedToCart, setAddedToCart] = useState(false);
-
-  const { isAuthenticated } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -186,9 +185,7 @@ export default function ProductDetails() {
 
                   <div className="flex items-center overflow-hidden rounded-2xl border border-gray-200 bg-white">
                     <button
-                      onClick={() =>
-                        setQuantity(Math.max(1, quantity - 1))
-                      }
+                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
                       className="px-5 py-3 text-lg hover:bg-gray-100 transition-colors duration-300"
                     >
                       −
@@ -200,9 +197,7 @@ export default function ProductDetails() {
 
                     <button
                       onClick={() =>
-                        setQuantity(
-                          Math.min(product.stock, quantity + 1)
-                        )
+                        setQuantity(Math.min(product.stock, quantity + 1))
                       }
                       className="px-5 py-3 text-lg hover:bg-gray-100 transition-colors duration-300"
                     >
@@ -230,8 +225,10 @@ export default function ProductDetails() {
 
             {/* Trust Features */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <div className="bg-white border border-gray-100 rounded-2xl p-5 text-center shadow-sm">
-                <p className="text-2xl mb-2">🚚</p>
+              <div className="bg-white border border-gray-100 rounded-2xl p-5 text-center shadow-sm flex items-center flex-col">
+                <p className="text-2xl mb-2">
+                  <Van />
+                </p>
 
                 <h4 className="font-bold text-[#13315C] text-sm">
                   Fast Delivery
@@ -242,8 +239,10 @@ export default function ProductDetails() {
                 </p>
               </div>
 
-              <div className="bg-white border border-gray-100 rounded-2xl p-5 text-center shadow-sm">
-                <p className="text-2xl mb-2">🔒</p>
+              <div className="bg-white border border-gray-100 rounded-2xl p-5 text-center shadow-sm  flex items-center flex-col">
+                <p className="text-2xl mb-2 ">
+                  <Lock />
+                </p>
 
                 <h4 className="font-bold text-[#13315C] text-sm">
                   Secure Payment
@@ -254,16 +253,16 @@ export default function ProductDetails() {
                 </p>
               </div>
 
-              <div className="bg-white border border-gray-100 rounded-2xl p-5 text-center shadow-sm">
-                <p className="text-2xl mb-2">↩️</p>
+              <div className="bg-white border border-gray-100 rounded-2xl p-5 text-center shadow-sm flex items-center flex-col">
+                <p className="text-2xl mb-2">
+                  <CornerDownLeft />
+                </p>
 
                 <h4 className="font-bold text-[#13315C] text-sm">
                   Easy Returns
                 </h4>
 
-                <p className="text-xs text-gray-500 mt-1">
-                  30-day guarantee
-                </p>
+                <p className="text-xs text-gray-500 mt-1">30-day guarantee</p>
               </div>
             </div>
           </div>

@@ -1,26 +1,45 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { toast } from "react-toastify";
+import { Link, NavLink } from "react-router-dom";
 import axiosInstance from "../api/axiosConfig";
 import fallbackImg from "../assets/Hero banner/Fallback.jpg";
 import heroImg from "../assets/Hero banner/hero img.jfif";
 import HeroCarousel from "../Carousel/HeroCarousel";
 import { useCart } from "../context/CartContext";
-import { addToCart } from "../utils/cart";
 import { formatCurrency } from "../utils/formatCurrency";
 
+import {
+  Backpack,
+  BriefcaseBusiness,
+  CookingPot,
+  Footprints,
+  Gem,
+  Laptop,
+  Shirt,
+  Sparkles,
+} from "lucide-react";
+
+const categoryIcons = {
+  "Fashion & Apparel": Shirt,
+  "Office & Stationery": BriefcaseBusiness,
+  Electronics: Laptop,
+  "Bags and Backpacks": Backpack,
+  Accessories: Gem,
+  "Beauty & Care": Sparkles,
+  "Home and Kitchen": CookingPot,
+  Footwears: Footprints,
+};
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
   const [featuredProducts, setFeaturedProducts] = useState([]);
-  const { cart } = useCart();
+  const { cart, addCart, decreaseCart, increaseCart } = useCart();
 
   useEffect(() => {
     const fetchHomeData = async () => {
       try {
         const [productsRes, categoriesRes] = await Promise.all([
-          axiosInstance.get("products/?limit=10"),
+          axiosInstance.get("products/?featured=true&limit=10"),
           axiosInstance.get("categories/"),
         ]);
 
@@ -123,32 +142,52 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6 grid">
-                {categories.map((category) => (
-                  <Link
-                    key={category.id}
-                    to={`/products?category=${category.id}`}
-                    className="relative group h-44 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 bg-[#13315c]"
-                  >
-                    <div className="absolute inset-0 bg-linear-t from-[#13315c] via-[#13315c]/40 to-transparent  z-10 opacity-80 group:opacity-90 transition-opacity"></div>
-                    <img
-                      src={category.image}
-                      alt="categoryImg"
-                      className="h-44 w-full object-cover transform hover:scale-110 transition-transform duration-300 "
-                    />
-                    <div className="p-2 z-20">
-                      <h3 className="absolute left-1 top-0 mt-2 rounded-lg bg-black px-4 py-0.5 text-sm text-white">
-                        <span className="inline-block transition-transform hover:translate-x-5">
-                          {category.name}
-                        </span>
-                      </h3>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
+                {categories.map((category) => {
+                  const Icon = categoryIcons[category.name];
 
-                      <span className="absolute mb-1 bottom-0 left-0 mt-1  rounded-xl bg-black px-4 py-0.5 text-xs font-medium text-sky-200 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                        Browse Collection &rarr;
-                      </span>
+                  return (
+                    <div
+                      key={category.key}
+                      className=" rounded-lg shadow-sm hover:shadow-lg transition-all duration-300"
+                    >
+                      <div className="relative">
+                        <div className="overflow-hidden rounded-t-lg h-40">
+                          <img
+                            src={category.image}
+                            alt={category.name}
+                            className="w-full h-full object-cover  hover:scale-110 transition-all duration-300"
+                          />
+                        </div>
+
+                        <div className="absolute left-1/2 bottom-0 -translate-x-1/2 translate-y-1/2 w-10 h-10 rounded-full bg-sky-100 border border-[#155daf] shadow-lg flex items-center justify-center">
+                          {Icon && (
+                            <Icon size={18} className="text-[#13315c]" />
+                          )}
+                          {/* {category.name.charAt(0)} */}
+                        </div>
+                      </div>
+
+                      <div className=" bg-white rounded-xl pt-6 pb-3 flex flex-col items-center text-center px-4">
+                        <h3 className="font-semibold text-lg text-[#13315c]">
+                          {category.name}
+                        </h3>
+
+                        <p className="text-gray-500 text-sm mt-1">
+                          {category.stock}{" "}
+                          {category.stock > 1 ? "items" : "item"}
+                        </p>
+
+                        <NavLink
+                          to="/products"
+                          className="mt-1 text-[#13315c] text-sm hover:translate-x-1.5 transition-all duration-300 active:scale-110 font-medium hover:underline"
+                        >
+                          Shop Now
+                        </NavLink>
+                      </div>
                     </div>
-                  </Link>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </section>
@@ -174,70 +213,64 @@ export default function Home() {
               </div>
             ) : (
               <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-8">
-                {featuredProducts.map((product) => {
-                  const cartItem = cart.find((item) => item.id === product.id);
-
-                  return (
-                    <div
-                      key={product.id}
-                      className="group bg-white rounded-2xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-200 flex flex-col"
-                    >
-                      {/* Product Image */}
-                      <div className="relative h-48 bg-gray-50 overflow-hidden">
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-all duration-300 cursor-pointer"
-                        />
-
-                        <span className="absolute top-3 right-3 text-white tracking-widest px-2 py-1 rounded-lg font-medium bg-[#155daf] shadow-md text-xs">
-                          {formatCurrency(product.price)}
-                        </span>
-                      </div>
-
-                      <div className="p-4 flex flex-col grow">
-                        <span className="text-xs text-[#155daf] font-bold tracking-wider uppercase mb-2">
-                          {product.category?.name || "Premium Line"}
-                        </span>
-
-                        <h3 className="text-lg font-bold text-[#13315C] mb-2 line-clamp-1 group-hover:text-[#155daf] transition-colors">
-                          {product.name}
-                        </h3>
-
-                        <p className="text-gray-500 text-sm mb-6 line-clamp-2 leading-relaxed flex-grow">
-                          {product.description ||
-                            "Indulge in our carefully engineered premium items built for absolute comfort and longevity."}
-                        </p>
-
-                        <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                          <button
-                            className={`px-5 py-2 rounded-lg font-semibold transition cursor-pointer ${
-                              cartItem
-                                ? "bg-green-600 hover:bg-green-700 text-white"
-                                : "bg-[#155daf] hover:bg-[#13315C] text-white"
-                            }`}
-                            onClick={() => {
-                              addToCart(product, 1);
-                              toast.success(`${product.name} added to cart`);
-                            }}
-                            
-                          >
-                            {cartItem
-                              ? `Added (${cartItem.quantity})`
-                              : "Add to Cart"}
-                          </button>
-
-                          <Link
-                            to={`/products/${product.id}`}
-                            className="text-sm font-bold text-[#13315C] hover:text-[#155daf] transition"
-                          >
-                            View Details
-                          </Link>
+                {featuredProducts.length > 0 && (
+                  <section className="py-16 sm:px-6 px-4 lg:px-8 bg-gray-50">
+                    <div className="max-w-7xl mx-auto">
+                      <div className="mb-12 flex justify-between items-end">
+                        <div>
+                          <h2 className="text-3xl font-black text-[#13315c] tracking-tight">
+                            Featured Products
+                          </h2>
+                          <p className="text-gray-500 mt-2">
+                            Our top selected premium choices just for you
+                          </p>
                         </div>
                       </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                        {featuredProducts.map((product) => (
+                          <div
+                            key={product.id}
+                            className="bg-white rounded-2xl border border-gray-100 overflow-hidden relative group flex flex-col justify-between"
+                          >
+                            <div className="absolute top-3 left-3 z-10 flex flex-col gap-1">
+                              {product.is_new && (
+                                <span className="bg-emerald-500 text-white text-xs font-bold px-2.5 py-1 rounded-md uppercase">
+                                  New
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="h-56 bg-gray-50 overflow-hidden flex items-center justify-center">
+                              <img
+                                src={product.image || fallbackImg}
+                                alt={product.name}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-all duration-300"
+                              />
+                            </div>
+
+                            <div className="p-5 flex-1 flex flex-col justify-between gap-4">
+                              <div>
+                                <span className="text-xs text-gray-400 font-medium uppercase">
+                                  {product.category?.name || "Uncategorized"}
+                                </span>
+                                <h3 className="font-bold text-lg text-[#13315c] line-clamp-1 mt-1">
+                                  {product.name}
+                                </h3>
+                              </div>
+
+                              <div className="flex items-center justify-between pt-2">
+                                <span className="text-xl font-black text-[#13315c]">
+                                  {formatCurrency(product.price)}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  );
-                })}
+                  </section>
+                )}
               </div>
             )}
           </div>

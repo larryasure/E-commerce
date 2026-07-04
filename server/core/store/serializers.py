@@ -2,6 +2,9 @@ from django.contrib.auth.models import User
 from .models import Category,OrderItem,Product,Order,UserProfile
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
+from datetime import timedelta
+from django.utils import timezone
+
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -20,9 +23,15 @@ class ProductSerializer(serializers.ModelSerializer):
         write_only=True
     )
 
+
+  is_new = serializers.SerializerMethodField()
+  
+  def get_is_new(self, obj):
+    return obj.created_at >= timezone.now() - timedelta(days=3)
+  
   class Meta:
     model=Product
-    fields= ['id', 'category', 'category_id', 'name', 'slug', 'description', 'price', 'image', 'created_at', 'stock', 'is_active']
+    fields= ['id', 'category', 'category_id', 'name', 'slug', 'description', 'price', 'image', 'created_at', 'stock', 'is_active', 'featured', 'is_new']
     
 
     

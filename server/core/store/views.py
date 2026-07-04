@@ -29,10 +29,30 @@ class ProductViewSet(viewsets.ModelViewSet):
 
   def get_queryset(self):
     queryset=super().get_queryset()  
+    featured = self.request.query_params.get('featured')
     category = self.request.query_params.get('category')
+    limit = self.request.query_params.get('limit')
+    
+    
+    if featured == "true":
+      queryset = queryset.filter(featured=True)
+    
     if category:
       queryset= queryset.filter(category__slug=category)
+      
+    if limit: 
+      try:
+        limit = int(limit)
+        if limit > 0 :
+          queryset = queryset[:limit]
+          
+      except Exception as e:
+        raise e
+  
+      
+      
     return queryset
+
   
 class UserProfileViewSet(viewsets.ModelViewSet):
   queryset= UserProfile.objects.all()
