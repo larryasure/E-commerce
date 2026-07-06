@@ -23,7 +23,7 @@ export default function Cart() {
 
   if (cart.length === 0) {
     return (
-      <div className="min-h-screen py-12">
+      <div className="min-h-screen py-12 mt-24">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <h1 className="text-4xl font-bold text-[#13315C] mb-8">
             Shopping Cart

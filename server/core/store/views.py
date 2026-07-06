@@ -9,8 +9,8 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from .emails import send_password_reset_email, send_verification_email, send_order_confirmation_email, send_welcome_email
-from .models import UserProfile, Product, Category, Order
-from .serializers import CategorySerializer, OrderSerializer, ProductSerializer, UserProfileSerializer, UserSerializer
+from .models import UserProfile, Product, Category, Order, Wishlist
+from .serializers import CategorySerializer, OrderSerializer, ProductSerializer, UserProfileSerializer, UserSerializer, WishListSerializer
 
 
 
@@ -125,6 +125,18 @@ def get_current_user(request):
   return Response(serializer.data)
     
     
+class WishlistViewSet(viewsets.ModelViewSet):
+  serializer_class= WishListSerializer
+  permission_classes= [permissions.IsAuthenticated]
+  
+  def get_queryset(self):
+    return Wishlist.objects.filter(
+      user = self.request.user
+      
+    ).select_related("product", "product.category")
+    
+  def perform_create(self, serializer):
+    serializer.save(user = self.request.user)
     
 @api_view(['GET'])
 def verify_email(request, uid, token):

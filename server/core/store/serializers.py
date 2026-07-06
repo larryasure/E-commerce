@@ -1,5 +1,5 @@
 from django.contrib.auth.models import User
-from .models import Category,OrderItem,Product,Order,UserProfile
+from .models import Category,OrderItem,Product,Order,UserProfile,Wishlist
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from datetime import timedelta
@@ -25,13 +25,27 @@ class ProductSerializer(serializers.ModelSerializer):
 
 
   is_new = serializers.SerializerMethodField()
+  is_in_wishlist= serializers.SerializerMethodField()
+  
   
   def get_is_new(self, obj):
     return obj.created_at >= timezone.now() - timedelta(days=3)
   
+  
+  def get_is_in_wishlist(self, obj):
+    request = self.context.get("request")
+    
+    if not request or not request.user.is_authenticated:
+      return False
+    
+    return obj.wishlisted_by.filter(
+      user = request.user
+    ).exists()
+    
+  
   class Meta:
     model=Product
-    fields= ['id', 'category', 'category_id', 'name', 'slug', 'description', 'price', 'image', 'created_at', 'stock', 'is_active', 'featured', 'is_new']
+    fields= ['id', 'category', 'category_id', 'name', 'slug', 'description', 'price', 'image', 'created_at', 'stock', 'is_active', 'featured', 'is_new', "is_in_wishlist"]
     
 
     
@@ -100,4 +114,15 @@ class OrderSerializer(serializers.ModelSerializer):
     
     
     
-    
+class WishListSerializer(serializers.ModelSerializer):
+  
+  product = ProductSerializer(read_only=True)
+  product_id = serializers.PrimaryKeyRelatedField(
+    queryset= Product.objects.all(),
+    source="product",
+    write_only= True,
+  )
+  
+  class Meta:
+    model = Wishlist
+    fields = ["id", "product", "product_id", "created_at"]
