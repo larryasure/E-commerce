@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import axiosInstance from "../../api/axiosConfig";
 import { formatCurrency } from "../../utils/formatCurrency";
@@ -7,9 +7,9 @@ export default function AdminProducts() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
-  const [openDeleteModal, setDeleteModal] = useState(false);
+  const [activeDeleteId, setActiveDeleteId] = useState(null);
 
-  useState(() => {
+  useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await axiosInstance.get("products/");
@@ -27,11 +27,9 @@ export default function AdminProducts() {
     try {
       await axiosInstance.delete(`products/${id}/`);
       setProducts(products.filter((p) => p.id !== id));
-      setDeleteModal(false);
+      setActiveDeleteId(null);
     } catch (error) {
       console.error(`Failed to delete product`, error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -40,9 +38,11 @@ export default function AdminProducts() {
   );
 
   if (loading) {
-    <div className="flex items-center justify-center h-96 ">
-      <div className="w-12 h-12 animate-spin border-[#13315c] border-b-2 rounded-full"></div>
-    </div>;
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="w-12 h-12 animate-spin border-[#13315c] border-b-2 rounded-full"></div>
+      </div>
+    );
   }
 
   return (
@@ -122,7 +122,7 @@ export default function AdminProducts() {
                         Edit
                       </NavLink>
                       <button
-                        onClick={() => setDeleteModal(product.id)}
+                        onClick={() => setActiveDeleteId(product.id)}
                         className="text-red-500 cursor-pointer hover:text-red-600 font-semibold bg-red-200 p-1 py-0.5 rounded-md "
                       >
                         Delete
@@ -145,7 +145,7 @@ export default function AdminProducts() {
         </div>
       </div>
 
-      {openDeleteModal && (
+      {activeDeleteId && (
         <div className="fixed bg-black/60 flex items-center justify-center inset-0 backdrop-blur-xs  ">
           <div className="flex  flex-col bg-white rounded-xl shadow-md p-8  max-w-xs  w-full">
             <h2 className="text-2xl text-[#13315c] font-bold ">
@@ -160,14 +160,15 @@ export default function AdminProducts() {
 
             <div className="mt-7 grid  grid-cols-2 gap-12 ">
               <button
-                onClick={() => setDeleteModal(null)}
+                onClick={() => setActiveDeleteId(null)}
                 className="font-medium bg-[#13315c]  text-white cursor-pointer p-2 rounded-lg hover:bg-[#155daf] transition-all duration-300 "
               >
                 Cancel
               </button>
               <button
-              onClick={handleDelete}
-                className="font-medium text-[#13315c] bg-red-200 rounded-lg  p-2 hover:text-white hover:bg-red-600 transition-all duration-300 cursor-pointer ">
+                onClick={() => handleDelete(activeDeleteId)}
+                className="font-medium text-[#13315c] bg-red-200 rounded-lg  p-2 hover:text-white hover:bg-red-600 transition-all duration-300 cursor-pointer "
+              >
                 Delete
               </button>
             </div>

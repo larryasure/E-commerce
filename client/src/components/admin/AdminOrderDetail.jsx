@@ -37,7 +37,7 @@ export default function AdminOrderDetail() {
       setOrder({ ...order, order_status: newStatus });
       alert("Order status updated");
     } catch (error) {
-      alert("Failed to update status");
+      alert("Failed to update status" , error);
     } finally {
       setUpdating(false);
     }
@@ -93,7 +93,6 @@ export default function AdminOrderDetail() {
           </div>
         </div>
 
-        {/* Order Items */}
         <div className="mb-8 border-t pt-8">
           <h3 className="text-lg font-bold text-[#13315C] mb-4">Order Items</h3>
           <div className="space-y-3">

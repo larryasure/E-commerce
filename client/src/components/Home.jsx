@@ -5,7 +5,6 @@ import fallbackImg from "../assets/Hero banner/Fallback.jpg";
 import heroImg from "../assets/Hero banner/hero img.jfif";
 import HeroCarousel from "../Carousel/HeroCarousel";
 import { useCart } from "../context/CartContext";
-import { formatCurrency } from "../utils/formatCurrency";
 
 import {
   Backpack,
@@ -17,6 +16,7 @@ import {
   Shirt,
   Sparkles,
 } from "lucide-react";
+import FeaturedProducts from "./FeaturedProducts";
 
 const categoryIcons = {
   "Fashion & Apparel": Shirt,
@@ -43,7 +43,7 @@ export default function Home() {
           axiosInstance.get("categories/"),
         ]);
 
-        setFeaturedProducts(productsRes.data.slice(0, 7));
+        setFeaturedProducts(productsRes.data);
         setCategories(categoriesRes.data);
       } catch (error) {
         console.error("Failed to fetch Homepage data", error);
@@ -65,7 +65,6 @@ export default function Home() {
         <section className="relative px-4 py-12 lg:py-16 sm:px-6 lg:px-8">
           <div className="max-w-7xl mx-auto ">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-              {/* Left Content */}
               <div className="lg:col-span-7 space-y-8">
                 <div className="space-y-4">
                   <span className="inline-block text-sky-700 bg-[#155daf]/10   text-sm font-semibold tracking-wider uppercase px-4 py-1 rounded-xl">
@@ -182,7 +181,7 @@ export default function Home() {
                           to="/products"
                           className="mt-1 text-[#13315c] text-sm hover:translate-x-1.5 transition-all duration-300 active:scale-110 font-medium hover:underline"
                         >
-                          Shop Now
+                          Shop Now &#10137;
                         </NavLink>
                       </div>
                     </div>
@@ -193,8 +192,8 @@ export default function Home() {
           </section>
         )}
 
-        <section className="py-20 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
+        <section className="py-20  px-4 ">
+          <div className="max-w-7xl mx-auto ">
             <div className="text-center mb-16">
               <span className="text-sm font-bold text-[#155daf] uppercase tracking-widest">
                 Our Picks
@@ -207,70 +206,20 @@ export default function Home() {
               </p>
             </div>
 
-            {loading && featuredProducts.length === 0 ? (
-              <div className="flex justify-center items-center h-54">
-                <div className="h-12 w-12 border-t-3 rounded-full animate-spin border-[#13315C]"></div>
+            {loading ? (
+              <div className="flex justify-center items-center py-20">
+                <div className="h-12 w-12 border-4 border-gray-200 border-t-[#13315C] rounded-full animate-spin"></div>
               </div>
+            ) : featuredProducts.length > 0 ? (
+              <FeaturedProducts
+                featuredProducts={featuredProducts}
+                cart={cart}
+              />
             ) : (
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 gap-8">
-                {featuredProducts.length > 0 && (
-                  <section className="py-16 sm:px-6 px-4 lg:px-8 bg-gray-50">
-                    <div className="max-w-7xl mx-auto">
-                      <div className="mb-12 flex justify-between items-end">
-                        <div>
-                          <h2 className="text-3xl font-black text-[#13315c] tracking-tight">
-                            Featured Products
-                          </h2>
-                          <p className="text-gray-500 mt-2">
-                            Our top selected premium choices just for you
-                          </p>
-                        </div>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                        {featuredProducts.map((product) => (
-                          <div
-                            key={product.id}
-                            className="bg-white rounded-2xl border border-gray-100 overflow-hidden relative group flex flex-col justify-between"
-                          >
-                            <div className="absolute top-3 left-3 z-10 flex flex-col gap-1">
-                              {product.is_new && (
-                                <span className="bg-emerald-500 text-white text-xs font-bold px-2.5 py-1 rounded-md uppercase">
-                                  New
-                                </span>
-                              )}
-                            </div>
-
-                            <div className="h-56 bg-gray-50 overflow-hidden flex items-center justify-center">
-                              <img
-                                src={product.image || fallbackImg}
-                                alt={product.name}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-all duration-300"
-                              />
-                            </div>
-
-                            <div className="p-5 flex-1 flex flex-col justify-between gap-4">
-                              <div>
-                                <span className="text-xs text-gray-400 font-medium uppercase">
-                                  {product.category?.name || "Uncategorized"}
-                                </span>
-                                <h3 className="font-bold text-lg text-[#13315c] line-clamp-1 mt-1">
-                                  {product.name}
-                                </h3>
-                              </div>
-
-                              <div className="flex items-center justify-between pt-2">
-                                <span className="text-xl font-black text-[#13315c]">
-                                  {formatCurrency(product.price)}
-                                </span>
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </section>
-                )}
+              <div className="py-20 text-center">
+                <h3 className="text-xl font-semibold text-gray-700">
+                  No featured products available.
+                </h3>
               </div>
             )}
           </div>

@@ -21,7 +21,7 @@ export default function AdminOrders() {
       } finally {
         setLoading(false);
       }
-    };
+    };``
     fetchOrders();
   }, []);
 

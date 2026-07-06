@@ -2,34 +2,26 @@ import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { formatCurrency } from "../utils/formatCurrency";
+import { useCart } from "../context/CartContext";
 
 export default function Cart() {
   const { isAuthenticated } = useContext(AuthContext);
   const navigate = useNavigate();
-  const [cartItems, setCartItems] = useState(() =>
-    JSON.parse(localStorage.getItem("cart") || "[]"),
-  );
 
-  const updateQuantity = (id, newQuantity) => {
-    const updated = cartItems.map((item) =>
-      item.id === id ? { ...item, quantity: Math.max(1, newQuantity) } : item,
-    );
-    setCartItems(updated);
-    localStorage.setItem("cart", JSON.stringify(updated));
-  };
+  const {cart, increaseCart, decreaseCart, removeCart} = useCart()
 
-  const removeItem = (id) => {
-    const updated = cartItems.filter((item) => item.id !== id);
-    setCartItems(updated);
-    localStorage.setItem("cart", JSON.stringify(updated));
-  };
+  const total = cart.reduce((sum , item) => sum + item.price * item.quantity , 0 )
 
-  const total = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0,
-  );
+  let shipping = 0
+  if (total > 0 && total < 150000) {
+    shipping = 3500
+  }
 
-  if (cartItems.length === 0) {
+  const grandTotal = total + shipping
+
+
+
+  if (cart.length === 0) {
     return (
       <div className="min-h-screen py-12">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -61,7 +53,7 @@ export default function Cart() {
           {/* Cart Items */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-              {cartItems.map((item, index) => (
+              {cart.map((item, index) => (
                 <div
                   key={item.id}
                   className={`p-6 flex items-center justify-between border-b last:border-b-0 hover:bg-gray-50 transition-colors duration-300 animate-fadeInUp`}
@@ -80,7 +72,7 @@ export default function Cart() {
                     <div className="flex items-center border-2 border-[#155daf] rounded-lg">
                       <button
                         onClick={() =>
-                          updateQuantity(item.id, item.quantity - 1)
+                          decreaseCart(item.id)
                         }
                         className="px-3 py-1 hover:bg-[#155daf]/10 transition-colors duration-300"
                       >
@@ -91,9 +83,9 @@ export default function Cart() {
                       </span>
                       <button
                         onClick={() =>
-                          updateQuantity(item.id, item.quantity + 1)
+                          increaseCart(item.id)
                         }
-                        className="px-3 py-1 hover:bg-[#155daf]/10 transition-colors duration-300"
+                        className="px-3 py-0.5 hover:bg-[#155daf]/10 transition-colors duration-300"
                       >
                         +
                       </button>
@@ -104,7 +96,7 @@ export default function Cart() {
                     </p>
 
                     <button
-                      onClick={() => removeItem(item.id)}
+                      onClick={() => removeCart(item.id)}
                       className="text-red-500 hover:text-red-700 font-bold transition-colors duration-300"
                     >
                       ✕
@@ -131,18 +123,22 @@ export default function Cart() {
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping</span>
-                  {total > 150000 ? (
-                    <span className="text-green-500 text-sm ">Free</span>
-                  ) : (
-                    <div>3500</div>
-                  )}
+                  <span className="text-[#13315c] text-sm">
+                    {shipping === 0 ? (
+                      <span className="text-green-500  ">Free</span>
+                    ) : (
+                        <span>
+                          { formatCurrency(shipping)}
+                        </span>
+                      )}
+                  </span>
                 </div>
               </div>
 
               <div className="flex justify-between items-center">
                 <span className="font-bold text-[#13315C]">Total</span>
                 <span className="text-lg font-bold text-[#155daf] tracking-wider">
-                  {formatCurrency(total)}
+                  {formatCurrency(grandTotal)}
                 </span>
               </div>
 

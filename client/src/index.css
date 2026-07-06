@@ -25,7 +25,8 @@ html {
 }
 
 @keyframes float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0px);
   }
   50% {
@@ -41,3 +42,17 @@ html {
 .animate-float {
   animation: float 3s ease-in-out infinite;
 }
+
+.swiper-button-prev,
+.swiper-button-next {
+  opacity: 0;
+  transition: 0.3s;
+}
+
+.swiper:hover .swiper-button-prev,
+.swiper:hover .swiper-button-next {
+  opacity: 1;
+}
+
+
+
