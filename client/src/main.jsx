@@ -21,7 +21,7 @@ import Register from "./components/Register.jsx";
 import WishList from "./components/WishList.jsx";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { CartProvider } from "./context/CartContext.jsx";
-import { WishlistProvider } from "./context/Wishlist.jsx";
+import { WishlistProvider } from "./context/WishlistContext.jsx";
 import Checkout from "./dashboard/Checkout.jsx";
 import Dashboard from "./dashboard/Dashboard.jsx";
 import Orders from "./dashboard/Orders.jsx";
@@ -106,12 +106,12 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <AuthProvider>
-      <CartProvider>
         <WishlistProvider>
+      <CartProvider>
+          <RouterProvider router={router} />
           <ToastContainer position="top-center" autoClose={2000} theme="dark" />
-        </WishlistProvider>
-        <RouterProvider router={router} />
       </CartProvider>
+        </WishlistProvider>
     </AuthProvider>
   </StrictMode>,
 );

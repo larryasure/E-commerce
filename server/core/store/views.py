@@ -132,10 +132,13 @@ class WishlistViewSet(viewsets.ModelViewSet):
     return Wishlist.objects.filter(
       user = self.request.user
       
-    ).select_related("product", "product.category")
+    ).select_related("user", "product" )
     
   def perform_create(self, serializer):
     serializer.save(user = self.request.user)
+    
+    
+    
     
 @api_view(['GET'])
 def verify_email(request, uid, token):
@@ -278,3 +281,4 @@ def change_password(request):
     {"message": "Password changed successfully"},
     status= status.HTTP_200_OK
   )
+  

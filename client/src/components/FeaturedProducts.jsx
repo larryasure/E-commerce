@@ -9,7 +9,6 @@ import { formatCurrency } from "../utils/formatCurrency";
 
 export default function FeaturedProducts({ featuredProducts = [], cart = [] }) {
   const { addCart, increaseCart, decreaseCart } = useCart();
-  console.log(featuredProducts);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

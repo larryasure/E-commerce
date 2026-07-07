@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { addWishlist, getWishlist, removeWishlist } from "../api/wishlist";
-import { AuthContext } from "./authContext";
+import { AuthContext } from "./AuthContext";
 
 const WishlistContext = createContext();
 
@@ -9,29 +9,32 @@ export function WishlistProvider({ children }) {
   const [wishlist, setWishlist] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const { isAuthenticated } = useContext(AuthContext);
 
-  useEffect(() => {
-    fetchWishlist();
-  }, [isAuthenticated]);
+const auth = useContext(AuthContext);
 
-  const fetchWishlist = async () => {
-    if (!isAuthenticated) {
-      setWishlist([]);
-      setLoading(false);
-      return;
-    }
 
-    try {
-      const data = await getWishlist();
-      setLoading(true)
-      setWishlist(data);
-    } catch (error) {
-      console.error("Failed to fetch wishlist", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+const fetchWishlist = async () => {
+  if (!auth && !loading) {
+    setWishlist([]);
+    setLoading(false);
+    return;
+  }
+
+  try {
+    setLoading(true);
+    const data = await getWishlist();
+    setWishlist(data);
+  } catch (error) {
+    console.error(error);
+  } finally {
+    setLoading(false);
+  }
+};
+
+useEffect(() => {
+  fetchWishlist();
+}, [auth]);
+
 
   const addItem = async (productId) => {
     try {
@@ -40,7 +43,7 @@ export function WishlistProvider({ children }) {
       toast.success("Added to wishlist ❤️");
     } catch (error) {
       console.error("Unable to add to wishlist", error);
-      toast.error("Unable to add wishlist")
+      toast.error("Unable to add wishlist");
     }
   };
 
@@ -77,12 +80,11 @@ export function WishlistProvider({ children }) {
         removeItem,
         isWishlisted,
         toggleWishlist,
-        fetchWishlist
+        fetchWishlist,
       }}
     >
       {children}
     </WishlistContext.Provider>
   );
-
 }
-export const useWishlist = () =>  useContext(WishlistContext)
+export const useWishlist = () => useContext(WishlistContext);
