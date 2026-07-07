@@ -9,7 +9,7 @@ router.register('products', views.ProductViewSet)
 router.register('orders', views.OrderViewSet, basename='order')
 router.register('users', views.UserViewSet)
 router.register('profiles', views.UserProfileViewSet, basename='profile')
-router.register("wishlist", views.WishlistSerializer, basename="wishlist")
+router.register("wishlist", views.WishlistViewSet, basename="wishlist")
 
 
 

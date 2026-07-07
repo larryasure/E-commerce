@@ -67,24 +67,7 @@ class UserProfileViewSet(viewsets.ModelViewSet):
   def perform_update(self, serializer):
     serializer.save(user= self.request.user)
       
-class UserViewSet(viewsets.ModelViewSet):
-  queryset= User.objects.all()
-  serializer_class=UserSerializer
-  
-  
-  def get_permissions(self):
-    if self.action == 'create':
-      return [permissions.AllowAny()]
-    return [permissions.IsAuthenticated()]
 
-  def perform_create(self, serializer):
-    user= serializer.save()
-    
-    
-    token= default_token_generator.make_token(user)
-    uid= urlsafe_base64_encode(force_bytes(user.pk))
-    verification_url = f"http://localhost:3000/verify-email/{uid}/{token}/"
-    send_verification_email(user, verification_url)
 class OrderViewSet(viewsets.ModelViewSet):
   serializer_class=OrderSerializer
   permission_classes=[permissions.IsAuthenticatedOrReadOnly]  
@@ -109,10 +92,26 @@ class UserProfileUpdateView(generics.UpdateAPIView):
   
    
 class UserViewSet(viewsets.ModelViewSet):
-  queryset = User.objects.all()
-  serializer_class = UserSerializer
-  permission_classes= [permissions.IsAdminUser]
-    
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+    def get_permissions(self):
+        if self.action == "create":
+            return [permissions.AllowAny()]
+
+        return [permissions.IsAdminUser()]
+
+    def perform_create(self, serializer):
+        user = serializer.save()
+
+        token = default_token_generator.make_token(user)
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        verification_url = (
+            f"http://localhost:3000/verify-email/{uid}/{token}/"
+        )
+
+        send_verification_email(user, verification_url)
+
 @api_view(['GET'])
 def get_current_user(request):
   if not request.user.is_authenticated:
