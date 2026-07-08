@@ -134,34 +134,34 @@ class CartItemSerializer(serializers.ModelSerializer):
   
   subtotal = serializers.SerializerMethodField()
 
-class Meta:
-  model = CartItem
+  class Meta:
+   model = CartItem
   fields = ["id", "product", "product_id", "quantity", "subtotal"]
   
   def get_subtotal(self, obj):
-    return obj.product.name * obj.quantity
+    return obj.product.price * obj.quantity
   
   
-  class CartSerializer(serializers.ModelSerializer):
-    items = CartItemSerializer(read_only=True)
-    total = serializers.SerializerMethodField()
-    total_items = serializers.SerializerMethodField()
+class CartSerializer(serializers.ModelSerializer):
+  items = CartItemSerializer(read_only=True, many=True)
+  total = serializers.SerializerMethodField()
+  total_items = serializers.SerializerMethodField()
     
     
-    class Meta:
-      model = Cart
-      fields = ["id", "items", "total_items", "created_at", "updated_at"]
+  class Meta:
+    model = Cart
+    fields = ["id", "items",'total',  "total_items", "created_at", "updated_at"]
+    
       
       
-      
-    def get_total(self, obj):
-      return sum(
-        item.product.price * item.quantity
+  def get_total(self, obj):
+    return sum(
+      item.product.price * item.quantity
+      for item in obj.items.all()
+    )
+    
+  def get_total_items(self, obj):
+    return sum(
+        item.quantity
         for item in obj.items.all()
       )
-      
-    def get_total_items(self, obj):
-      return sum(
-          item.quantity
-          for item in obj.items.all()
-        )

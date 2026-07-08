@@ -10,7 +10,7 @@ export default function RootLayout() {
     <>
       <header>{!isAdmin && <Navbar />}</header>
 
-      <main className="min-h-screen  ">
+      <main className="min-h-screen  mt-16">
         <Outlet />
         <ScrollRestoration />
       </main>

@@ -1,16 +1,18 @@
 
+from arrow import get
 from django.contrib.messages import api
 from rest_framework import viewsets, permissions, generics
-from rest_framework.decorators import api_view 
+from rest_framework.decorators import api_view , action
 from rest_framework.response import Response
 from rest_framework import status
+from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from .emails import send_password_reset_email, send_verification_email, send_order_confirmation_email, send_welcome_email
-from .models import UserProfile, Product, Category, Order, Wishlist
-from .serializers import CategorySerializer, OrderSerializer, ProductSerializer, UserProfileSerializer, UserSerializer, WishListSerializer
+from .models import Cart, CartItem, UserProfile, Product, Category, Order, Wishlist
+from .serializers import CategorySerializer, OrderSerializer, ProductSerializer, UserProfileSerializer, UserSerializer, WishListSerializer, CartSerializer
 
 
 
@@ -139,7 +141,104 @@ class WishlistViewSet(viewsets.ModelViewSet):
     
     
     
+class CartViewSet(viewsets.ModelViewSet):
+  serializer_class= CartSerializer
+  permission_classes= [permissions.IsAuthenticated]
+  
+  def get_queryset(self):
+    return Cart.objects.filter(user= self.request.user).prefetch_related("items_product", "items_product_category")
+
+
+  def perform_create(self, serializer):
+    serializer.save(user= self.request.user)
     
+@action(detail=False, methods=["POST"])  
+  
+def add(self, request):
+  
+  
+  product_id = request.data.get("product_id")
+  quantity= int(request.data.get("quantity", 1))
+  
+  product = get_object_or_404(
+    Product,
+    id= product_id,
+    is_active= True,
+  )
+  
+  
+  cart , _ = Cart.objects.get_or_create(
+      user = request.user
+  )  
+  
+  item, created = CartItem.objects.get_or_create(cart=cart,
+    product= product,
+    defaults={"quantity": quantity})
+  
+  
+  
+  if not created:
+    item.quantity += quantity
+    item.save()
+    
+  serializer = CartSerializer(cart)
+  
+  return Response(serializer.data)
+
+
+@action(detail=True, methods=["patch"])
+def increase(self, request, pk=None):
+
+    item = get_object_or_404(
+      CartItem,
+       id=pk,
+        cart__user=request.user
+    )
+
+    item.quantity += 1
+    item.save()
+
+    return Response(
+        CartSerializer(item.cart).data
+    )
+    
+@action(detail=True, methods=["patch"])
+def decrease(self, request, pk=None):
+
+    item = get_object_or_404(
+      CartItem,
+        id=pk,
+        cart__user=request.user
+    )
+
+    if item.quantity > 1:
+        item.quantity -= 1
+        item.save()
+    else:
+        item.delete()
+
+    return Response(
+        CartSerializer(item.cart).data
+    )
+    
+@action(detail=True, methods=["delete"])
+def remove(self, request, pk=None):
+
+    item = get_object_or_404(
+      CartItem,
+        id=pk,
+        cart__user=request.user
+    )
+
+    cart = item.cart
+
+    item.delete()
+
+    return Response(
+        CartSerializer(cart).data
+    )
+    
+
 @api_view(['GET'])
 def verify_email(request, uid, token):
   try:
