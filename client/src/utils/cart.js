@@ -38,3 +38,12 @@ export const removeFromCart = (id) => {
 export const clearCart = () => {
   saveCart([]);
 };
+
+import axiosInstance from "../api/axiosConfig.js";
+
+const fetchCart = async () => {
+  const response = axiosInstance.get("cart/");
+  return response.data;
+};
+
+
