@@ -1,10 +1,12 @@
 import { Heart, Minus, Plus, ShoppingCart } from "lucide-react";
 import { NavLink } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { useWishlist } from "../context/WishlistContext";
 import { formatCurrency } from "../utils/formatCurrency";
 
 export default function ProductCard({ product, index = 0, variant = "grid" }) {
   const { cart, addCart, increaseCart, decreaseCart } = useCart();
+  const { isWishlisted, toggleWishlist } = useWishlist();
   const cartItem = cart.find((item) => item.id === product.id);
   const quantity = cartItem?.quantity || 0;
 
@@ -29,7 +31,9 @@ export default function ProductCard({ product, index = 0, variant = "grid" }) {
         </div>
 
         <div className="absolute top-2 right-2 bg-white/90 p-1 rounded-lg">
-          <Heart size={18} className="cursor-pointer hover:text-red-500" />
+          <button onClick={() => toggleWishlist(product.id)}>
+            <Heart size={20} className="cursor-pointer hover:text-red-500" />
+          </button>
         </div>
 
         {product.is_new && (

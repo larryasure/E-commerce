@@ -1,89 +1,79 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { getCart, saveCart } from "../utils/cart";
+import { getCart } from "../utils/cart.js";
 
 const CartContext = createContext();
 
 export function CartProvider({ children }) {
   const [cart, setCart] = useState([]);
+  const [loading, setLoading] = useState(false);
+
+  const fetchCart = async () => {
+    try {
+      setLoading(true);
+      const data = await getCart();
+      setCart(data);
+    } catch (error) {
+      console.error("Error fetching Cart:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const refreshCart = () => {
-      setCart(getCart());
-    };
+    fetchCart();
+  }, []);
 
-    refreshCart();
-
-    window.addEventListener("cartUpdated", refreshCart);
-    return () => window.removeEventListener("cartUpdated", refreshCart);
-  }, [setCart]);
-
-  const addCart = (product) => {
-    const currentCart = getCart();
-
-    let updatedCart;
-    const existingCart = currentCart.find((item) => item.id === product.id);
-
-    if (existingCart) {
-      updatedCart = currentCart.map((item) =>
-        item.id === product.id
-          ? { ...item, quantity: item.quantity + 1 }
-          : item,
-      );
-    } else {
-      updatedCart = [...currentCart, { ...product, quantity: 1 }];
+  const addCart = async (productId) => {
+    try {
+      const updatedCart = await addCart(productId, 1);
+      setCart(updatedCart);
+    } catch (error) {
+      console.error("Failed to add quantity:", error);
     }
-
-    saveCart(updatedCart);
-    setCart(updatedCart);
   };
 
-  const increaseCart = (id) => {
-    const updatedCart = cart.map((item) =>
-      item.id === id ? { ...item, quantity: item.quantity + 1 } : item,
-    );
-
-    saveCart(updatedCart);
-    setCart(updatedCart);
+  const increaseCart = async (id) => {
+    try {
+      const updatedCart = await increaseCart(id);
+      setCart(updatedCart);
+    } catch (error) {
+      console.error("Failed to increase quantity:", error);
+    }
   };
 
-  const decreaseCart = (id) => {
-    let updatedCart = cart.map((item) =>
-      item.id === id ? { ...item, quantity: item.quantity - 1 } : item,
-    );
-
-    updatedCart = updatedCart.filter((item) => item.quantity > 0);
-
-    saveCart(updatedCart);
-    setCart(updatedCart);
+  const decreaseCart = async (id) => {
+    try {
+      const updatedCart = await decreaseCart(id);
+      setCart(updatedCart);
+    } catch (error) {
+      console.error("Failed to decrease quantity:", error);
+    }
   };
 
-  const removeCart = (id) => {
-    const updatedCart = cart.filter((item) => item.id !== id);
-
-    saveCart(updatedCart);
-    setCart(updatedCart);
-  };
-
-  const clearCart = () => {
-    setCart([]);
+  const removeCart = async (id) => {
+    try {
+      await removeCart();
+      setCart((prev) => prev.filter((item) => item.id !== id));
+    } catch (error) {
+      console.error("Failed to removeCart:", error);
+    }
   };
 
   return (
     <CartContext.Provider
       value={{
         cart,
+        loading,
         addCart,
         increaseCart,
         decreaseCart,
         removeCart,
-        clearCart,
+        refreshCart:fetchCart
       }}
     >
       {children}
     </CartContext.Provider>
   );
 }
-
-// export const useCart = useContext(CartContext)
 
 export const useCart = () => useContext(CartContext);
