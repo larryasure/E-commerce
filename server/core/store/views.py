@@ -1,4 +1,6 @@
 
+from urllib import request
+
 from arrow import get
 from django.contrib.messages import api
 from rest_framework import viewsets, permissions, generics
@@ -237,6 +239,14 @@ def remove(self, request, pk=None):
         CartSerializer(cart).data
     )
     
+    
+    
+@action(detail=True, methods=["delete"])
+def clear(self, request):
+
+  cart = CartItem.objects.filter(user =request.user)
+  cart.delete()
+  return Response([], status=status.HTTP_204_NO_CONTENT)
 
 @api_view(['GET'])
 def verify_email(request, uid, token):

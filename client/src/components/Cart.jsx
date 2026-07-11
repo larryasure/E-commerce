@@ -1,25 +1,23 @@
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import { formatCurrency } from "../utils/formatCurrency";
 import { useCart } from "../context/CartContext";
+import { formatCurrency } from "../utils/formatCurrency";
 
 export default function Cart() {
   const { isAuthenticated } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const {cart, increaseCart, decreaseCart, removeCart} = useCart()
+  const { cart, increaseCart, decreaseCart, removeCart } = useCart();
 
-  const total = cart.reduce((sum , item) => sum + item.price * item.quantity , 0 )
+  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  let shipping = 0
+  let shipping = 0;
   if (total > 0 && total < 150000) {
-    shipping = 3500
+    shipping = 3500;
   }
 
-  const grandTotal = total + shipping
-
-
+  const grandTotal = total + shipping;
 
   if (cart.length === 0) {
     return (
@@ -71,9 +69,7 @@ export default function Cart() {
                   <div className="flex items-center gap-4">
                     <div className="flex items-center border-2 border-[#155daf] rounded-lg">
                       <button
-                        onClick={() =>
-                          decreaseCart(item.id)
-                        }
+                        onClick={() => decreaseCart(item.id)}
                         className="px-3 py-1 hover:bg-[#155daf]/10 transition-colors duration-300"
                       >
                         −
@@ -82,9 +78,7 @@ export default function Cart() {
                         {item.quantity}
                       </span>
                       <button
-                        onClick={() =>
-                          increaseCart(item.id)
-                        }
+                        onClick={() => increaseCart(item.id)}
                         className="px-3 py-0.5 hover:bg-[#155daf]/10 transition-colors duration-300"
                       >
                         +
@@ -127,10 +121,8 @@ export default function Cart() {
                     {shipping === 0 ? (
                       <span className="text-green-500  ">Free</span>
                     ) : (
-                        <span>
-                          { formatCurrency(shipping)}
-                        </span>
-                      )}
+                      <span>{formatCurrency(shipping)}</span>
+                    )}
                   </span>
                 </div>
               </div>

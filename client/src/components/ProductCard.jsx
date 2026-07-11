@@ -32,7 +32,7 @@ export default function ProductCard({ product, index = 0, variant = "grid" }) {
 
         <div className="absolute top-2 right-2 bg-white/90 p-1 rounded-lg">
           <button onClick={() => toggleWishlist(product.id)}>
-            <Heart size={20} className="cursor-pointer hover:text-red-500" />
+            <Heart size={20} fill={`is`} className="cursor-pointer hover:text-red-500" />
           </button>
         </div>
 

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axiosConfig";
 import { AuthContext } from "../context/AuthContext";
 import { formatCurrency } from "../utils/formatCurrency";
-import { clearCart, getCart } from "../utils/cart";
+import { clearCartApi, getCartApi } from "../utils/cart";
 
 
 

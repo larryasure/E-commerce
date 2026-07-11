@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { getCart } from "../utils/cart.js";
+import { addCartApi, clearCartApi, decreaseCartApi, getCartApi, increaseCartApi, removeCartApi } from "../utils/cart";
+
 
 const CartContext = createContext();
 
@@ -10,7 +11,7 @@ export function CartProvider({ children }) {
   const fetchCart = async () => {
     try {
       setLoading(true);
-      const data = await getCart();
+      const data = await getCartApi();
       setCart(data);
     } catch (error) {
       console.error("Error fetching Cart:", error);
@@ -25,7 +26,7 @@ export function CartProvider({ children }) {
 
   const addCart = async (productId) => {
     try {
-      const updatedCart = await addCart(productId, 1);
+      const updatedCart = await addCartApi(productId, 1);
       setCart(updatedCart);
     } catch (error) {
       console.error("Failed to add quantity:", error);
@@ -34,7 +35,7 @@ export function CartProvider({ children }) {
 
   const increaseCart = async (id) => {
     try {
-      const updatedCart = await increaseCart(id);
+      const updatedCart = await increaseCartApi(id);
       setCart(updatedCart);
     } catch (error) {
       console.error("Failed to increase quantity:", error);
@@ -43,7 +44,7 @@ export function CartProvider({ children }) {
 
   const decreaseCart = async (id) => {
     try {
-      const updatedCart = await decreaseCart(id);
+      const updatedCart = await decreaseCartApi(id);
       setCart(updatedCart);
     } catch (error) {
       console.error("Failed to decrease quantity:", error);
@@ -52,12 +53,24 @@ export function CartProvider({ children }) {
 
   const removeCart = async (id) => {
     try {
-      await removeCart();
+      await removeCartApi();
       setCart((prev) => prev.filter((item) => item.id !== id));
     } catch (error) {
       console.error("Failed to removeCart:", error);
     }
   };
+
+
+const clearCart = async () => {
+  await clearCartApi();
+
+  setCart((prev) => ({
+    ...prev,
+    items: [],
+    total: 0,
+    total_items: 0,
+  }));
+};
 
   return (
     <CartContext.Provider
@@ -68,7 +81,8 @@ export function CartProvider({ children }) {
         increaseCart,
         decreaseCart,
         removeCart,
-        refreshCart:fetchCart
+        clearCart,
+        refreshCart:fetchCart,
       }}
     >
       {children}
