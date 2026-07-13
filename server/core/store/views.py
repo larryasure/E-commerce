@@ -1,8 +1,3 @@
-
-from urllib import request
-
-from arrow import get
-from django.contrib.messages import api
 from rest_framework import viewsets, permissions, generics
 from rest_framework.decorators import api_view , action
 from rest_framework.response import Response
@@ -13,8 +8,11 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from .emails import send_password_reset_email, send_verification_email, send_order_confirmation_email, send_welcome_email
-from .models import Cart, CartItem, UserProfile, Product, Category, Order, Wishlist
+from .models import Cart, CartItem, OrderItem, UserProfile, Product, Category, Order, Wishlist
 from .serializers import CategorySerializer, OrderSerializer, ProductSerializer, UserProfileSerializer, UserSerializer, WishListSerializer, CartSerializer
+
+
+
 
 
 
@@ -76,16 +74,12 @@ class OrderViewSet(viewsets.ModelViewSet):
   serializer_class=OrderSerializer
   permission_classes=[permissions.IsAuthenticatedOrReadOnly]  
   
-  
   def get_queryset(self):
     return Order.objects.filter(user=self.request.user)
   
-  def perform_create(self, serializer):
-    order = serializer.save(user=self.request.user)
-    
-    send_order_confirmation_email(self.request.user, order)
-   
-   
+  
+  
+
 class UserProfileUpdateView(generics.UpdateAPIView):
   serializer_class= UserProfileSerializer
   permission_classes= [permissions.IsAuthenticated]

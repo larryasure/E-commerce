@@ -49,7 +49,7 @@ export default function AdminOrders() {
       await axiosInstance.delete(`orders/${id}/`);
       setOrders((prev) => prev.filter((order) => order.id !== id));
     } catch (error) {
-      console.error("Failed to delete Order");
+      console.error("Failed to delete Order:", error);
     }
   };
 
@@ -71,7 +71,7 @@ export default function AdminOrders() {
               <select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
-                className="px-6 py-3 border-2 border-[#155daf] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#155daf]"
+                className="px-6 py-2 border-2 border-[#155daf] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#155daf]"
               >
                 <option value="">All Orders</option>
                 <option value="PROCESSING">Processing</option>

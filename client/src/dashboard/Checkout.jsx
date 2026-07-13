@@ -56,11 +56,11 @@ export default function Checkout() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!handleValidate()) return;
-    setCheckoutLoading(true);
+     setCheckoutLoading(true);
 
     try {
       const orderTotal = {
-        totalPrice: grandtotal,
+        total_items: grandtotal,
         shipping_address: formData.shippingAddress,
       };
 
