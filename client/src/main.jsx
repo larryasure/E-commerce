@@ -90,8 +90,8 @@ const router = createBrowserRouter([
           { path: "dashboard", element: <AdminDashboard /> },
           { path: "categories", element: <AdminCategories /> },
           { path: "products", element: <AdminProducts /> },
-          { path: "products/:id", element: <AdminProductForm /> },
           { path: "products/new", element: <AdminProductForm /> },
+          { path: "products/:id", element: <AdminProductForm /> },
           { path: "orders", element: <AdminOrders /> },
           { path: "orders/:id", element: <AdminOrderDetail /> },
           { path: "users", element: <AdminUsers /> },
@@ -106,12 +106,12 @@ const router = createBrowserRouter([
 createRoot(document.getElementById("root")).render(
   <StrictMode>
     <AuthProvider>
-        <WishlistProvider>
-      <CartProvider>
+      <WishlistProvider>
+        <CartProvider>
           <RouterProvider router={router} />
           <ToastContainer position="top-center" autoClose={2000} theme="dark" />
-      </CartProvider>
-        </WishlistProvider>
+        </CartProvider>
+      </WishlistProvider>
     </AuthProvider>
   </StrictMode>,
 );

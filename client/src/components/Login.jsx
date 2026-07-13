@@ -84,7 +84,7 @@ export default function Login() {
   return (
     <>
       <div className="flex items-center justify-center  my-10 px-4 ">
-        <div className=" max-w-md w-full shadow-xl rounded-lg bg-white p-8">
+        <div className=" max-w-sm w-full shadow-xl rounded-lg bg-white p-8">
           <h2 className="text-3xl font-bold text-[#13315C] text-center">
             PrimePack
           </h2>

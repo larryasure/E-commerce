@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axiosInstance from "../api/axiosConfig";
 import fallback from "../assets/Hero banner/Fallback.jpg";
+import { useCart } from "../context/CartContext";
 import { formatCurrency } from "../utils/formatCurrency";
 
 export default function ProductDetails() {
@@ -10,9 +11,15 @@ export default function ProductDetails() {
   const navigate = useNavigate();
 
   const [product, setProduct] = useState(null);
-  const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(true);
-  const [addedToCart, setAddedToCart] = useState(false);
+
+  const { cart, addCart, increaseCart, decreaseCart } = useCart();
+
+  const cartItem = cart?.items?.find(
+    (item) => item.product?.id === product?.id,
+  );
+
+  const quantity = cartItem?.quantity || 0;
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -27,25 +34,6 @@ export default function ProductDetails() {
     };
     fetchProduct();
   }, [id]);
-
-  const handleAddToCart = () => {
-    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
-    const existingItem = cart.find((item) => item.id === product.id);
-    if (existingItem) {
-      existingItem.quantity += quantity;
-    } else {
-      cart.push({
-        id: product.id,
-        name: product.name,
-        image: product.image,
-        price: product.price,
-        quantity,
-      });
-    }
-    localStorage.setItem("cart", JSON.stringify(cart));
-    setAddedToCart(true);
-    setTimeout(() => setAddedToCart(false), 2000);
-  };
 
   if (loading) {
     return (
@@ -107,19 +95,15 @@ export default function ProductDetails() {
               </p>
             </div>
 
-            {/* Middle column — name, rating, price, description */}
             <div className="flex flex-col gap-4">
-              {/* Category */}
               <p className="text-xs text-[#155daf] font-semibold uppercase tracking-widest">
                 {product.category?.name || "Premium Collection"}
               </p>
 
-              {/* Name */}
               <h1 className="text-xl sm:text-2xl font-bold text-gray-900 leading-snug">
                 {product.name}
               </h1>
 
-              {/* Rating row */}
               <div className="flex items-center gap-2 pb-3 border-b border-gray-200">
                 <span className="text-yellow-400 text-sm leading-none">
                   ★★★★★
@@ -129,7 +113,6 @@ export default function ProductDetails() {
                 </span>
               </div>
 
-              {/* Price block */}
               <div className="pb-3 border-b border-gray-200">
                 <p className="text-xs text-gray-500 mb-0.5">Price</p>
                 <p className="text-3xl font-bold text-gray-900">
@@ -140,14 +123,12 @@ export default function ProductDetails() {
                 </p>
               </div>
 
-              {/* Stock */}
               <p
                 className={`text-base font-semibold ${product.stock > 0 ? "text-[#007600]" : "text-red-600"}`}
               >
                 {product.stock > 0 ? "In Stock" : "Out of Stock"}
               </p>
 
-              {/* Description */}
               <div className="pb-3 border-b border-gray-200">
                 <p className="text-sm font-semibold text-gray-800 mb-2">
                   About this item
@@ -158,7 +139,6 @@ export default function ProductDetails() {
                 </p>
               </div>
 
-              {/* Trust */}
               <div className="flex flex-col gap-3">
                 {[
                   {
@@ -186,11 +166,9 @@ export default function ProductDetails() {
             </div>
           </div>
 
-          {/* ── RIGHT col: buy box ── */}
           {product.stock > 0 && (
             <div className="lg:sticky lg:top-6">
               <div className="border border-gray-200 bg-white/80  rounded-lg p-6 flex flex-col gap-4">
-                {/* Price */}
                 <p className="text-2xl font-bold text-gray-900">
                   {formatCurrency(product.price)}
                 </p>
@@ -210,7 +188,7 @@ export default function ProductDetails() {
                   </label>
                   <div className="flex items-center border border-gray-300  rounded-xl">
                     <button
-                      onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                      onClick={() => decreaseCart(cartItem.id)}
                       className="px-3 py-1.5 text-gray-600 hover:bg-gray-100 transition-colors text-lg leading-none border-r border-gray-300 active:scale-110 hover:rounded-xs"
                     >
                       −
@@ -219,9 +197,7 @@ export default function ProductDetails() {
                       {quantity}
                     </span>
                     <button
-                      onClick={() =>
-                        setQuantity(Math.min(product.stock, quantity + 1))
-                      }
+                      onClick={() => increaseCart(cartItem.id)}
                       className="px-3 py-1.5 text-gray-600 hover:bg-gray-200 transition-colors text-lg leading-none border-l border-gray-300 active:scale-110 hover:rounded-xs"
                     >
                       +
@@ -230,13 +206,12 @@ export default function ProductDetails() {
                 </div>
 
                 <button
-                  onClick={handleAddToCart}
+                  onClick={() => addCart(product.id)}
                   className="w-full bg-[#155daf] hover:bg-[#13315C] text-white py-2.5 rounded-full font-semibold text-sm transition-all duration-200 active:scale-[0.98] shadow-sm"
                 >
-                  {addedToCart ? "✓ Added to Cart" : "Add to Cart"}
+                  {quantity > 0 ? "✓ Added to Cart" : "Add to Cart"}
                 </button>
 
-                {/* Go to cart */}
                 <button
                   onClick={() => navigate("/cart")}
                   className="w-full bg-[#13315C] hover:bg-[#0d2240] text-white py-2.5 rounded-full font-semibold text-sm transition-all duration-200"

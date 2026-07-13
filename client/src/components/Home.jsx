@@ -163,7 +163,6 @@ export default function Home() {
                           {Icon && (
                             <Icon size={18} className="text-[#13315c]" />
                           )}
-                          {/* {category.name.charAt(0)} */}
                         </div>
                       </div>
 
@@ -213,7 +212,10 @@ export default function Home() {
             ) : featuredProducts.length > 0 ? (
               <FeaturedProducts
                 featuredProducts={featuredProducts}
-                cart={cart}
+                  cart={cart}
+                  addCart={addCart}
+                  increaseCart={increaseCart}
+                  decreaseCart= {decreaseCart}
               />
             ) : (
               <div className="py-20 text-center">

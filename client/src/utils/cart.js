@@ -1,8 +1,17 @@
 import axiosInstance from "../api/axiosConfig.js";
 
 export const getCartApi = async () => {
-  const response = await axiosInstance.get("cart/");
-  return response.data;
+
+  try {
+    const response = await axiosInstance.get("cart/");
+    return response.data;
+    
+  } catch (error) {
+    console.error("error", error);
+    
+  }
+  
+  
 };
 
 export const addCartApi = async (productId, quantity = 1) => {
@@ -20,11 +29,12 @@ export const increaseCartApi = async (itemId) => {
 };
 
 export const decreaseCartApi = async (itemId) => {
-  const response = await axiosInstance.patch(`cart/${itemId}decrease/`);
+  const response = await axiosInstance.patch(`cart/${itemId}/decrease/`);
   return response.data;
 };
 
 export const removeCartApi = async (itemId) => {
+
   const response = await axiosInstance.delete(`cart/${itemId}/remove/`);
   return response.data;
 };

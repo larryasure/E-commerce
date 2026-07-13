@@ -2,27 +2,29 @@ import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../api/axiosConfig";
 import { AuthContext } from "../context/AuthContext";
+import { useCart } from "../context/CartContext";
 import { formatCurrency } from "../utils/formatCurrency";
-import { clearCartApi, getCartApi } from "../utils/cart";
-
-
 
 export default function Checkout() {
   const navigate = useNavigate();
 
   const { user, loading } = useContext(AuthContext);
-  const [cartItems, setCartItems] = useState([]);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [formData, setFormData] = useState({ shippingAddress: "" });
   const [errors, setErrors] = useState({});
   const [isReady, setIsReady] = useState(false);
   const [success, setSuccess] = useState("");
-  
+  const { cart, clearCart } = useCart();
 
+  const cartItems = cart?.items || [];
+  const subtotal = cart?.total || 0;
+  const totalItems = cart?.total_items || 0;
+  let shipping = 0;
 
-  useEffect(() => {
-    setCartItems(getCart());
-  }, []);
+  if (totalItems > 0 && subtotal < 150000) {
+    shipping = 3500;
+  }
+  const grandtotal = subtotal + shipping;
 
   useEffect(() => {
     if (!loading) {
@@ -32,8 +34,6 @@ export default function Checkout() {
       setIsReady(true);
     }
   }, [user, loading]);
-
-  const total = cartItems.reduce((sum, item) => item.price * item.quantity, 0);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -60,16 +60,18 @@ export default function Checkout() {
 
     try {
       const orderTotal = {
-        totalPrice: total,
+        totalPrice: grandtotal,
         shipping_address: formData.shippingAddress,
       };
 
-      await axiosInstance.get("orders/", orderTotal);
-      clearCart(cartItems)
+      await axiosInstance.post("orders/", orderTotal);
+      await clearCart()
       setSuccess("Order placed successfully");
       navigate("/orders");
     } catch (error) {
       setErrors({ submit: error.response?.detail || "Failed to place order" });
+      console.log(error.response.data);
+      
     } finally {
       setCheckoutLoading(false);
     }
@@ -137,7 +139,7 @@ export default function Checkout() {
                         >
                           <div>
                             <p className="text-sm font-medium text-[#13315c] ">
-                              {item.name}
+                              {item.product.name}
                             </p>
 
                             <p className="text-sm text-gray-500 mt-0.5">
@@ -146,7 +148,9 @@ export default function Checkout() {
                           </div>
 
                           <p className="text-[#155daf] text-sm tracking-wider font-medium">
-                            {formatCurrency(item.price * item.quantity)}
+                            {formatCurrency(
+                              item?.product?.price * item.quantity,
+                            )}
                           </p>
                         </div>
                       ))}
@@ -182,28 +186,29 @@ export default function Checkout() {
                   </h2>
                 </div>
                 <div className="space-y-3 border-b pb-4   ">
-                  <div className="flex items-center justify-between text-gray-600">
-                    <span>Subtotal</span>
-                    <span className="text-[#13315c] font-medium text-sm tracking-wider]">
-                      {formatCurrency(total)}
-                    </span>
-                  </div>
-                  <div className="flex justify-between text-gray-600">
-                    <span>Shipping</span>
-                    {total > 150000 ? (
-                      <span className="text-sm text-green-600 font-medium">
-                        Free
+                  <div className="space-y-3 border-b pb-4">
+                    <div className="flex justify-between text-gray-600">
+                      <span>Subtotal</span>
+                      <span className="text-sm">
+                        {formatCurrency(subtotal)}
                       </span>
-                    ) : (
-                      <span className="text-sm text-[#13315c] font-medium ">
-                        #3500.00
+                    </div>
+                    <div className="flex justify-between text-gray-600">
+                      <span>Shipping</span>
+                      <span className="text-[#13315c] text-sm">
+                        {shipping === 0 ? (
+                          <span className="text-green-500  ">Free</span>
+                        ) : (
+                          <span>{formatCurrency(shipping)}</span>
+                        )}
                       </span>
-                    )}
+                    </div>
                   </div>
+
                   <div className="flex justify-between items-center pt-7 ">
                     <span className="font-bold text-[#13315C]">Total</span>
                     <span className="text-lg tracking-wider font-bold text-[#155daf]">
-                      {formatCurrency(total)}
+                      {formatCurrency(grandtotal)}
                     </span>
                   </div>
 

@@ -124,7 +124,7 @@ class Wishlist(models.Model):
   
   class Meta: 
       unique_together= ("user", "product")
-      ordering = ["-created_at"]
+      ordering = ["id"]
     
   def __str__(self):
     return f"{self.user.username} 💗 {self.product.name}"

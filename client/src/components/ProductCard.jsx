@@ -7,8 +7,13 @@ import { formatCurrency } from "../utils/formatCurrency";
 export default function ProductCard({ product, index = 0, variant = "grid" }) {
   const { cart, addCart, increaseCart, decreaseCart } = useCart();
   const { isWishlisted, toggleWishlist } = useWishlist();
-  const cartItem = cart.find((item) => item.id === product.id);
+  
+  const cartItem = cart?.items?.find(
+    (item) => item.product.id === product.id
+  );
   const quantity = cartItem?.quantity || 0;
+
+
 
   const baseClass =
     "group bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full";
@@ -21,7 +26,7 @@ export default function ProductCard({ product, index = 0, variant = "grid" }) {
 
   return (
     <div className={baseClass} style={{ animationDelay: `${index * 100}ms` }}>
-      <div className="relative bg-gray-100 overflow-hidden h-42">
+      <div className="relative bg-gray-100 overflow-hidden h-40">
         <div className={imageHeight}>
           <img
             src={product.image}
@@ -30,9 +35,17 @@ export default function ProductCard({ product, index = 0, variant = "grid" }) {
           />
         </div>
 
-        <div className="absolute top-2 right-2 bg-white/90 p-1 rounded-lg">
-          <button onClick={() => toggleWishlist(product.id)}>
-            <Heart size={20} fill={`is`} className="cursor-pointer hover:text-red-500" />
+        <div className="absolute top-2 right-2 ">
+          <button
+            onClick={() => toggleWishlist(product.id)}
+            className="flex item-center justify-center p-1 bg-white rounded-md "
+          >
+            <Heart
+              strokeWidth={0.5}
+              size={20}
+              fill={isWishlisted(product.id) ? "#ef4544" : "none"}
+              className="cursor-pointer"
+            />
           </button>
         </div>
 
@@ -51,7 +64,6 @@ export default function ProductCard({ product, index = 0, variant = "grid" }) {
         )}
       </div>
 
-      {/* CONTENT SECTION */}
       <div className="p-2.5 flex flex-col flex-1">
         <h3 className="font-bold text-[#13315c] group-hover:text-[#155daf] transition-colors">
           {product.name}
@@ -95,7 +107,7 @@ export default function ProductCard({ product, index = 0, variant = "grid" }) {
             {quantity > 0 ? (
               <div className="flex items-center rounded-xl  border border-sky-200 bg-sky-50 overflow-hidden">
                 <button
-                  onClick={() => decreaseCart(product.id)}
+                  onClick={() => decreaseCart(cartItem.id)}
                   className="p-2 hover:bg-sky-100"
                 >
                   <Minus size={16} />
@@ -104,7 +116,7 @@ export default function ProductCard({ product, index = 0, variant = "grid" }) {
                 <span className="px-2 text-sm font-bold">{quantity}</span>
 
                 <button
-                  onClick={() => increaseCart(product.id)}
+                  onClick={() => increaseCart(cartItem.id)}
                   className="p-2 hover:bg-sky-100"
                 >
                   <Plus size={16} />
@@ -112,7 +124,7 @@ export default function ProductCard({ product, index = 0, variant = "grid" }) {
               </div>
             ) : (
               <button
-                onClick={() => addCart(product)}
+                onClick={() => addCart(product.id)}
                 className="flex items-center gap-2 rounded-lg bg px-3 py-1.5 text-sm bg-[#155daf] text-white hover:bg-[#13315C] hover:scale-105 cursor-pointer"
               >
                 <ShoppingCart size={16} />

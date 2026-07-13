@@ -4,12 +4,15 @@ import "swiper/css";
 import "swiper/css/pagination";
 import { Autoplay, Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { useCart } from "../context/CartContext";
 import { formatCurrency } from "../utils/formatCurrency";
 
-export default function FeaturedProducts({ featuredProducts = [], cart = [] }) {
-  const { addCart, increaseCart, decreaseCart } = useCart();
-
+export default function FeaturedProducts({
+  featuredProducts = [],
+  cart = [],
+  increaseCart,
+  decreaseCart,
+  addCart,
+}) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Header */}
@@ -46,7 +49,9 @@ export default function FeaturedProducts({ featuredProducts = [], cart = [] }) {
           className="h-[420px] featured-swiper"
         >
           {featuredProducts.map((product) => {
-            const cartItem = cart.find((item) => item.id === product.id);
+            const cartItem = cart?.items?.find(
+              (item) => item.product?.id === product.id,
+            );
             const quantity = cartItem?.quantity || 0;
 
             return (
@@ -111,10 +116,10 @@ export default function FeaturedProducts({ featuredProducts = [], cart = [] }) {
                       </NavLink>
 
                       {quantity > 0 ? (
-                        <div className="flex items-center rounded-xl border border-sky-200 bg-sky-50 overflow-hidden">
+                        <div className="flex items-center rounded-xl  border border-sky-200 bg-sky-50 overflow-hidden">
                           <button
-                            onClick={() => decreaseCart(product.id)}
-                            className="p-1.5 hover:bg-sky-100"
+                            onClick={() => decreaseCart(cartItem.id)}
+                            className="p-2 hover:bg-sky-100"
                           >
                             <Minus size={16} />
                           </button>
@@ -124,16 +129,16 @@ export default function FeaturedProducts({ featuredProducts = [], cart = [] }) {
                           </span>
 
                           <button
-                            onClick={() => increaseCart(product.id)}
-                            className="p-1.5 hover:bg-sky-100"
+                            onClick={() => increaseCart(cartItem.id)}
+                            className="p-2 hover:bg-sky-100"
                           >
                             <Plus size={16} />
                           </button>
                         </div>
                       ) : (
                         <button
-                          onClick={() => addCart(product)}
-                          className="flex items-center gap-2 rounded-lg bg-[#13315C] px-3 py-2 text-white text-sm hover:bg-[#155daf] active:scale-95"
+                          onClick={() => addCart(product.id)}
+                          className="flex items-center gap-2 rounded-lg bg px-3 py-1.5 text-sm bg-[#155daf] text-white hover:bg-[#13315C] hover:scale-105 cursor-pointer"
                         >
                           <ShoppingCart size={16} />
                           Add

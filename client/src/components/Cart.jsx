@@ -10,16 +10,18 @@ export default function Cart() {
 
   const { cart, increaseCart, decreaseCart, removeCart } = useCart();
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const subtotal = cart?.total || 0;
+  const totalItems = cart?.total_items || 0;
 
   let shipping = 0;
-  if (total > 0 && total < 150000) {
+  
+  if ( totalItems > 0 && subtotal < 150000) {
     shipping = 3500;
   }
 
-  const grandTotal = total + shipping;
+  const grandTotal = subtotal + shipping;
 
-  if (cart.length === 0) {
+  if (!cart?.items?.length) {
     return (
       <div className="min-h-screen py-12 mt-24">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -51,18 +53,18 @@ export default function Cart() {
           {/* Cart Items */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-              {cart.map((item, index) => (
+              {cart?.items?.map((item) => (
                 <div
                   key={item.id}
-                  className={`p-6 flex items-center justify-between border-b last:border-b-0 hover:bg-gray-50 transition-colors duration-300 animate-fadeInUp`}
-                  style={{ animationDelay: `${index * 50}ms` }}
+                  className="p-6 flex items-center justify-between border-b last:border-b-0 hover:bg-gray-50 transition-colors duration-300"
                 >
                   <div className="flex-1">
                     <h3 className="font-bold text-[#13315C] mb-2">
-                      {item.name}
+                      {item.product.name}
                     </h3>
+
                     <p className="text-[#155daf] font-semibold text-sm">
-                      {formatCurrency(item.price)}
+                      {formatCurrency(item.product.price)}
                     </p>
                   </div>
 
@@ -70,28 +72,30 @@ export default function Cart() {
                     <div className="flex items-center border-2 border-[#155daf] rounded-lg">
                       <button
                         onClick={() => decreaseCart(item.id)}
-                        className="px-3 py-1 hover:bg-[#155daf]/10 transition-colors duration-300"
+                        className="px-3 py-1 hover:bg-[#155daf]/10"
                       >
                         −
                       </button>
+
                       <span className="px-4 py-1.5 font-bold">
                         {item.quantity}
                       </span>
+
                       <button
                         onClick={() => increaseCart(item.id)}
-                        className="px-3 py-0.5 hover:bg-[#155daf]/10 transition-colors duration-300"
+                        className="px-3 py-1 hover:bg-[#155daf]/10"
                       >
                         +
                       </button>
                     </div>
 
                     <p className="font-bold text-[#13315C] w-20 text-right text-sm">
-                      {formatCurrency(item.price * item.quantity)}
+                      {formatCurrency(item.product.price * item.quantity)}
                     </p>
 
                     <button
                       onClick={() => removeCart(item.id)}
-                      className="text-red-500 hover:text-red-700 font-bold transition-colors duration-300"
+                      className="text-red-500 hover:text-red-700 font-bold"
                     >
                       ✕
                     </button>
@@ -101,7 +105,6 @@ export default function Cart() {
             </div>
           </div>
 
-          {/* Summary */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl shadow-lg p-6 sticky top-20 space-y-6 animate-fadeInUp">
               <div>
@@ -113,7 +116,7 @@ export default function Cart() {
               <div className="space-y-3 border-b pb-4">
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal</span>
-                  <span className="text-sm">{formatCurrency(total)}</span>
+                  <span className="text-sm">{formatCurrency(subtotal)}</span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping</span>

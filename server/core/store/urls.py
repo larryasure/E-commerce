@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenBlacklistView
 from rest_framework.routers import DefaultRouter
-from . import views
+from . import views 
 
 router = DefaultRouter()
 router.register('categories', views.CategoryViewSet)

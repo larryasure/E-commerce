@@ -10,7 +10,7 @@ export default function Navbar() {
 
   const { cart } = useCart();
 
-  const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const cartCount = cart?.total_items || 0
 
   const textLinkStyle = ({ isActive }) =>
     `px-3 py-2 text-sm font-medium transition-colors duration-200
@@ -27,7 +27,7 @@ export default function Navbar() {
   return (
     <>
       <nav className="fixed w-full top-0 z-10  bg-white/85 backdrop-blur-xl border-b border-slate-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 py-2 flex items-center justify-between">
           <NavLink
             to="/"
             className="text-2xl font-extrabold tracking-tight text-[#13315c]"

@@ -86,7 +86,6 @@ class OrderViewSet(viewsets.ModelViewSet):
     send_order_confirmation_email(self.request.user, order)
    
    
-   
 class UserProfileUpdateView(generics.UpdateAPIView):
   serializer_class= UserProfileSerializer
   permission_classes= [permissions.IsAuthenticated]
@@ -127,127 +126,92 @@ def get_current_user(request):
   serializer= UserSerializer(request.user)
   return Response(serializer.data)
     
-    
 class WishlistViewSet(viewsets.ModelViewSet):
-  serializer_class= WishListSerializer
-  permission_classes= [permissions.IsAuthenticated]
-  
+  serializer_class = WishListSerializer
+  permission_classes = [permissions.IsAuthenticated]
+
   def get_queryset(self):
     return Wishlist.objects.filter(
-      user = self.request.user
-      
-    ).select_related("user", "product" )
-    
+      user=self.request.user
+    ).select_related("user", "product")
+
   def perform_create(self, serializer):
-    serializer.save(user = self.request.user)
-    
-    
-    
+    serializer.save(user=self.request.user)
+
+
 class CartViewSet(viewsets.ModelViewSet):
-  serializer_class= CartSerializer
-  permission_classes= [permissions.IsAuthenticated]
-  
+  serializer_class = CartSerializer
+  permission_classes = [permissions.IsAuthenticated]
   def get_queryset(self):
-    return Cart.objects.filter(user= self.request.user).prefetch_related("items_product", "items_product_category")
-
-
+      return Cart.objects.filter(
+          user=self.request.user
+      ).prefetch_related(
+          "items__product",
+          "items__product__category"
+      )
+  def list(self, request):
+      cart, created = Cart.objects.get_or_create(
+          user=request.user
+      )
+      serializer = self.get_serializer(cart)
+      return Response(serializer.data)
   def perform_create(self, serializer):
-    serializer.save(user= self.request.user)
+      serializer.save(user=self.request.user)
     
-@action(detail=False, methods=["POST"])  
-def add(self, request):
-  
-  
-  product_id = request.data.get("product_id")
-  quantity= int(request.data.get("quantity", 1))
-  
-  product = get_object_or_404(
-    Product,
-    id= product_id,
-    is_active= True,
-  )
-  
-  
-  cart , _ = Cart.objects.get_or_create(
-      user = request.user
-  )  
-  
-  item, created = CartItem.objects.get_or_create(cart=cart,
-    product= product,
-    defaults={"quantity": quantity})
-  
-  
-  
-  if not created:
-    item.quantity += quantity
-    item.save()
-    
-  serializer = CartSerializer(cart)
-  
-  return Response(serializer.data)
 
+  @action(detail=False, methods=["POST"])
+  def add(self, request):
+    product_id = request.data.get("product_id")
+    quantity = int(request.data.get("quantity", 1))
 
-@action(detail=True, methods=["patch"])
-def increase(self, request, pk=None):
+    product = get_object_or_404(Product, id=product_id, is_active=True)
 
-    item = get_object_or_404(
-      CartItem,
-       id=pk,
-        cart__user=request.user
+    cart, _ = Cart.objects.get_or_create(user=request.user)
+
+    item, created = CartItem.objects.get_or_create(
+      cart=cart,
+      product=product,
+      defaults={"quantity": quantity},
     )
 
+    if not created:
+      item.quantity += quantity
+      item.save()
+
+    serializer = CartSerializer(cart)
+    return Response(serializer.data)
+
+  @action(detail=True, methods=["PATCH"])
+  def increase(self, request, pk=None):
+    item = get_object_or_404(CartItem, id=pk, cart__user=request.user)
     item.quantity += 1
     item.save()
+    return Response(CartSerializer(item.cart).data)
 
-    return Response(
-        CartSerializer(item.cart).data
-    )
-    
-@action(detail=True, methods=["patch"])
-def decrease(self, request, pk=None):
-
-    item = get_object_or_404(
-      CartItem,
-        id=pk,
-        cart__user=request.user
-    )
-
+  @action(detail=True, methods=["PATCH"])
+  def decrease(self, request, pk=None):
+    item = get_object_or_404(CartItem, id=pk, cart__user=request.user)
     if item.quantity > 1:
-        item.quantity -= 1
-        item.save()
+      item.quantity -= 1
+      item.save()
     else:
-        item.delete()
+      item.delete()
+    return Response(CartSerializer(item.cart).data)
 
-    return Response(
-        CartSerializer(item.cart).data
-    )
-    
-@action(detail=True, methods=["delete"])
-def remove(self, request, pk=None):
-
-    item = get_object_or_404(
-      CartItem,
-        id=pk,
-        cart__user=request.user
-    )
-
+  @action(detail=True, methods=["DELETE"])
+  def remove(self, request, pk=None):
+    item = get_object_or_404(CartItem, id=pk, cart__user=request.user)
     cart = item.cart
-
     item.delete()
+    return Response(CartSerializer(cart).data)
 
-    return Response(
-        CartSerializer(cart).data
-    )
-    
-    
-    
-@action(detail=True, methods=["delete"])
-def clear(self, request):
-
-  cart = CartItem.objects.filter(user =request.user)
-  cart.delete()
-  return Response([], status=status.HTTP_204_NO_CONTENT)
-
+  @action(detail=False, methods=["DELETE"])
+  def clear(self, request):
+    cart = get_object_or_404(Cart, user=request.user)
+    cart.items.all().delete()
+    return Response([], status=status.HTTP_204_NO_CONTENT)
+  
+  
 @api_view(['GET'])
 def verify_email(request, uid, token):
   try:

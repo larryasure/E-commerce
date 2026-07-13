@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import axiosInstance from "../../api/axiosConfig";
-// 1. Import your auth hook or context here (e.g., import { useAuth } from "../../context/AuthContext")
 
 export default function AdminUsers() {
   const [userToDelete, setUserToDelete] = useState(null);
