@@ -8,7 +8,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 
-from server.core.store.services.cart_service import CartService
+from .services.cart_service import CartService
 from .emails import send_password_reset_email, send_verification_email, send_order_confirmation_email, send_welcome_email
 from .models import Cart, CartItem, OrderItem, UserProfile, Product, Category, Order, Wishlist
 from .serializers import CategorySerializer, OrderSerializer, ProductSerializer, UserProfileSerializer, UserSerializer, WishListSerializer, CartSerializer
@@ -164,43 +164,34 @@ class CartViewSet(viewsets.ModelViewSet):
 
   @action(detail=False, methods=["POST"])
   def add(self, request):
-    cart = CartService.add_item(request.user, request.data.get("product_id"), int(request.data.get("quantity, 1")))
+    cart = CartService.add_item(request.user, request.data.get("product_id"), int(request.data.get("quantity",  1)))
   
     return Response(CartSerializer(cart).data)
-  
-  
-  
-  
+
 
   @action(detail=True, methods=["PATCH"])
   def increase(self, request, pk=None):
-    item = CartService.get_cart_item(request.user , pk)
-    item.quantity += 1
-    item.save()
-    return Response(CartSerializer(item.cart).data)
+    cart = CartService.increase_quantity(request.user, pk)
+    return Response(CartSerializer(cart).data)
 
   @action(detail=True, methods=["PATCH"])
   def decrease(self, request, pk=None):
-    item =CartService.get_cart_item(request.user, pk)
-    if item.quantity > 1:
-      item.quantity -= 1
-      item.save()
-    else:
-      item.delete()
-    return Response(CartSerializer(item.cart).data)
+    cart = CartService.decrease_quantity(request.user, pk)
+    return Response(CartSerializer(cart).data)
+  
 
   @action(detail=True, methods=["DELETE"])
   def remove(self, request, pk=None):
-    item =CartService.get_cart_item(request.user, pk)
-    cart = item.cart
-    item.delete()
+    cart = CartService.remove_item(request.user, pk)
+    
     return Response(CartSerializer(cart).data)
+
 
   @action(detail=False, methods=["DELETE"])
   def clear(self, request):
-    cart = get_object_or_404(Cart, user=request.user)
-    cart.items.all().delete()
-    return Response([], status=status.HTTP_204_NO_CONTENT)
+    cart = CartService.clear_cart(request.user)  
+    return Response(CartSerializer(cart).data)
+  
   
   
 @api_view(['GET'])

@@ -1,7 +1,7 @@
 
 from django.db import transaction
 from django.shortcuts import get_object_or_404
-from rest_framework.validators import ValidationError
+from rest_framework.exceptions import  ValidationError
 
 from ..models import Cart, CartItem, Product;
 
@@ -11,6 +11,8 @@ class CartService:
   @staticmethod
   def get_cart(user):
     cart, created = Cart.objects.get_or_create(user= user)
+    
+    return cart
     
   
   
@@ -30,7 +32,7 @@ class CartService:
     if quantity < 1:
       raise ValidationError("Quantity must be at least 1")
     
-    if quantity < product.stock:
+    if quantity > product.stock:
       raise ValidationError("Not enough stock available")
 
     cart = CartService.get_cart(user)
@@ -54,7 +56,7 @@ class CartService:
   
   @staticmethod
   def increase_quantity(user , item_id):
-    item = CartService.get_cart_item(user= user, id=item_id)
+    item = CartService.get_cart_item(user , item_id)
     
     if item.quantity + 1 > item.product.stock:
       raise ValidationError("Not enough stock available")
@@ -69,5 +71,65 @@ class CartService:
   
   @staticmethod
   def decrease_quantity(user, item_id):
-    ite
+    item = CartService.get_cart_item(user , item_id)
+    if item.quantity > 1:
+      item.quantity -= 1
+      item.save()
+    else:
+      item.delete()
+    return CartService.get_cart(user)
+  
+      
 
+  @staticmethod
+  def remove_item(user, item_id):
+    item = CartService.get_cart_item(user, item_id)
+    
+    cart = item.cart
+    item.delete()
+    return cart
+  
+  
+  @staticmethod
+  def clear_cart(user):
+    cart = CartService.get_cart(user)
+    
+    cart.items.all().delete()
+    
+    return cart
+  
+  
+  
+  @staticmethod
+  def calculate_total(cart):
+    
+    return sum(item.product.price * item.quantity
+               for item in cart.items.all())
+    
+  
+  @staticmethod
+  def calculate_total_items(cart):
+    
+    return sum(item.quantity
+               for item in cart.items.all())
+  
+  
+  @staticmethod
+  def calculate_shipping(cart):
+    subtotal = CartService.calculate_total(cart)
+    totalItems = CartService.calculate_total_items(cart)
+    
+    if totalItems > 0 and subtotal < 150000:
+      return 3500 
+    
+    return 0
+  
+  
+  @staticmethod 
+  def calculate_grand_total(cart):
+    subtotal = CartService.calculate_total(cart)
+    shipping = CartService.calculate_shipping(cart)
+    
+    return subtotal + shipping
+  
+  
