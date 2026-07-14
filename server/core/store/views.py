@@ -138,7 +138,6 @@ class WishlistViewSet(viewsets.ModelViewSet):
     return Wishlist.objects.filter(
       user=self.request.user
     ).select_related("user", "product")
-
   def perform_create(self, serializer):
     serializer.save(user=self.request.user)
 
@@ -157,7 +156,6 @@ class CartViewSet(viewsets.ModelViewSet):
   def list(self , request):
     cart = CartService.get_cart(request.user)
     serializer = self.get_serializer(cart)
-    
     return Response(serializer.data)
           
 
@@ -165,7 +163,6 @@ class CartViewSet(viewsets.ModelViewSet):
   @action(detail=False, methods=["POST"])
   def add(self, request):
     cart = CartService.add_item(request.user, request.data.get("product_id"), int(request.data.get("quantity",  1)))
-  
     return Response(CartSerializer(cart).data)
 
 
@@ -183,7 +180,6 @@ class CartViewSet(viewsets.ModelViewSet):
   @action(detail=True, methods=["DELETE"])
   def remove(self, request, pk=None):
     cart = CartService.remove_item(request.user, pk)
-    
     return Response(CartSerializer(cart).data)
 
 
