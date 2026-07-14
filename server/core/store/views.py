@@ -7,10 +7,12 @@ from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+
+from server.core.store.services.cart_service import CartService
 from .emails import send_password_reset_email, send_verification_email, send_order_confirmation_email, send_welcome_email
 from .models import Cart, CartItem, OrderItem, UserProfile, Product, Category, Order, Wishlist
 from .serializers import CategorySerializer, OrderSerializer, ProductSerializer, UserProfileSerializer, UserSerializer, WishListSerializer, CartSerializer
-
+from .services.order_service import create_order
 
 
 
@@ -77,6 +79,14 @@ class OrderViewSet(viewsets.ModelViewSet):
   def get_queryset(self):
     return Order.objects.filter(user=self.request.user)
   
+  def create(self, request, *args, **kwargs):
+    
+    order = create_order(user= self.request.user, validated_data=request.data)
+    
+    send_order_confirmation_email(request.user, order)
+    
+    serializer = self.get_serializer(order)
+    return Response(serializer, status=status.HTTP_201_CREATED)  
   
   
 
@@ -143,48 +153,35 @@ class CartViewSet(viewsets.ModelViewSet):
           "items__product",
           "items__product__category"
       )
-  def list(self, request):
-      cart, created = Cart.objects.get_or_create(
-          user=request.user
-      )
-      serializer = self.get_serializer(cart)
-      return Response(serializer.data)
-  def perform_create(self, serializer):
-      serializer.save(user=self.request.user)
+      
+  def list(self , request):
+    cart = CartService.get_cart(request.user)
+    serializer = self.get_serializer(cart)
     
+    return Response(serializer.data)
+          
+
 
   @action(detail=False, methods=["POST"])
   def add(self, request):
-    product_id = request.data.get("product_id")
-    quantity = int(request.data.get("quantity", 1))
-
-    product = get_object_or_404(Product, id=product_id, is_active=True)
-
-    cart, _ = Cart.objects.get_or_create(user=request.user)
-
-    item, created = CartItem.objects.get_or_create(
-      cart=cart,
-      product=product,
-      defaults={"quantity": quantity},
-    )
-
-    if not created:
-      item.quantity += quantity
-      item.save()
-
-    serializer = CartSerializer(cart)
-    return Response(serializer.data)
+    cart = CartService.add_item(request.user, request.data.get("product_id"), int(request.data.get("quantity, 1")))
+  
+    return Response(CartSerializer(cart).data)
+  
+  
+  
+  
 
   @action(detail=True, methods=["PATCH"])
   def increase(self, request, pk=None):
-    item = get_object_or_404(CartItem, id=pk, cart__user=request.user)
+    item = CartService.get_cart_item(request.user , pk)
     item.quantity += 1
     item.save()
     return Response(CartSerializer(item.cart).data)
 
   @action(detail=True, methods=["PATCH"])
   def decrease(self, request, pk=None):
-    item = get_object_or_404(CartItem, id=pk, cart__user=request.user)
+    item =CartService.get_cart_item(request.user, pk)
     if item.quantity > 1:
       item.quantity -= 1
       item.save()
@@ -194,7 +191,7 @@ class CartViewSet(viewsets.ModelViewSet):
 
   @action(detail=True, methods=["DELETE"])
   def remove(self, request, pk=None):
-    item = get_object_or_404(CartItem, id=pk, cart__user=request.user)
+    item =CartService.get_cart_item(request.user, pk)
     cart = item.cart
     item.delete()
     return Response(CartSerializer(cart).data)

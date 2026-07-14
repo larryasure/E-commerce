@@ -53,6 +53,7 @@ class UserProfile(models.Model):
   phone_number= models.CharField(max_length=21, blank=True)
   address= models.TextField(blank=True)
   is_verified= models.BooleanField(default=False)
+  customer_id = models.CharField(max_length=20, editable=False, blank=True, unique=True)
   
   
   def __str__(self):
@@ -90,7 +91,15 @@ class Order(models.Model):
   shipping_address= models.TextField(blank=True, null=True)
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at= models.DateTimeField(auto_now=True)
+  order_number= models.CharField(unique=True, max_length=20, editable=False, blank=True)
   
+  
+  import random
+  def save(self, *args, **kwargs):
+    if not self.order_number:
+      self.order_number= f"PP{self.random.randint(10000000 - 99999999)}"
+    super().save(*args , **kwargs)
+   
   
   def __str__(self):
     return f" #{self.id} by {self.user.username if self.user else 'Guest'}"

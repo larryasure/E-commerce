@@ -1,5 +1,5 @@
 from decimal import Decimal
-from .models import Cart, CartItem, Order, OrderItem
+from ..models import Cart,  Order, OrderItem
 
 
 def create_order(user, validated_data):
