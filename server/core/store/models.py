@@ -53,7 +53,7 @@ class UserProfile(models.Model):
   phone_number= models.CharField(max_length=21, blank=True)
   address= models.TextField(blank=True)
   is_verified= models.BooleanField(default=False)
-  customer_id = models.CharField(max_length=20, editable=False, blank=True, unique=True)
+  customer_id = models.CharField(max_length=20, editable=False, blank=True, unique=False)
   
   
   def __str__(self):
@@ -91,7 +91,7 @@ class Order(models.Model):
   shipping_address= models.TextField(blank=True, null=True)
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at= models.DateTimeField(auto_now=True)
-  order_number= models.CharField(unique=True, max_length=20, editable=False, blank=True)
+  order_number= models.CharField(unique=False, max_length=20, editable=False, blank=True)
   
   
   import random

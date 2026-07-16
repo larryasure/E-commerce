@@ -70,7 +70,7 @@ export default function AdminUsers() {
 
   return (
     <>
-      <div className="p-4 max-w-4xl mx-auto">
+      <div className="p-4 max-w-5xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <h2 className="text-2xl font-bold text-[#13315c]">Users</h2>
 

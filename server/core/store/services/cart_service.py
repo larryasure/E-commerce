@@ -3,7 +3,7 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import  ValidationError
 
-from ..models import Cart, CartItem, Product;
+from ..models import Cart, CartItem, Product
 
 
 class CartService:

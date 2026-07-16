@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
@@ -18,9 +18,16 @@ export default function Login() {
 
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
+    setErrors((prev) => {
+      if (prev[name]) {
+        return {
+          ...prev,
+          [name]: "",
+        };
+      }
+
+      return prev;
+    });
   };
 
   const handleValidForm = () => {
@@ -33,8 +40,6 @@ export default function Login() {
     if (!formData.password.trim()) {
       newErrors.password = "Password is required";
     }
-
-
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -58,22 +63,21 @@ export default function Login() {
           navigate("/");
         }, 2000);
       } else {
+        console.log("Login failed");
+
         if (result.error) {
-          if (result.error.non_filed_errors) {
-            setErrors({ submit: result.error.non_filed_errors[0] });
-          } else if (result.error.username) {
-            setErrors((prev) => ({
-              ...prev,
-              username: result.error.username[0],
-            }));
-          } else if (result.error.password) {
-            setErrors((prev) => ({
-              ...prev,
-              password: result.error.password[0],
-            }));
+          console.log("Server error:", result.error);
+
+          if (result.error.detail) {
+            console.log("Setting submit error");
+            setErrors({ submit: "Invalid credentials, Try Again!" });
+          } else if (result.error.non_field_errors) {
+            console.log("Setting submit error");
+            setErrors({ submit: "Invalid credentials, Try Again!" });
           }
         } else {
-          setErrors({ submit: "Login Failed, Try again later " });
+          console.log("No error object");
+          setErrors({ submit: "Login Failed, Try again later" });
         }
       }
     } catch (error) {
@@ -83,9 +87,15 @@ export default function Login() {
     }
   };
 
+  useEffect(() => {
+    console.log("ERROR STATE UPDATED:", errors);
+  }, [errors]);
+
+  console.log("Current Errors:", errors);
+
   return (
     <>
-      <div className="flex items-center justify-center  my-10 px-4 ">
+      <div className="flex items-center justify-center my-20 sm:my-24 px-4 ">
         <div className=" max-w-sm w-full shadow-xl rounded-lg bg-white p-8">
           <h2 className="text-3xl font-bold text-[#13315C] text-center">
             PrimePack

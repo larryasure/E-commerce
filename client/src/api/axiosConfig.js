@@ -50,7 +50,7 @@ axiosInstance.interceptors.response.use(
         localStorage.setItem("access_token", newAccessToken);
 
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-        return axios(originalRequest);
+        return axiosInstance(originalRequest);
       } catch (refreshError) {
         localStorage.removeItem("refresh_token");
         localStorage.removeItem("access_token");

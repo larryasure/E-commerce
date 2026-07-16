@@ -79,7 +79,7 @@ class UserSerializer(serializers.ModelSerializer):
       password=validated_data['password'],
     )
     
-    user.is_staff = validated_data("is_staff", False)
+    user.is_staff = validated_data.get("is_staff", False)
     user.save()
     return user
   
