@@ -34,6 +34,8 @@ export default function Login() {
       newErrors.password = "Password is required";
     }
 
+
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };

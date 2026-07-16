@@ -7,13 +7,9 @@ import { formatCurrency } from "../utils/formatCurrency";
 export default function ProductCard({ product, index = 0, variant = "grid" }) {
   const { cart, addCart, increaseCart, decreaseCart } = useCart();
   const { isWishlisted, toggleWishlist } = useWishlist();
-  
-  const cartItem = cart?.items?.find(
-    (item) => item.product.id === product.id
-  );
+
+  const cartItem = cart?.items?.find((item) => item.product.id === product.id);
   const quantity = cartItem?.quantity || 0;
-
-
 
   const baseClass =
     "group bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col h-full";
@@ -88,7 +84,7 @@ export default function ProductCard({ product, index = 0, variant = "grid" }) {
                 product.stock > 0 ? "text-green-600" : "text-red-500"
               }`}
             >
-              {product.stock > 0 ? "In stock" : "Out of stock"}
+              {product.stock} {product.stock > 0 ? "In stock" : "Out of stock"}
             </span>
           </div>
 

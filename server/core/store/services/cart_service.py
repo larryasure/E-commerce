@@ -33,7 +33,8 @@ class CartService:
       raise ValidationError("Quantity must be at least 1")
     
     if quantity > product.stock:
-      raise ValidationError("Not enough stock available")
+       raise ValidationError({"detail": f"Only {item.product.stock} item(s) available"})
+
 
     cart = CartService.get_cart(user)
     
@@ -46,7 +47,7 @@ class CartService:
       new_quantity = item.quantity + quantity
       
       if new_quantity > product.stock:
-        raise ValidationError("Not enough stock available")
+        raise ValidationError({"detail": f"Only {item.product.stock} item(s) available in stock"})
       
       
       item.quantity = new_quantity
@@ -59,7 +60,8 @@ class CartService:
     item = CartService.get_cart_item(user , item_id)
     
     if item.quantity + 1 > item.product.stock:
-      raise ValidationError("Not enough stock available")
+      raise ValidationError({"detail": f"Only {item.product.stock} item(s) available in stock"})
+
     
     
     item.quantity += 1

@@ -91,10 +91,15 @@ export default function FeaturedProducts({
                         </h3>
                       </NavLink>
 
-                      <span className="text-xs text-gray-500 uppercase">
-                        {product.category?.name || "Uncategorized"}
-                      </span>
+                      <div className="flex items-center justify-between mt-2 ">
+                        <span className="text-xs text-gray-500 uppercase">
+                          {product.category?.name || "Uncategorized"}
+                        </span> 
 
+                        <p className="flex items-center justify-center rounded-lg text-white p-1 bg-[#13315c]  ">
+                          <span className="text-xs ">{product.stock} in stock</span>
+                        </p>
+                      </div>
                       <p className="mt-2 text-xs text-gray-500 line-clamp-2">
                         {product.description || "No description available."}
                       </p>

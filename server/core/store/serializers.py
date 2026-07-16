@@ -1,4 +1,6 @@
 from django.contrib.auth.models import User
+
+from .services.cart_service import CartService
 from .models import Category,OrderItem,Product,Order,UserProfile,Wishlist, Cart, CartItem
 from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
@@ -146,22 +148,21 @@ class CartSerializer(serializers.ModelSerializer):
   items = CartItemSerializer(read_only=True, many=True)
   total = serializers.SerializerMethodField()
   total_items = serializers.SerializerMethodField()
-    
-    
+  shipping = serializers.SerializerMethodField()
+  total = serializers.SerializerMethodField()
   class Meta:
     model = Cart
-    fields = ["id", "items",'total',  "total_items", "created_at", "updated_at"]
+    fields = ["id", "items",'total',  "total_items", "shipping", "total", "created_at", "updated_at"]
     
       
-      
-  def get_total(self, obj):
-    return sum(
-      item.product.price * item.quantity
-      for item in obj.items.all()
-    )
-    
+  def get_subtotal(self, obj):
+    return CartService.calculate_total(obj)
+  
   def get_total_items(self, obj):
-    return sum(
-        item.quantity
-        for item in obj.items.all()
-      )
+    return CartService.calculate_total_items(obj)
+  
+  def get_shipping(self , obj):
+    return CartService.calculate_shipping(obj)
+  
+  def get_total(self, obj):
+    return CartService.calculate_grand_total(obj)

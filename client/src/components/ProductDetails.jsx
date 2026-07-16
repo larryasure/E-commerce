@@ -124,9 +124,10 @@ export default function ProductDetails() {
               </div>
 
               <p
-                className={`text-base font-semibold ${product.stock > 0 ? "text-[#007600]" : "text-red-600"}`}
+                className={`text-sm font-semibold ${product.stock > 0 ? "text-[#007600]" : "text-red-600"}`}
               >
-                {product.stock > 0 ? "In Stock" : "Out of Stock"}
+                 {product.stock}{" "}
+                  {product.stock > 0 ? "In stock" : "Out of stock"}
               </p>
 
               <div className="pb-3 border-b border-gray-200">
@@ -179,7 +180,8 @@ export default function ProductDetails() {
                 </p>
 
                 <p className="text-base font-semibold text-[#007600]">
-                  In Stock
+                  {product.stock}{" "}
+                  {product.stock > 0 ? "In stock" : "Out of stock"}
                 </p>
 
                 <div className="flex items-center gap-3">
@@ -207,7 +209,7 @@ export default function ProductDetails() {
 
                 <button
                   onClick={() => addCart(product.id)}
-                  className="w-full bg-[#155daf] hover:bg-[#13315C] text-white py-2.5 rounded-full font-semibold text-sm transition-all duration-200 active:scale-[0.98] shadow-sm"
+                  className="w-full bg-[#155daf] hover:bg-[#13315C] text-white py-2.5 rounded-full font-semibold text- transition-all duration-200 active:scale-[0.98] shadow-sm"
                 >
                   {quantity > 0 ? "✓ Added to Cart" : "Add to Cart"}
                 </button>

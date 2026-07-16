@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
+import { toast } from "react-toastify";
 import {
   addCartApi,
   clearCartApi,
@@ -51,6 +52,11 @@ export function CartProvider({ children }) {
       const updatedCart = await increaseCartApi(itemId);
       setCart(updatedCart);
     } catch (error) {
+      toast.error(
+        error.response?.data?.detail ||
+          error.response?.data?.non_field_errors?.[0] ||
+          "Unable to increase quantity.",
+      );
       console.error("Failed to increase quantity:", error);
     }
     fetchCart();

@@ -17,14 +17,11 @@ export default function Checkout() {
   const { cart, clearCart } = useCart();
 
   const cartItems = cart?.items || [];
-  const subtotal = cart?.total || 0;
-  const totalItems = cart?.total_items || 0;
-  let shipping = 0;
+  const subtotal = cart?.subtotal || 0
+  const shipping = cart?.shipping || 0
+  const grandtotal = cart?.grand_total || 0
+  const totalItem = cart?.total_items || 0
 
-  if (totalItems > 0 && subtotal < 150000) {
-    shipping = 3500;
-  }
-  const grandtotal = subtotal + shipping;
 
   useEffect(() => {
     if (!loading) {
