@@ -9,17 +9,14 @@ export default function Cart() {
   const navigate = useNavigate();
 
   const { cart, increaseCart, decreaseCart, removeCart } = useCart();
-
-  const subtotal = cart?.total || 0;
-  const totalItems = cart?.total_items || 0;
-
-  let shipping = 0;
+  const total = cart?.total || 0
+  const shipping = cart?.shipping || 0
+  const subtotal = cart?.subtotal || 0
+  const grandTotal = cart?.grand_total || 0
   
-  if ( totalItems > 0 && subtotal < 150000) {
-    shipping = 3500;
-  }
 
-  const grandTotal = subtotal + shipping;
+
+
 
   if (!cart?.items?.length) {
     return (

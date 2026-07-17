@@ -56,7 +56,7 @@ export default function Checkout() {
 
     try {
       const orderTotal = {
-        total_items: grandtotal,
+        grand_total: grandtotal,
         shipping_address: formData.shippingAddress,
       };
 
@@ -97,7 +97,7 @@ export default function Checkout() {
     <>
       <div className="min-h-screen py-12">
         <div className="mx-auto max-w-6xl px-4 md:px-6 lg:px-8 ">
-          <h2 className="text-3xl font-bold text-[#13315c] mb-8  ">
+          <h2 className="text-3xl font-bold text-[#13315c] my-8  ">
             Checkout{" "}
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
