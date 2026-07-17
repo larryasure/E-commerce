@@ -42,8 +42,7 @@ export default function Home() {
           axiosInstance.get("products/?featured=true&limit=10"),
           axiosInstance.get("categories/"),
         ]);
-
-        setFeaturedProducts(productsRes.data);
+        setFeaturedProducts(productsRes.data.results || productsRes.data);
         setCategories(categoriesRes.data);
       } catch (error) {
         console.error("Failed to fetch Homepage data", error);
@@ -51,7 +50,6 @@ export default function Home() {
         setLoading(false);
       }
     };
-
     fetchHomeData();
   }, []);
 
@@ -212,10 +210,10 @@ export default function Home() {
             ) : featuredProducts.length > 0 ? (
               <FeaturedProducts
                 featuredProducts={featuredProducts}
-                  cart={cart}
-                  addCart={addCart}
-                  increaseCart={increaseCart}
-                  decreaseCart= {decreaseCart}
+                cart={cart}
+                addCart={addCart}
+                increaseCart={increaseCart}
+                decreaseCart={decreaseCart}
               />
             ) : (
               <div className="py-20 text-center">

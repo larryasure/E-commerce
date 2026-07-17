@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
@@ -86,12 +86,6 @@ export default function Login() {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    console.log("ERROR STATE UPDATED:", errors);
-  }, [errors]);
-
-  console.log("Current Errors:", errors);
 
   return (
     <>

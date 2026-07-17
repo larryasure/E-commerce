@@ -20,7 +20,6 @@ export default function Checkout() {
   const subtotal = cart?.subtotal || 0
   const shipping = cart?.shipping || 0
   const grandtotal = cart?.grand_total || 0
-  const totalItem = cart?.total_items || 0
 
 
   useEffect(() => {

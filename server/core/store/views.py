@@ -2,6 +2,7 @@ from rest_framework import viewsets, permissions, generics
 from rest_framework.decorators import api_view , action
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.exceptions import ValidationError
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
@@ -9,6 +10,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 
 from .services.cart_service import CartService
+from .services.user_service import UserService
 from .emails import send_password_reset_email, send_verification_email, send_order_confirmation_email, send_welcome_email
 from .models import Cart, CartItem, OrderItem, UserProfile, Product, Category, Order, Wishlist
 from .serializers import CategorySerializer, OrderSerializer, ProductSerializer, UserProfileSerializer, UserSerializer, WishListSerializer, CartSerializer
@@ -26,38 +28,13 @@ class CategoryViewSet(viewsets.ModelViewSet):
   permission_classes=[permissions.IsAuthenticatedOrReadOnly]
   
 class ProductViewSet(viewsets.ModelViewSet):
-  queryset= Product.objects.all().select_related('category')
-  serializer_class= ProductSerializer
-  permission_classes=[permissions.IsAuthenticatedOrReadOnly]
+    queryset = Product.objects.all().select_related('category')
+    serializer_class = ProductSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+    pagination_class = None
 
-
-  def get_queryset(self):
-    queryset=super().get_queryset()  
-    featured = self.request.query_params.get('featured')
-    category = self.request.query_params.get('category')
-    limit = self.request.query_params.get('limit')
-    
-    
-    if featured == "true":
-      queryset = queryset.filter(featured=True)
-    
-    if category:
-      queryset= queryset.filter(category__slug=category)
-      
-    if limit: 
-      try:
-        limit = int(limit)
-        if limit > 0 :
-          queryset = queryset[:limit]
-          
-      except Exception as e:
-        raise e
-  
-      
-      
-    return queryset
-
-  
+    def get_queryset(self):
+        return Product.objects.all()
 class UserProfileViewSet(viewsets.ModelViewSet):
   queryset= UserProfile.objects.all()
   serializer_class= UserProfileSerializer
@@ -109,15 +86,10 @@ class UserViewSet(viewsets.ModelViewSet):
         return [permissions.IsAdminUser()]
 
     def perform_create(self, serializer):
-        user = serializer.save()
+        UserService.create_user(serializer.validated_data)
+        
 
-        token = default_token_generator.make_token(user)
-        uid = urlsafe_base64_encode(force_bytes(user.pk))
-        verification_url = (
-            f"http://localhost:3000/verify-email/{uid}/{token}/"
-        )
-
-        send_verification_email(user, verification_url)
+    
 
 @api_view(['GET'])
 def get_current_user(request):

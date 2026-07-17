@@ -64,6 +64,7 @@ class UserSerializer(serializers.ModelSerializer):
   profile= UserProfileSerializer(read_only=True)
   password= serializers.CharField(write_only=True)
   email= serializers.EmailField(validators=[UniqueValidator(queryset=User.objects.all(), message="Registration could not be completed with the provided details.")])
+  username= serializers.CharField(validators=[UniqueValidator(queryset=User.objects.all(), message="Registration could not be completed with the provided details")])
   is_staff= serializers.BooleanField(required=False)
   
   
@@ -72,17 +73,7 @@ class UserSerializer(serializers.ModelSerializer):
     fields= ['id', 'username', 'email', "password", 'profile', 'is_staff']
     
     
-  def create(self, validated_data):
-    user = User.objects.create_user(
-      username=validated_data['username'],
-      email= validated_data['email'],
-      password=validated_data['password'],
-    )
-    
-    user.is_staff = validated_data.get("is_staff", False)
-    user.save()
-    return user
-  
+ 
   
   def update(self, instance, validated_data):
     
@@ -117,7 +108,6 @@ class OrderSerializer(serializers.ModelSerializer):
     
     
 class WishListSerializer(serializers.ModelSerializer):
-  
   product = ProductSerializer(read_only=True)
   product_id = serializers.PrimaryKeyRelatedField(
     queryset= Product.objects.all(),
@@ -146,23 +136,31 @@ class CartItemSerializer(serializers.ModelSerializer):
   
 class CartSerializer(serializers.ModelSerializer):
   items = CartItemSerializer(read_only=True, many=True)
-  total = serializers.SerializerMethodField()
+  subtotal = serializers.SerializerMethodField()
   total_items = serializers.SerializerMethodField()
   shipping = serializers.SerializerMethodField()
-  total = serializers.SerializerMethodField()
+  grand_total = serializers.SerializerMethodField()
   class Meta:
-    model = Cart
-    fields = ["id", "items",'total',  "total_items", "shipping", "total", "created_at", "updated_at"]
+        model = Cart
+        fields = [
+            "id", 
+            "items", 
+            "subtotal", 
+            "total_items", 
+            "shipping", 
+            "grand_total", 
+            "created_at", 
+            "updated_at"
+        ]
     
-      
   def get_subtotal(self, obj):
     return CartService.calculate_total(obj)
   
   def get_total_items(self, obj):
     return CartService.calculate_total_items(obj)
   
-  def get_shipping(self , obj):
+  def get_shipping(self, obj):
     return CartService.calculate_shipping(obj)
   
-  def get_total(self, obj):
+  def get_grand_total(self, obj):
     return CartService.calculate_grand_total(obj)

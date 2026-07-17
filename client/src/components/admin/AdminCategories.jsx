@@ -7,7 +7,12 @@ export default function AdminCategories() {
   const [categories, setCategories] = useState([]);
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
-  const [formData, setFormData] = useState({ name: "", slug: "", image: null });
+  const [formData, setFormData] = useState({
+    name: "",
+    slug: "",
+    stock: "",
+    image: null,
+  });
   const [editingId, setEditingId] = useState(null);
   const [showFormModal, setShowFormModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -38,6 +43,7 @@ export default function AdminCategories() {
 
     payload.append("name", formData.name);
     payload.append("slug", formData.slug);
+    payload.append("stock", formData.stock)
 
     if (formData.image instanceof File) {
       payload.append("image", formData.image);
@@ -62,7 +68,7 @@ export default function AdminCategories() {
         setSuccess("Category saved successfully!");
       }
 
-      setFormData({ name: "", slug: "", image: "" });
+      setFormData({ name: "", slug: "", stock: "", image: "" });
       setEditingId(null);
       setSelectedCategory(null);
       setShowFormModal(false);
@@ -96,6 +102,7 @@ export default function AdminCategories() {
     setFormData({
       name: category.name,
       slug: category.slug,
+      stock: category.stock,
       image: category.image || null,
     });
     setSelectedCategory(category);
@@ -126,6 +133,7 @@ export default function AdminCategories() {
               setFormData({
                 name: "",
                 slug: "",
+                stock: "",
                 image: null,
               });
 
@@ -146,6 +154,11 @@ export default function AdminCategories() {
                 <th className="px-6 py-4 text-left text-sm  font-semibold">
                   Slug
                 </th>
+
+                   <th className="px-6 py-4 text-left text-sm  font-semibold">
+                  Stock
+                </th>
+
                 <th className="px-6 py-4 text-left text-sm  font-semibold">
                   Action
                 </th>
@@ -167,6 +180,12 @@ export default function AdminCategories() {
                       {" "}
                       {category.slug}
                     </td>
+
+                        <td className="px-6 py-4 font-medium text-[#13315c] ">
+                      {" "}
+                      {category.stock}
+                    </td>
+
                     <td className="px-6 py-4 flex gap-3  ">
                       <button
                         onClick={() => openEditModal(category)}
@@ -201,13 +220,14 @@ export default function AdminCategories() {
           <div className="bg-white items-center justify-center p-8 rounded-xl max-w-md w-full ">
             <div className="space-y-3">
               <div className="items-center flex justify-between">
-
-              <div className="text-xl font-bold text-[#13315c]">
-                {editingId ? "Edit Category" : "Add Category"}
+                <div className="text-xl font-bold text-[#13315c]">
+                  {editingId ? "Edit Category" : "Add Category"}
                 </div>
-                <div onClick={() => setShowFormModal(false)}  className="w-7 h-7 bg-red-300   hover:bg-red-400 flex items-center justify-center rounded-md  duration-300 transition-all">
-                <X className="text-red-500  cursor-pointer  hover:text-white  active:scale-105 "/>
-
+                <div
+                  onClick={() => setShowFormModal(false)}
+                  className="w-7 h-7 bg-red-300   hover:bg-red-400 flex items-center justify-center rounded-md  duration-300 transition-all"
+                >
+                  <X className="text-red-500  cursor-pointer  hover:text-white  active:scale-105 " />
                 </div>
               </div>
 
@@ -239,6 +259,24 @@ export default function AdminCategories() {
                     value={formData.slug}
                     onChange={(e) =>
                       setFormData((prev) => ({ ...prev, slug: e.target.value }))
+                    }
+                    className="w-full border border-[#13315c] py-2 px-4 rounded-xl  focus:ring focu:ring-[#13315c] focus:outline-none transition-all duration-300"
+                  />
+                </div>
+
+                <div className="">
+                    <label className="text-sm text-[#13315c] font-medium block mb-1 ">
+                    Stock
+                  </label>
+                  <input
+                    type="number"
+                    name="stock"
+                    value={formData.stock}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        stock: e.target.value,
+                      }))
                     }
                     className="w-full border border-[#13315c] py-2 px-4 rounded-xl  focus:ring focu:ring-[#13315c] focus:outline-none transition-all duration-300"
                   />

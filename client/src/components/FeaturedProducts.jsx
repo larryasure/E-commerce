@@ -15,7 +15,6 @@ export default function FeaturedProducts({
 }) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
         <NavLink
           to="/products"
@@ -60,7 +59,6 @@ export default function FeaturedProducts({
                   className="group flex flex-col overflow-hidden rounded-2xl border border-gray-100 bg-white 
                 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl h-full"
                 >
-                  {/* Image */}
                   <div className="relative aspect-square overflow-hidden bg-gray-100">
                     <NavLink to={`/products/${product.id}`}>
                       <img

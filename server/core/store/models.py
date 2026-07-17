@@ -12,8 +12,6 @@ class Category(models.Model):
   name= models.CharField(max_length=200, unique=True)
   slug = models.SlugField(unique=True)
   stock= models.IntegerField(default=0)
-  
-  
   image= models.ImageField(upload_to="categories/", null=True, blank=True)
   
   
