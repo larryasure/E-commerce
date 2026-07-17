@@ -3,11 +3,11 @@ from ..models import Cart, Order, OrderItem
 
 
 def create_order(user, validated_data):
-  cart = Order.objects.get(user=user)
+  cart = Cart.objects.get(user=user)
   subtotal= Decimal("0.00")
-  order = Cart.objects.create(user=user,
+  order = Order.objects.create(user=user,
                               shipping_address= validated_data.get("shipping_address", ""),
-                              total_Price = Decimal("0.00"))
+                              total_price = Decimal("0.00"))
   
   for item in cart.items.all():
     item_instance = OrderItem.objects.create(
@@ -22,7 +22,7 @@ def create_order(user, validated_data):
   if subtotal < Decimal("150000"):
     shipping = 3500
   
-  order.total_Price = subtotal + shipping 
+  order.total_price = subtotal + shipping 
   order.save()
   
   cart.items.all().delete()

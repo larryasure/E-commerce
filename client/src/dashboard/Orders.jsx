@@ -80,7 +80,7 @@ export default function Orders() {
               <div className="p-6 sm:p-8">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 pb-6 border-b">
                   <div>
-                    <h3 className="text-[#13315c] font-semibold">Order {order.id}</h3>
+                    <h3 className="text-[#13315c] font-semibold">Order {order.order_number}</h3>
                     <p className="text-sm text-gray-500">
                       {new Date(order.created_at).toLocaleDateString("en-US", {
                         year: "numeric",

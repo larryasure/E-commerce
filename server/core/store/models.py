@@ -89,13 +89,13 @@ class Order(models.Model):
   shipping_address= models.TextField(blank=True, null=True)
   created_at = models.DateTimeField(auto_now_add=True)
   updated_at= models.DateTimeField(auto_now=True)
-  order_number= models.CharField(unique=False, max_length=20, editable=False, blank=True)
+  order_number= models.CharField(unique=True, max_length=20, editable=False, blank=True)
   
   
   import random
   def save(self, *args, **kwargs):
     if not self.order_number:
-      self.order_number= f"PP{self.random.randint(10000000 - 99999999)}"
+      self.order_number= f"PP{self.random.randint(10000000 , 99999999 )}"
     super().save(*args , **kwargs)
    
   

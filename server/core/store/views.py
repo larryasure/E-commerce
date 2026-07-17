@@ -61,9 +61,13 @@ class OrderViewSet(viewsets.ModelViewSet):
     order = create_order(user= self.request.user, validated_data=request.data)
     
     send_order_confirmation_email(request.user, order)
-  
+    print("=" * 50)
+    print("EMAIL FUNCTION CALLED")
+    print(f"Order ID: {order.id}")
+    print("=" * 50)
+    
     serializer = self.get_serializer(order)
-    return Response(serializer, status=status.HTTP_201_CREATED)  
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
   
   
 
