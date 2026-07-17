@@ -78,7 +78,7 @@ class Order(models.Model):
   ]
   
   user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name="orders", null=True)
-  total_Price= models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+  total_price= models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
   
   
   payment_status= models.CharField(max_length=100, choices=PAYMENT_CHOICES, default='PENDING')

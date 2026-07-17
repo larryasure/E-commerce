@@ -100,37 +100,35 @@ class CartService:
     
     return cart
   
-  
-  
   @staticmethod
-  def calculate_total(cart):
-    return sum(item.product.price * item.quantity
+  def calculate_subtotal(cart):
+    return sum(item.product.price * item.quantity 
                for item in cart.items.all())
     
-  
   @staticmethod
   def calculate_total_items(cart):
-    
     return sum(item.quantity
                for item in cart.items.all())
-  
-  
+    
   @staticmethod
   def calculate_shipping(cart):
-    subtotal = CartService.calculate_total(cart)
-    totalItems = CartService.calculate_total_items(cart)
+    subtotal = CartService.calculate_subtotal(cart)
+    total_items = CartService.calculate_total_items(cart)
     
-    if totalItems > 0 and subtotal < 150000:
-      return 3500 
+    if total_items > 0 and subtotal < 15000:
+      return 3500
     
     return 0
   
-  
-  @staticmethod 
+  @staticmethod
   def calculate_grand_total(cart):
-    subtotal = CartService.calculate_total(cart)
+    subtotal = CartService.calculate_subtotal(cart)
     shipping = CartService.calculate_shipping(cart)
     
-    return subtotal + shipping
+    return subtotal + shipping 
+    
   
+
   
+
+ 

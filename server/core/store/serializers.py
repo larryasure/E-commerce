@@ -140,6 +140,9 @@ class CartSerializer(serializers.ModelSerializer):
   total_items = serializers.SerializerMethodField()
   shipping = serializers.SerializerMethodField()
   grand_total = serializers.SerializerMethodField()
+  
+  
+  
   class Meta:
         model = Cart
         fields = [
@@ -152,15 +155,15 @@ class CartSerializer(serializers.ModelSerializer):
             "created_at", 
             "updated_at"
         ]
-    
+  
   def get_subtotal(self, obj):
-    return CartService.calculate_total(obj)
-  
+      return CartService.calculate_subtotal(obj)
+    
   def get_total_items(self, obj):
-    return CartService.calculate_total_items(obj)
-  
+      return CartService.calculate_total_items(obj)
+    
   def get_shipping(self, obj):
-    return CartService.calculate_shipping(obj)
-  
+      return CartService.calculate_shipping(obj)
+    
   def get_grand_total(self, obj):
-    return CartService.calculate_grand_total(obj)
+      return CartService.calculate_grand_total(obj)
