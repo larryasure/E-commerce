@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import axiosInstance from "../../api/axiosConfig";
 import { formatCurrency } from "../../utils/formatCurrency";
+import { toast } from "react-toastify";
 
 export default function AdminOrderDetail() {
   const { id } = useParams();
@@ -11,6 +12,7 @@ export default function AdminOrderDetail() {
   const [updating, setUpdating] = useState(false);
   const [newStatus, setNewStatus] = useState("");
 
+  
   useEffect(() => {
     fetchOrder();
   }, [id]);
@@ -35,13 +37,16 @@ export default function AdminOrderDetail() {
         order_status: newStatus,
       });
       setOrder({ ...order, order_status: newStatus });
-      alert("Order status updated");
+      toast.success("Order updated successfully")
     } catch (error) {
       alert("Failed to update status" , error);
     } finally {
       setUpdating(false);
     }
   };
+
+
+ 
 
   if (loading) {
     return (
@@ -66,8 +71,8 @@ export default function AdminOrderDetail() {
 
       <div className="bg-white rounded-xl shadow-lg p-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-[#13315C] mb-2">
-            Order #{order.id}
+          <h1 className=" font-bold text-[#13315C] mb-2">
+            Order 🇮🇩 {order.order_number}
           </h1>
           <p className="text-gray-600">
             {new Date(order.created_at).toLocaleTimeString()}
@@ -143,8 +148,8 @@ export default function AdminOrderDetail() {
         <div className="border-t pt-8 mt-8">
           <div className="flex justify-between items-center">
             <span className="text-xl font-bold text-[#13315C]">Total</span>
-            <span className="text-3xl font-bold text-[#155daf]">
-              {formatCurrency(order.total_Price)}
+            <span className="text-2xl font-bold text-[#155daf]">
+              {formatCurrency(order.total_price)}
             </span>
           </div>
         </div>

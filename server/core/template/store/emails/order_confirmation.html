@@ -16,7 +16,7 @@
   <tr>
     <td style="padding: 8px 0; color: #888888">Order Number:</td>
     <td style="padding: 8px 0; font-weight: bold; text-align: right">
-      🇮🇩{{ order.order_number }}
+      🇮🇩 {{ order.order_number }}
     </td>
   </tr>
   <tr>
@@ -57,7 +57,7 @@
     <tr style="border-bottom: 1px solid #eeeeee">
       <td style="padding: 10px">{{ item.product.name }}</td>
       <td style="padding: 10px; text-align: center">{{ item.quantity }}</td>
-      <td style="padding: 10px; text-align: right">₦{{ item.price }}</td>
+      <td style="padding: 10px; text-align: right">₦ {{ item.price }}</td>
     </tr>
     {% endfor %}
   </tbody>
@@ -69,9 +69,8 @@
           padding: 10px;
           text-align: right;
           font-weight: bold;
-          color: #e94560;
-          letter-spacing: 3px;
-          
+          color: #151daf;
+          letter-spacing: 1px;
         "
       >
         #{{ order.total_price }}

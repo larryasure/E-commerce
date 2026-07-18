@@ -26,7 +26,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed w-full top-0 z-10  bg-white/85 backdrop-blur-xl border-b border-slate-200 shadow-sm">
+      <nav className="fixed w-full top-0 z-20  bg-white/85 backdrop-blur-xl border-b border-slate-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-6 py-2 flex items-center justify-between">
           <NavLink
             to="/"

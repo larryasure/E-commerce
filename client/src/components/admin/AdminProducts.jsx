@@ -23,6 +23,8 @@ export default function AdminProducts() {
     fetchProducts();
   }, []);
 
+
+
   const handleDelete = async (id) => {
     try {
       await axiosInstance.delete(`products/${id}/`);
@@ -32,6 +34,7 @@ export default function AdminProducts() {
       console.error(`Failed to delete product`, error);
     }
   };
+  
 
   const filteredProducts = products.filter((product) =>
     product.name.toLowerCase().includes(searchTerm.toLowerCase()),

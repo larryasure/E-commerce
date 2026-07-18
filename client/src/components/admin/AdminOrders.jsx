@@ -8,6 +8,7 @@ export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [filterStatus, setFilterStatus] = useState("");
+  const [activeDeleteId, setActiveDeleteId] = useState(null)
    
   useEffect(() => {
     const fetchOrders = async () => {
@@ -48,6 +49,7 @@ export default function AdminOrders() {
     try {
       await axiosInstance.delete(`orders/${id}/`);
       setOrders((prev) => prev.filter((order) => order.id !== id));
+      setActiveDeleteId(null)
     } catch (error) {
       console.error("Failed to delete Order:", error);
     }
@@ -115,13 +117,13 @@ export default function AdminOrders() {
                       key={order.key}
                     >
                       <td className="text-[#13315c] py-4 px-6 font-medium">
-                        # {order.id}
+                        🇮🇩 {order.order_number}
                       </td>
                       <td className="text-gray-600 py-4 px-6 font-medium capitalize ">
                         {order.user?.username || "Guest"}
                       </td>
                       <td className="text-[#155daf]">
-                        {formatCurrency(order.price)}
+                        {formatCurrency(order.total_price)}
                       </td>
                       <td className="px-6 py-4">
                         <span
@@ -136,15 +138,22 @@ export default function AdminOrders() {
                       <td className="px-6 py-4 text-gray-600">
                         {new Date (order.created_at).toDateString()}
                       </td>
-                      <td className="px-6 py-4">
+                      
+                      <td className="px-6 py-4 flex items-center gap-3">
                         <NavLink
                           end
                           to={`/admin/orders/${order.id}`}
                           className="text-[#155daf] hover:text-[#13315C] font-semibold"
                         >
-                          View
+                        View
                         </NavLink>
+
+                        <td className="text-red-500 cursor-pointer " onClick={() => setActiveDeleteId(order.id)} >
+                          Delete
+                        </td>
                       </td>
+
+
                     </tr>
                   ))
                 ) : (
@@ -159,6 +168,37 @@ export default function AdminOrders() {
           </div>
         </div>
       </div>
+
+          {activeDeleteId && (
+        <div className="fixed bg-black/60 flex items-center justify-center inset-0 backdrop-blur-xs  ">
+          <div className="flex  flex-col bg-white rounded-xl shadow-md p-8  max-w-xs  w-full">
+            <h2 className="text-2xl text-[#13315c] font-bold ">
+              Delete Order
+            </h2>
+
+            <div className="flex items-start mt-4">
+              <p className="tracking-wide  ">
+                Are you sure you want to delete this Order ?
+              </p>
+            </div>
+
+            <div className="mt-7 grid  grid-cols-2 gap-12 ">
+              <button
+                onClick={() => setActiveDeleteId(null)}
+                className="font-medium bg-[#13315c]  text-white cursor-pointer p-2 rounded-lg hover:bg-[#155daf] transition-all duration-300 "
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => handleDelete(activeDeleteId)}
+                className="font-medium text-[#13315c] bg-red-200 rounded-lg  p-2 hover:text-white hover:bg-red-600 transition-all duration-300 cursor-pointer "
+              >
+                Delete
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   );
 }

@@ -14,7 +14,7 @@ export default function ProductDetails() {
   const [loading, setLoading] = useState(true);
 
   const { cart, addCart, increaseCart, decreaseCart } = useCart();
-
+  
   const cartItem = cart?.items?.find(
     (item) => item.product?.id === product?.id,
   );
