@@ -53,17 +53,21 @@ export default function Checkout() {
     setCheckoutLoading(true);
 
     try {
-      const orderTotal = {
-        grand_total: grandtotal,
+      const orderResponse = await axiosInstance.post("orders/", {
         shipping_address: formData.shippingAddress,
-      };
+      });
 
-      await axiosInstance.post("orders/", orderTotal);
-      await clearCart();
-      setSuccess("Order placed successfully");
-      navigate("/orders");
+      const orderId = orderResponse.data.id;
+
+      const paymentResponse = axiosInstance.post("payments/initialize/", {
+        order_id: orderId,
+      });
+
+      window.location.href = paymentResponse.data.payment_link
     } catch (error) {
-      setErrors({ submit: error.response?.data?.detail || "Failed to place order" });
+      setErrors({
+        submit: error.response?.data?.detail || "Failed to place order",
+      });
       console.log(error.response?.data);
     } finally {
       setCheckoutLoading(false);
@@ -95,7 +99,6 @@ export default function Checkout() {
       <div className="mx-auto max-w-6xl px-4 md:px-6 lg:px-8">
         <h2 className="text-3xl font-bold text-[#13315c] mb-8">Checkout</h2>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12">
-          
           <div className="md:col-span-2">
             <div className="bg-white p-6 rounded-xl shadow-lg">
               <form className="space-y-4" onSubmit={handleSubmit}>
@@ -110,22 +113,35 @@ export default function Checkout() {
                     rows="3"
                     placeholder="Enter your shipping address"
                     className={`px-4 py-2 w-full border rounded-lg focus:outline-none focus:ring transition-all duration-300 placeholder:text-sm ${
-                      errors.shippingAddress ? "border-red-500 focus:ring-red-500" : "border-[#155daf] focus:ring-[#155daf]"
+                      errors.shippingAddress
+                        ? "border-red-500 focus:ring-red-500"
+                        : "border-[#155daf] focus:ring-[#155daf]"
                     }`}
                   ></textarea>
                   {errors.shippingAddress && (
-                    <div className="text-xs text-red-500 mt-1">{errors.shippingAddress}</div>
+                    <div className="text-xs text-red-500 mt-1">
+                      {errors.shippingAddress}
+                    </div>
                   )}
                 </div>
 
                 <div className="pt-6 border-t border-gray-200">
-                  <h3 className="text-lg font-medium text-[#13315c] mb-4">Order Items</h3>
+                  <h3 className="text-lg font-medium text-[#13315c] mb-4">
+                    Order Items
+                  </h3>
                   <div className="space-y-3">
                     {cartItems.map((item) => (
-                      <div className="flex items-center justify-between p-4 bg-sky-50 rounded-lg" key={item.id}>
+                      <div
+                        className="flex items-center justify-between p-4 bg-sky-50 rounded-lg"
+                        key={item.id}
+                      >
                         <div>
-                          <p className="text-sm font-medium text-[#13315c]">{item.product?.name}</p>
-                          <p className="text-sm text-gray-500 mt-0.5">Qty: {item.quantity}</p>
+                          <p className="text-sm font-medium text-[#13315c]">
+                            {item.product?.name}
+                          </p>
+                          <p className="text-sm text-gray-500 mt-0.5">
+                            Qty: {item.quantity}
+                          </p>
                         </div>
                         <p className="text-[#155daf] text-sm tracking-wider font-medium">
                           {formatCurrency(item?.product?.price * item.quantity)}
@@ -141,7 +157,9 @@ export default function Checkout() {
                   </div>
                 )}
                 {success && (
-                  <p className="text-sm text-green-500 bg-green-100 p-2 rounded-lg">{success}</p>
+                  <p className="text-sm text-green-500 bg-green-100 p-2 rounded-lg">
+                    {success}
+                  </p>
                 )}
 
                 <button
@@ -157,16 +175,24 @@ export default function Checkout() {
 
           <div className="md:col-span-2">
             <div className="bg-white rounded-xl p-6 shadow-lg sticky top-20">
-              <h2 className="text-[#13315c] font-semibold text-lg mb-4">Order Summary</h2>
+              <h2 className="text-[#13315c] font-semibold text-lg mb-4">
+                Order Summary
+              </h2>
               <div className="space-y-3 border-b pb-4">
                 <div className="flex justify-between text-gray-600">
                   <span>Subtotal</span>
-                  <span className="text-sm font-medium">{formatCurrency(subtotal)}</span>
+                  <span className="text-sm font-medium">
+                    {formatCurrency(subtotal)}
+                  </span>
                 </div>
                 <div className="flex justify-between text-gray-600">
                   <span>Shipping</span>
                   <span className="text-sm font-medium">
-                    {shipping === 0 ? <span className="text-green-500 font-semibold">Free</span> : formatCurrency(shipping)}
+                    {shipping === 0 ? (
+                      <span className="text-green-500 font-semibold">Free</span>
+                    ) : (
+                      formatCurrency(shipping)
+                    )}
                   </span>
                 </div>
               </div>
@@ -178,7 +204,6 @@ export default function Checkout() {
               </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>

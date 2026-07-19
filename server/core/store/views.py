@@ -1,20 +1,24 @@
 from rest_framework import viewsets, permissions, generics
-from rest_framework.decorators import api_view , action
+from rest_framework.decorators import api_view , action, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.exceptions import ValidationError
-from django.shortcuts import get_object_or_404
+from rest_framework.permissions import IsAuthenticated
+
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.shortcuts import get_object_or_404
+from .emails import send_password_reset_email, send_order_confirmation_email, send_welcome_email
+
+from .serializers import CategorySerializer, OrderSerializer, ProductSerializer, UserProfileSerializer, UserSerializer, WishListSerializer, CartSerializer
+from .models import Cart, CartItem, OrderItem, UserProfile, Product, Category, Order, Wishlist
 
 from .services.cart_service import CartService
 from .services.user_service import UserService
-from .emails import send_password_reset_email, send_verification_email, send_order_confirmation_email, send_welcome_email
-from .models import Cart, CartItem, OrderItem, UserProfile, Product, Category, Order, Wishlist
-from .serializers import CategorySerializer, OrderSerializer, ProductSerializer, UserProfileSerializer, UserSerializer, WishListSerializer, CartSerializer
 from .services.order_service import create_order
+from .services.payment_service import PaymentService
 
 
 
@@ -308,3 +312,17 @@ def change_password(request):
     status= status.HTTP_200_OK
   )
   
+  
+  # Payment service Logic------
+  
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def initialize_payment(request):
+  order_id = request.data.get("order_number")
+  
+  order = Order.objects.create(user=request.user, id=order_id)
+  payment_link = PaymentService.initialize_payment(order)
+  
+  return Response({
+    "payment_link" : payment_link
+  }, status= status.HTTP_200_OK)

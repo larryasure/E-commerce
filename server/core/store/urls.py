@@ -32,6 +32,9 @@ urlpatterns = [
   
   path('logout/', TokenBlacklistView.as_view(), name="logout"),
   
+  
+  path("payments/initialize/", views.initialize_payment, name="initialize-payment"),
 ]
+
 
 
