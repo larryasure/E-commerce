@@ -6,7 +6,7 @@ import { AuthContext } from "./AuthContext";
 const WishlistContext = createContext();
 
 export function WishlistProvider({ children }) {
-  const [wishlist, setWishlist] = useState([]);
+  const [wishlists, setWishlists] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const { isAuthenticated } = useContext(AuthContext);
@@ -15,14 +15,14 @@ export function WishlistProvider({ children }) {
   useEffect(() => {
     const fetchWishlist = async () => {
       if (!isAuthenticated) {
-        setWishlist([]);
+        setWishlists([]);
         return;
       }
 
       try {
         setLoading(true);
         const data = await getWishlist();
-        setWishlist(data);
+        setWishlists(data);
       } catch (error) {
         console.error("Failed to load wishlist:", error);
       } finally {
@@ -36,7 +36,7 @@ export function WishlistProvider({ children }) {
   const addItem = async (productId) => {
     try {
       const item = await addWishlist(productId);
-      setWishlist((prev) => [item, ...prev]);
+      setWishlists((prev) => [item, ...prev]);
       toast.success("Added to wishlist ❤️");
     } catch (error) {
       console.error("Unable to add to wishlist", error);
@@ -47,7 +47,7 @@ export function WishlistProvider({ children }) {
   const removeItem = async (wishlistId) => {
     try {
       await removeWishlist(wishlistId);
-      setWishlist((prev) => prev.filter((item) => item.id !== wishlistId));
+      setWishlists((prev) => prev.filter((item) => item.id !== wishlistId));
       toast.success("Removed from wishlist");
     } catch (error) {
       console.error("Unable to remove wishlist item", error);
@@ -56,12 +56,13 @@ export function WishlistProvider({ children }) {
 
 
   const isWishlisted = (productId) => {
-    if (!wishlist) return false
+    if (!wishlists) return false
 
-     return wishlist.some((item) => item.product?.id === productId)
+     return wishlists.some((item) => item.product?.id === productId)
   }
+  
   const toggleWishlist = async (productId) => {
-    const existing = wishlist.find((item) => item.product?.id === productId);
+    const existing = wishlists.find((item) => item.product?.id === productId);
     if (existing) {
       await removeItem(existing.id);
     } else {
@@ -72,7 +73,7 @@ export function WishlistProvider({ children }) {
   return (
     <WishlistContext.Provider
       value={{
-        wishlist,
+        wishlists,
         loading,
         addItem,
         removeItem,

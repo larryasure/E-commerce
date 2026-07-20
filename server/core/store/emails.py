@@ -60,7 +60,7 @@ def send_password_reset_email(user, reset_url):
   
   
 def send_order_confirmation_email(user, order):
-  subject= f'Order Confirmed #{order.id}'
+  subject= f'Order Confirmed #{order.order_number}'
   from_email=settings.EMAIL_HOST_USER
   to_email=user.email
   
@@ -68,7 +68,7 @@ def send_order_confirmation_email(user, order):
   html_content= render_to_string('store/emails/order_confirmation.html', {
     'username': user.username,
     'order': order,
-    'order_url': f'http://localhost:3000/orders/{order.id}',
+    'order_url': f'http://localhost:3000/orders/{order.order_number}',
   })
   
   
