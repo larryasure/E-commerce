@@ -18,12 +18,22 @@ def create_order(user, validated_data):
     )
     subtotal += Decimal(str(item.product.price)) * item.quantity
     
+    
+    
   shipping = Decimal("0.00")
   if subtotal < Decimal("150000"):
     shipping = 3500
+    
   
   order.total_price = subtotal + shipping 
   order.save()
+  
+  
+  print("=" * 50)
+  print("SUBTOTAL:", subtotal)
+  print("SHIPPING:", shipping)
+  print("TOTAL BEFORE RETURN:", order.total_price)
+  print("=" * 50)
   
   cart.items.all().delete()
   

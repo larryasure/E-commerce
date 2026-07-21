@@ -41,8 +41,8 @@ export default function Cart() {
 
   return (
     <div className="min-h-screen py-12">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h1 className="text-4xl font-bold text-[#13315C] mb-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 my-8">
+        <h1 className="text-4xl font-bold text-[#13315C] mb-6">
           Shopping Cart
         </h1>
 
@@ -60,7 +60,7 @@ export default function Cart() {
                       {item.product.name}
                     </h3>
 
-                    <p className="text-[#155daf] font-semibold text-sm">
+                    <p className="text-[#155daf] font-semibold text-xs">
                       {formatCurrency(item.product.price)}
                     </p>
                   </div>
@@ -69,30 +69,30 @@ export default function Cart() {
                     <div className="flex items-center border-2 border-[#155daf] rounded-lg">
                       <button
                         onClick={() => decreaseCart(item.id)}
-                        className="px-3 py-1 hover:bg-[#155daf]/10"
+                        className="px-2 py-1 hover:bg-[#155daf]/10"
                       >
                         −
                       </button>
 
-                      <span className="px-4 py-1.5 font-bold">
+                      <span className="px-2 py-1.5 font-bold">
                         {item.quantity}
                       </span>
 
                       <button
                         onClick={() => increaseCart(item.id)}
-                        className="px-3 py-1 hover:bg-[#155daf]/10"
+                        className="px-2 py-1 hover:bg-[#155daf]/10"
                       >
                         +
                       </button>
                     </div>
 
-                    <p className="font-bold text-[#13315C] w-20 text-right text-sm">
+                    <p className="font-bold  text-[#13315C] w-24 text-right text-sm">
                       {formatCurrency(item.product.price * item.quantity)}
                     </p>
 
                     <button
                       onClick={() => removeCart(item.id)}
-                      className="text-red-500 hover:text-red-700 font-bold"
+                      className="text-red-500 text-sm hover:text-red-700 font-bold"
                     >
                       ✕
                     </button>

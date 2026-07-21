@@ -1,11 +1,13 @@
+import { Minus, Plus, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { useWishlist } from "../context/WishlistContext";
 import { formatCurrency } from "../utils/formatCurrency";
 
 export default function WishList() {
-  const { addCart } = useCart();
+  const { cart, addCart, decreaseCart, increaseCart } = useCart();
   const { wishlists, removeItem } = useWishlist();
+
 
   if (wishlists.length === 0) {
     return (
@@ -63,6 +65,9 @@ export default function WishList() {
           <div className="my-4  bg-white  shadow-sm p-6 rounded-xl">
             {wishlists.map((wishlistItem) => {
               const item = wishlistItem.product;
+              const cartItem = cart?.items?.find((c) => c.product.id === item.id)
+              const quantity = cartItem ? cartItem.quantity : 0
+              
               return (
                 <div
                   key={item.id}
@@ -104,12 +109,40 @@ export default function WishList() {
                           Remove
                         </button>
 
-                        <button
-                          onClick={() => addCart(item)}
-                          className="bg-[#155daf] text-white text-sm px-3 py-2 font-medium  cursor-pointer rounded-lg hover:bg-[#13315c] transition"
+                        <div
+                          
+                          className=" text-[#13315c] text-sm px-3 py-2 font-medium  cursor-pointer rounded-lg  transition "
                         >
-                          Add to Cart
-                        </button>
+                          {quantity ? (
+                            <div className="flex items-center rounded-xl border overflow-hidden border-sky-200 shadow">
+                              <button
+                                className="hover:bg-sky-100 p-2"
+                                onClick={() => decreaseCart(cartItem.id)}
+                              >
+                                <Minus />
+                              </button>
+
+                              <span className="font-semibold text-sm px-2  ">
+                                {quantity}
+                              </span>
+
+                              <button
+                                className="p-2 hover:bg-sky-100"
+                                onClick={() => increaseCart(cartItem.id)}
+                              >
+                                <Plus />
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => addCart(item.id)}
+                              className="flex items-center gap-2 rounded-lg bg px-1.5 py-2.5 text-sm  text-white hover:bg-[#13315C] hover:scale-105 cursor-pointer bg-[#155daf] transition-all duration-300"
+                            >
+                              <ShoppingCart size={14} />
+                              Add to cart
+                            </button>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>

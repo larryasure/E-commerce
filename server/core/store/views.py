@@ -2,15 +2,15 @@ from rest_framework import viewsets, permissions, generics
 from rest_framework.decorators import api_view , action, permission_classes
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.exceptions import ValidationError
 from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import get_object_or_404
 
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from django.shortcuts import get_object_or_404
 from .emails import send_password_reset_email, send_order_confirmation_email, send_welcome_email
+
 
 from .serializers import CategorySerializer, OrderSerializer, ProductSerializer, UserProfileSerializer, UserSerializer, WishListSerializer, CartSerializer
 from .models import Cart, CartItem, OrderItem, UserProfile, Product, Category, Order, Wishlist
@@ -64,7 +64,7 @@ class OrderViewSet(viewsets.ModelViewSet):
     
     order = create_order(user= self.request.user, validated_data=request.data)
     
-    send_order_confirmation_email(request.user, order)
+    # send_order_confirmation_email(request.user, order)
     print("=" * 50)
     print("EMAIL FUNCTION CALLED")
     print(f"Order ID: {order.id}")
@@ -318,11 +318,26 @@ def change_password(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def initialize_payment(request):
+  print("========== PAYMENT VIEW REACHED ==========")
+  
   order_id = request.data.get("order_number")
   
-  order = Order.objects.create(user=request.user, id=order_id)
+  order = get_object_or_404(
+    Order,
+    id=order_id,
+    user=request.user
+  )
+  
+
+  print("VIEW ORDER TOTAL:", order.total_price)
+
   payment_link = PaymentService.initialize_payment(order)
   
   return Response({
     "payment_link" : payment_link
   }, status= status.HTTP_200_OK)
+
+
+@api_view(["GET"])
+def test_payment(request):
+  return Response({"message": "Payment URL works!"})

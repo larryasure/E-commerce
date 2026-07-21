@@ -18,6 +18,7 @@ class PaymentService():
     
   
   
+  print
   
   @staticmethod
   def initialize_payment(order):
@@ -39,14 +40,22 @@ class PaymentService():
       },
     }
 
+
+    print("ORDER_TOTAL:", order.total_price)
+    print("ORDER_TYPE:", type(order.total_price))
+    print("PAYLOAD:", payload)
+    print("=" * 50)
+    print("TOTAL FROM DATABASE:", order.total_price)
+    print("=" * 50)
+    
+    
     response = requests.post(
       f"{PaymentService.BASE_URL}/payments",
       json=payload,
       headers=PaymentService._headers()
     )
     
-    print("STATUS:", response.status_code)
-    print("RESPONSE:", response.text)
+
     
     data = response.json()
     

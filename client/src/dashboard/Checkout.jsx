@@ -50,6 +50,7 @@ export default function Checkout() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!handleValidate()) return;
+
     setCheckoutLoading(true);
 
     try {
@@ -58,10 +59,6 @@ export default function Checkout() {
       });
 
       const orderId = orderResponse.data.id;
-
-      // const paymentResponse = axiosInstance.post("payments/initialize/", {
-      //   order_id: orderId,
-      // });
 
       const paymentResponse = await axiosInstance.post("payments/initialize/", {
         order_id: orderId,
@@ -72,6 +69,7 @@ export default function Checkout() {
       setErrors({
         submit: error.response?.data?.detail || "Failed to place order",
       });
+
       console.log(error.response?.data);
     } finally {
       setCheckoutLoading(false);

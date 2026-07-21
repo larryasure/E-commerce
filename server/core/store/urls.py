@@ -34,6 +34,8 @@ urlpatterns = [
   
   
   path("payments/initialize/", views.initialize_payment, name="initialize-payment"),
+  
+  path("test-payment/", views.test_payment, name="test-payment"),
 ]
 
 
