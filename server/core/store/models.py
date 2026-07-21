@@ -95,7 +95,7 @@ class Order(models.Model):
   import random
   def save(self, *args, **kwargs):
     if not self.order_number:
-      self.order_number= f"PP{self.random.randint(10000000 , 99999999 )}"
+      self.order_number= f"{self.random.randint(10000000 , 99999999 )}"
     super().save(*args , **kwargs)
    
   

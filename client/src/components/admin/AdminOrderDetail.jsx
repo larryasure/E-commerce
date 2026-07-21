@@ -72,7 +72,7 @@ export default function AdminOrderDetail() {
       <div className="bg-white rounded-xl shadow-lg p-8">
         <div className="mb-8">
           <h1 className=" font-bold text-[#13315C] mb-2">
-            Order 🇮🇩 {order.order_number}
+            Order {order.order_number}
           </h1>
           <p className="text-gray-600">
             {new Date(order.created_at).toLocaleTimeString()}

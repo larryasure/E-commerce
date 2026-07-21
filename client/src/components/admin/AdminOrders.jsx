@@ -117,7 +117,7 @@ export default function AdminOrders() {
                       key={order.key}
                     >
                       <td className="text-[#13315c] py-4 px-6 font-medium">
-                        🇮🇩 {order.order_number}
+                        Order {order.order_number}
                       </td>
                       <td className="text-gray-600 py-4 px-6 font-medium capitalize ">
                         {order.user?.username || "Guest"}

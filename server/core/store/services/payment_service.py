@@ -7,7 +7,7 @@ from .. models import Order
 
 
 class PaymentService():
-  BASE_URL = "https://api.flutterwave.com/v3"
+  BASE_URL = settings.FLUTTERWAVE_BASE_URL
   
   @staticmethod
   def _headers():
@@ -40,10 +40,13 @@ class PaymentService():
     }
 
     response = requests.post(
-      f"{PaymentService.BASE_URL}payments/",
+      f"{PaymentService.BASE_URL}/payments",
       json=payload,
       headers=PaymentService._headers()
     )
+    
+    print("STATUS:", response.status_code)
+    print("RESPONSE:", response.text)
     
     data = response.json()
     

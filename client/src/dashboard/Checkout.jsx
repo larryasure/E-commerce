@@ -59,11 +59,15 @@ export default function Checkout() {
 
       const orderId = orderResponse.data.id;
 
-      const paymentResponse = axiosInstance.post("payments/initialize/", {
+      // const paymentResponse = axiosInstance.post("payments/initialize/", {
+      //   order_id: orderId,
+      // });
+
+      const paymentResponse = await axiosInstance.post("payments/initialize/", {
         order_id: orderId,
       });
 
-      window.location.href = paymentResponse.data.payment_link
+      window.location.href = paymentResponse.data.payment_link;
     } catch (error) {
       setErrors({
         submit: error.response?.data?.detail || "Failed to place order",
