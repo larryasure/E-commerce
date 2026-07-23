@@ -58,10 +58,10 @@ export default function Checkout() {
         shipping_address: formData.shippingAddress,
       });
 
-      const orderId = orderResponse.data.id;
+      const orderNumber = orderResponse.data.order_number;
 
       const paymentResponse = await axiosInstance.post("payments/initialize/", {
-        order_id: orderId,
+        order_number: orderNumber,
       });
 
       window.location.href = paymentResponse.data.payment_link;

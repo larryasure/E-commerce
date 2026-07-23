@@ -15,6 +15,7 @@ import Cart from "./components/Cart.jsx";
 import ErrorPage from "./components/ErrorPage.jsx";
 import Home from "./components/Home.jsx";
 import Login from "./components/Login.jsx";
+import PaymentCallback from "./components/PaymentCallback.jsx";
 import ProductDetails from "./components/ProductDetails.jsx";
 import Products from "./components/Products.jsx";
 import Register from "./components/Register.jsx";
@@ -74,6 +75,15 @@ const router = createBrowserRouter([
         element: (
           <ProtectedRoutes>
             <Orders />
+          </ProtectedRoutes>
+        ),
+      },
+
+      {
+        path: "/payment/callback",
+        element: (
+          <ProtectedRoutes>
+            <PaymentCallback />
           </ProtectedRoutes>
         ),
       },

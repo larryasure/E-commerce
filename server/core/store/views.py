@@ -60,17 +60,10 @@ class OrderViewSet(viewsets.ModelViewSet):
   def get_queryset(self):
     return Order.objects.filter(user=self.request.user)
   
-  def create(self, request, *args, **kwargs):
-    
-    order = create_order(user= self.request.user, validated_data=request.data)
-    
-    # send_order_confirmation_email(request.user, order)
-    print("=" * 50)
-    print("EMAIL FUNCTION CALLED")
-    print(f"Order ID: {order.id}")
-    print("=" * 50)
-    
+  def create(self, request, *args, **kwargs):  
+    order = create_order(user=self.request.user, validated_data=request.data)    
     serializer = self.get_serializer(order)
+    
     return Response(serializer.data, status=status.HTTP_201_CREATED)
   
   
@@ -314,30 +307,59 @@ def change_password(request):
   
   
   # Payment service Logic------
-  
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def initialize_payment(request):
-  print("========== PAYMENT VIEW REACHED ==========")
+    order_number = request.data.get("order_number")
+    try:
+        order = Order.objects.get(
+            order_number=order_number,
+            user=request.user
+        )
+
+    except Order.DoesNotExist:
+        return Response(
+            {"error": "Order does not exist"},
+            status=404
+        )
+
+
+    payment_link = PaymentService.initialize_payment(order)
+
+    return Response({
+        "payment_link": payment_link
+    })
+    
+    
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+
+def verify_payment(request):
+  print("VERIFY PAYMENT VIEW REACHED")
+  transaction_id = request.data.get("transaction_id")
+  order_number= request.data.get("order_number")
   
-  order_id = request.data.get("order_number")
+  
+  if not transaction_id or order_number:
+    return Response({"error:", "Transaction ID and order number are required"}, status=status.HTTP_400_BAD_REQUEST)
   
   order = get_object_or_404(
     Order,
-    id=order_id,
-    user=request.user
+    user= request.user,
+    order_number= order_number,
   )
   
-
-  print("VIEW ORDER TOTAL:", order.total_price)
-
-  payment_link = PaymentService.initialize_payment(order)
+  if order.payment_status == "PAID":
+    serializer= OrderSerializer(order)
+    return Response(serializer.data)
   
-  return Response({
-    "payment_link" : payment_link
-  }, status= status.HTTP_200_OK)
-
-
-@api_view(["GET"])
-def test_payment(request):
-  return Response({"message": "Payment URL works!"})
+  order = PaymentService.complete_payment(
+    order,
+    transaction_id,
+  )
+  
+  send_order_confirmation_email(request.user, order)
+  
+  serializer= OrderSerializer(order)
+  
+  return Response(serializer.data, status=status.HTTP_200_OK)

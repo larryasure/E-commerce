@@ -83,7 +83,7 @@ class Order(models.Model):
   
   payment_status= models.CharField(max_length=100, choices=PAYMENT_CHOICES, default='PENDING')
   order_status= models.CharField(max_length=200, choices=STATUS_CHOICES, default="PROCESSING")
-  payment_intent_id= models.CharField(max_length=255, null=True, blank=True)
+  payment_intent_id=models.CharField(max_length=255, null=True, blank=True)
   
   
   shipping_address= models.TextField(blank=True, null=True)

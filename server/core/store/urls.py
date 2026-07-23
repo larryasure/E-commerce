@@ -34,8 +34,7 @@ urlpatterns = [
   
   
   path("payments/initialize/", views.initialize_payment, name="initialize-payment"),
-  
-  path("test-payment/", views.test_payment, name="test-payment"),
+  path("payments/verify/", views.verify_payment, name='verify-payment')
 ]
 
 

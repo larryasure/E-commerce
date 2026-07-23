@@ -18,11 +18,11 @@ class PaymentService():
     
   
   
-  print
   
   @staticmethod
   def initialize_payment(order):
     # Initialize payment with flutterwave and return payment link back. 
+    print("REDIRECT URL:", settings.FLUTTERWAVE_REDIRECT_URL)
     payload= {
       "tx_ref": f"Order-{order.order_number}",
       "amount": str(order.total_price),
@@ -40,22 +40,11 @@ class PaymentService():
       },
     }
 
-
-    print("ORDER_TOTAL:", order.total_price)
-    print("ORDER_TYPE:", type(order.total_price))
-    print("PAYLOAD:", payload)
-    print("=" * 50)
-    print("TOTAL FROM DATABASE:", order.total_price)
-    print("=" * 50)
-    
-    
     response = requests.post(
       f"{PaymentService.BASE_URL}/payments",
       json=payload,
       headers=PaymentService._headers()
     )
-    
-
     
     data = response.json()
     
@@ -65,5 +54,43 @@ class PaymentService():
       )
     return data["data"]["link"]
 
+
+  @staticmethod
+  def verify_payment(transaction_id):
+    response = requests.get(
+      f"{PaymentService.BASE_URL}transactions/{transaction_id}/verify",
+      headers= PaymentService._headers()
+    )
+    
+    data = response.json()
+    
+    if response.status_code != 200:
+      raise ValidationError(
+        data.get("message", "Unable to verify payment.")
+      )
+      
+    return data["data"]
+  
+  
+  
+  @staticmethod
+  def complete_payment(order, transaction_id):
+    payment = PaymentService.verify_payment(transaction_id)
+    
+    if payment["status"] != "successful":
+      order.payment_status = "FAILED"
+      order.save()
+      
+      raise ValidationError("Payment not successful!")
+    
+    order.payment_status = "PAID"
+    order.payment_intent_id= str(payment["id"])
+    order.save()
+    
+    
+    return order
+    
+      
+    
 
 
