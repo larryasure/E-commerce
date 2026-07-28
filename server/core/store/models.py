@@ -42,7 +42,7 @@ class Product(models.Model):
   
   
   class Meta: 
-    ordering = ["-created_at"]
+    ordering = ["-created_at"] 
 
 class UserProfile(models.Model):
   user=models.OneToOneField(User, on_delete=models.CASCADE, related_name="profile")
