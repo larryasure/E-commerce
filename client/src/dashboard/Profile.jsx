@@ -32,7 +32,7 @@ export default function Profile() {
         phone_number: user.profile.address,
       });
       if (user.profile.avatar) {
-        setAvatarPreview(`http://127.0.0.1:8000${user.profile.avatar}`);
+        setAvatarPreview(user.profile.avatar);
       }
     }
   }, [user]);
@@ -182,11 +182,17 @@ export default function Profile() {
                 <img
                   src={
                     avatarPreview ||
-                    `https://via.placeholder.com/120x120?text=${user?.username}`
+                    `https://ui-avatars.com/api/?name=${user?.username}&background=ccccee&color=f4f4f4`
                   }
                   alt={user?.username}
-                  className="w-24 h-24"
+                  className="w-14 h-14 rounded-full object-cover border-2 border-blue-200 shadow-md"
+                  onError={(e) => {
+                    e.target.src = `https://ui-avatars.com/api/?name=${user?.username}&background=cccccc&color=f4f4f4`;
+                  }}
                 />
+                <label htmlFor="avatar-upload" className="absolute inset-0 font-size rounded-full bg-black/40 ">
+
+                </label>
               </div>
             </div>
           </div>

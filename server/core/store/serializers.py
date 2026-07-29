@@ -6,9 +6,6 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from datetime import timedelta
 from django.utils import timezone
-
-
-
 class CategorySerializer(serializers.ModelSerializer):
   
   class Meta:
@@ -57,6 +54,19 @@ class UserProfileSerializer(serializers.ModelSerializer):
   class Meta:
     model= UserProfile
     fields="__all__"
+    
+    
+  def get_avatar(self, obj):
+    if obj.avatar:
+      request = self.context.get('request')
+      if request:
+        return request.build_absolute_uri(obj.avatar.url)
+      return obj.avatar.url
+    return 'https://ui-avatars.com/api/?name=User&background=cccccc&color=ffffff'
+  
+  
+    
+  
       
   
   
@@ -73,8 +83,18 @@ class UserSerializer(serializers.ModelSerializer):
     fields= ['id', 'username', 'email', "password", 'profile', 'is_staff']
     
     
- 
   
+  def to_representation(self, instance):
+    data = super().to_representation(instance)
+    if instance.profile or instance.profile.avatar:
+      request = self.context.get("request")
+      
+      if request:
+        data['profile']['avatar'] = request.build_absolute_uri(instance.profile.avatar.url)
+    return data
+    
+    
+        
   def update(self, instance, validated_data):
     
     instance.username = validated_data.get("username", instance.username)
