@@ -10,7 +10,7 @@ export default function Navbar() {
 
   const { cart } = useCart();
 
-  const cartCount = cart?.total_items || 0
+  const cartCount = cart?.total_items || 0;
 
   const textLinkStyle = ({ isActive }) =>
     `px-3 py-2 text-sm font-medium transition-colors duration-200

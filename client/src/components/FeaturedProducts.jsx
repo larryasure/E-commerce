@@ -65,6 +65,7 @@ export default function FeaturedProducts({
                         src={product.image}
                         alt={product.name}
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                        loading="lazy"
                       />
                     </NavLink>
 

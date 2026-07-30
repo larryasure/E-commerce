@@ -6,7 +6,7 @@ import { AuthContext } from "../context/AuthContext";
 export default function Profile() {
   const navigate = useNavigate();
   const { user, logout } = useContext(AuthContext);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("profile");
   const [profileData, setProfileData] = useState({
     bio: "",
@@ -278,11 +278,134 @@ export default function Profile() {
                 {activeTab === "profile" && (
                   <form className="space-y-5" onSubmit={handleUpdateProfile}>
                     <div>
-                      <label className="block text-[#155daf] font-semibold mb-2 text-sm ">Bio</label>
-                      <textarea name="bio" value={profileData.bio} onChange={handleChange} className="w-full px-4 py-2 border-2 border-[#155daf] rounded-xl focus:outline-none focus:ring focus:ring-[#13315c] transition-all duration-300 text-sm" rows={3} placeholder="Tell us about yourself!" />
-                      
-
+                      <label className="block text-[#155daf] font-semibold mb-2 text-sm ">
+                        Bio
+                      </label>
+                      <textarea
+                        name="bio"
+                        value={profileData.bio}
+                        onChange={handleChange}
+                        className="w-full px-4 py-2 border-2 border-[#155daf] rounded-xl focus:outline-none focus:ring focus:ring-[#13315c] transition-all duration-300 text-sm"
+                        rows={3}
+                        placeholder="Tell us about yourself!"
+                      />
                     </div>
+
+                    <div className="flex items-center justify-center gap-5  ">
+                      <div className="flex-1 flex flex-col">
+                        <label className="block text-[#155daf] font-semibold mb-2 text-sm ">
+                          Phone Number
+                        </label>
+                        <input
+                          type="tel"
+                          name="phone_number"
+                          value={profileData.phone_number}
+                          onChange={handleChange}
+                          className={`w-full  px-4 py-2 rounded-xl border-2 border-[#155daf] focus:outline-none focus:ring focus:ring-[#13315c] transition-all duration-300 ${errors.phone_number ? "text-red-600 focus:ring:500" : "border-[#155daf] focus:ring-[#13315c]"}`}
+                        />
+                        {errors.phone_number && (
+                          <span className="text-xs mt-1 text-red-500">
+                            {errors.phone_number}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex-1 flex flex-col">
+                        <label className="text-sm block text-[#155daf] font-semibold mb-2 ">
+                          Address
+                        </label>
+
+                        <input
+                          type="text"
+                          name="address"
+                          value={profileData.address}
+                          onChange={handleChange}
+                          className={`px-4 py-2 rounded-xl border-[#155daf] border-2 focus:outline-none focus:ring focus:ring-[#13315c] transition-all duration-300 ${errors.address ? "text-red-500 focus:ring-red-500" : "text-[#155daf] focus:ring-[#13315c]"}`}
+                        />
+                        {errors.address && (
+                          <span className="text-xs mt-1 text-red-600">
+                            {errors.address}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      disabled={loading}
+                      type="submit"
+                      className="w-full bg-[#155daf] text-white py-3 mt-3 rounded-lg hover:bg-[#13315C] disabled:bg-gray-400 font-semibold text-sm transition-all duration-300 transform hover:scale-105 active:scale-95"
+                    >
+                      {loading ? (
+                        <span className="flex items-center gap-2">
+                          <span className="w-4 h-4 border-b-3 border-[#155daf] animate-spin rounded-full "></span>
+                          <span>Saving...</span>
+                        </span>
+                      ) : (
+                        <span>Save Changes</span>
+                      )}
+                    </button>
+                  </form>
+                )}
+
+                {activeTab === "password" && (
+                  <form
+                    onSubmit={handleChangePassword}
+                    className="space-y-5 max-w-md "
+                  >
+                    <div>
+                      <label className="block text-sm text-[#155daf] font-semibold mb-2 ">
+                        Current Password
+                      </label>
+                      <input
+                        type="password"
+                        name="oldPassword"
+                        value={passwordData.oldPassword}
+                        onChange={handlePasswordChange}
+                        className={`w-full px-4 py-2 rounded-xl focus:outline-none focus:ring focus:ring-[#155daf] transition-all duration-300 text-sm border-2 border-[#155daf] ${errors.oldPassword ? "text-red-600 focus:ring-red-500" : "text-[#155daf] focus:ring-[#13315c]"}`}
+                      />
+                      {errors.oldPassword && (
+                        <span className="text-xs mt-1 text-red-500 ">
+                          {errors.oldPassword}
+                        </span>
+                      )}
+                    </div>
+
+
+                    <div>
+                      <label className="block text-sm font-semibold mb-2 text-[#155daf] ">New Password</label>
+                      <input type="password" name="newPassword" value={passwordData.newPassword} onChange={handlePasswordChange} className={`w-full border-2 py-2 px-4  rounded-xl border-[#155daf] focus:outline-none focus:ring focus:ring-[#155daf] text-sm transition-all duration-300 ${errors.newPassword ? "text-red-600 focus:ring-red-500" : "text-[#155daf] focus:ring-[#13315c]"}`} />
+                      
+                      {
+                        errors.newPassword && (
+                          <span className="text-xs mt-1 text-red-500 ">{ errors.oldPassword}</span>
+                        )
+                      }
+                    </div>
+
+                       <div>
+                      <label className="block text-sm font-semibold mb-2 text-[#155daf] ">Confirm Password</label>
+                      <input type="password" name="confirmPassword" value={passwordData.confirmPassword} onChange={handlePasswordChange} className={`w-full border-2 py-2 px-4  rounded-xl border-[#155daf] focus:outline-none focus:ring focus:ring-[#155daf] text-sm transition-all duration-300 ${errors.confirmPassword ? "text-red-600 focus:ring-red-500" : "text-[#155daf] focus:ring-[#13315c]"}`} />
+                      
+                      {
+                        errors.confirmPassword && (
+                          <span className="text-xs mt-1 text-red-500 ">{ errors.confirmPassword}</span>
+                        )
+                      }
+                    </div>
+
+                     <button
+                      disabled={loading}
+                      type="submit"
+                      className="w-full bg-[#155daf] text-white py-3 mt-3 rounded-lg hover:bg-[#13315C] disabled:bg-gray-400 font-semibold text-sm transition-all duration-300 transform hover:scale-105 active:scale-95"
+                    >
+                      {loading ? (
+                        <span className="flex items-center gap-2">
+                          <span className="w-4 h-4 border-b-3 border-[#155daf] animate-spin rounded-full "></span>
+                          <span>Updating...</span>
+                        </span>
+                      ) : (
+                        <span>Change Password</span>
+                      )}
+                    </button>
                   </form>
                 )}
               </div>
