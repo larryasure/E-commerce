@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import axiosInstance from "../api/axiosConfig";
 
 export default function PaymentCallback() {
+  console.log("PaymentCallback rendered");
+  
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState("");
@@ -23,7 +25,7 @@ export default function PaymentCallback() {
         }
         const order_number = tx_ref.replace("Order-", "");
 
-        const response = await axiosInstance.post("verify/payment", {
+        const response = await axiosInstance.post("payments/verify", {
           transaction_id,
           order_number,
         });

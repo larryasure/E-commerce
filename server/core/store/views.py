@@ -340,7 +340,7 @@ def verify_payment(request):
   order_number= request.data.get("order_number")
   
   
-  if not transaction_id or order_number:
+  if not transaction_id or not order_number:
     return Response({"error:", "Transaction ID and order number are required"}, status=status.HTTP_400_BAD_REQUEST)
   
   order = get_object_or_404(

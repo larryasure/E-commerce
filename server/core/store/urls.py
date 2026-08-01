@@ -27,7 +27,7 @@ urlpatterns = [
   
   path('me/', views.get_current_user, name="get_current_user"),
   path('me/profile/', views.UserProfileUpdateView.as_view(), name='update-user-profile'),
-  path('change-password', views.change_password, name="change-password"),
+  path('change-password/', views.change_password, name="change-password"),
   
   
   path('logout/', TokenBlacklistView.as_view(), name="logout"),

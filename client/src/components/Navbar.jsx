@@ -1,5 +1,5 @@
 import { Heart, ShoppingCart, X } from "lucide-react";
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
@@ -7,6 +7,20 @@ import { useCart } from "../context/CartContext";
 export default function Navbar() {
   const { isAuthenticated, user, logout } = useContext(AuthContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isdropDownOpen, setIsDropDownOpen] = useState(false);
+
+
+  
+  useEffect(() => {
+    const closeDropDown = () => setIsDropDownOpen(false)
+    
+    document.addEventListener("click", closeDropDown)
+
+    return () => {
+      document.removeEventListener("click", closeDropDown)
+    }
+  }, [])
+  
 
   const { cart } = useCart();
 
@@ -91,7 +105,10 @@ export default function Navbar() {
               </div>
             </NavLink>
             {isAuthenticated ? (
-              <div className="relative group">
+              <div
+                className="relative "
+                onClick={() => { setIsDropDownOpen(!isdropDownOpen);  (e) => e.stopProgation()}}
+              >
                 <button className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-full transition-colors">
                   <div className="w-8 h-8 rounded-full bg-[#155daf] text-white flex items-center justify-center text-sm font-bold shadow-sm">
                     {userInitial}
@@ -101,7 +118,13 @@ export default function Navbar() {
                   </span>
                 </button>
 
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 overflow-hidden z-50">
+                <div
+                  className={`absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-slate-100 transition-all duration-300 ${
+                    isdropDownOpen
+                      ? "visible opacity-100"
+                      : "invisible opacity-0"
+                  }`}
+                >
                   <NavLink
                     to="/profile"
                     className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 hover:text-[#155daf]"
