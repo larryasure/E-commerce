@@ -24,11 +24,11 @@ export default function PaymentCallback() {
           return;
         }
         const order_number = tx_ref.replace("Order-", "");
-
-        const response = await axiosInstance.post("payments/verify", {
+        const response = await axiosInstance.post("payments/verify/", {
           transaction_id,
           order_number,
         });
+
         setStatus(response.data.status);
         setMessage(response.data.message);
         setLoading(false);
@@ -39,11 +39,11 @@ export default function PaymentCallback() {
         setLoading(false);
       }
     };
-
     verifyPayment();
   }, [searchParams]);
 
   if (loading) {
+
     return (
       <div className="min-h-screen flex items-center justify-center ">
         <div className="text-center">
@@ -59,7 +59,9 @@ export default function PaymentCallback() {
     );
   }
 
-  if (status === "success") {
+
+
+  if (status === "successful") {
     return (
       <div className="min-h-screen flex items-center justify-center ">
         <div className="max-w-md bg-white shadow-lg rounded-xl  p-8 text-center">
@@ -79,7 +81,7 @@ export default function PaymentCallback() {
     );
   }
 
-  if (status === "Failed ") {
+  if (status === "failed") {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="bg-white shadow-lg p-8 text-center rounded-xl">

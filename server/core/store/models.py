@@ -52,6 +52,8 @@ class UserProfile(models.Model):
   address= models.TextField(blank=True)
   is_verified= models.BooleanField(default=False)
   customer_id = models.CharField(max_length=20, editable=False, blank=True, unique=False)
+  full_name= models.CharField(max_length=255, blank=True)
+  
   
   
   def __str__(self):
@@ -84,6 +86,7 @@ class Order(models.Model):
   payment_status= models.CharField(max_length=100, choices=PAYMENT_CHOICES, default='PENDING')
   order_status= models.CharField(max_length=200, choices=STATUS_CHOICES, default="PROCESSING")
   payment_intent_id=models.CharField(max_length=255, null=True, blank=True)
+  tx_ref = models.CharField(max_length=255, null=True, blank=True, unique=True)
   
   
   shipping_address= models.TextField(blank=True, null=True)

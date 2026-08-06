@@ -9,27 +9,30 @@ export default function Cart() {
   const navigate = useNavigate();
 
   const { cart, increaseCart, decreaseCart, removeCart } = useCart();
-  const total = cart?.total || 0
   const shipping = cart?.shipping || 0
   const subtotal = cart?.subtotal || 0
-  const grandTotal = cart?.grand_total || 0
+  const totalPrice = cart?.total_price || 0
   
-
-
+  // console.log(grandTotal);
+  console.log(`Subtotal: ${subtotal}`);
+  console.log(`Shipping: ${shipping}`);
+  console.log(`Total Price: ${totalPrice}`);
+  
+  
 
 
   if (!cart?.items?.length) {
     return (
-      <div className="min-h-screen py-12 mt-24">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-bold text-[#13315C] mb-8">
+      <div className="min-h-screen py-12 mt-12 px-7">
+          <h1 className="sm:text-3xl text-xl font-bold text-[#13315C] mb-6">
             Shopping Cart
           </h1>
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white rounded-xl shadow-lg p-12 text-center">
-            <p className="text-gray-600 text-lg mb-8">Your cart is empty</p>
+            <p className="text-gray-600 text-lg mb-4">Your cart is empty</p>
             <Link
               to="/products"
-              className="inline-block bg-[#155daf] text-white px-8 py-4 rounded-lg font-semibold hover:bg-[#13315C] transition-all duration-300 transform hover:scale-105"
+              className="inline-block bg-[#155daf] text-white px-4 py-2.5 rounded-lg font-semibold hover:bg-[#13315C] transition-all duration-300 transform hover:scale-105"
             >
               Continue Shopping
             </Link>
@@ -42,7 +45,7 @@ export default function Cart() {
   return (
     <div className="min-h-screen py-12">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 my-8">
-        <h1 className="text-4xl font-bold text-[#13315C] mb-6">
+        <h1 className="sm:text-3xl text-xl font-bold text-[#13315C] mb-6">
           Shopping Cart
         </h1>
 
@@ -130,7 +133,7 @@ export default function Cart() {
               <div className="flex justify-between items-center">
                 <span className="font-bold text-[#13315C]">Total</span>
                 <span className="text-lg font-bold text-[#155daf] tracking-wider">
-                  {formatCurrency(grandTotal)}
+                  {formatCurrency(totalPrice)}
                 </span>
               </div>
 

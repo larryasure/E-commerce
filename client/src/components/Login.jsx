@@ -18,16 +18,9 @@ export default function Login() {
 
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    setErrors((prev) => {
-      if (prev[name]) {
-        return {
-          ...prev,
-          [name]: "",
-        };
-      }
-
-      return prev;
-    });
+    if (errors[name]) {
+      setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
   };
 
   const handleValidForm = () => {
@@ -47,6 +40,9 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    setSuccess("");
+    setErrors({});
 
     if (!handleValidForm()) {
       return;
@@ -72,7 +68,6 @@ export default function Login() {
             console.log("Setting submit error");
             setErrors({ submit: "Invalid credentials, Try Again!" });
           } else if (result.error.non_field_errors) {
-            console.log("Setting submit error");
             setErrors({ submit: "Invalid credentials, Try Again!" });
           }
         } else {
@@ -84,6 +79,8 @@ export default function Login() {
       setErrors({ submit: "An unexpected error occured", error });
     } finally {
       setLoading(false);
+    
+        setTimeout(() => setErrors({}), 3000);
     }
   };
 
@@ -124,6 +121,7 @@ export default function Login() {
                 name="username"
                 value={formData.username}
                 onChange={handleChange}
+                autoComplete="username"
                 placeholder="Enter your Username"
                 className={`w-full rounded-lg border border-[#0b52b5] px-4 py-2  focus:outline-0 focus:ring-1 focus:ring-[#0b52b5] placeholder:text-sm transition-all duration-300 ${errors.username ? "border-red-400" : "border-[#0b52b5]"}`}
               />
@@ -133,12 +131,13 @@ export default function Login() {
             </div>
 
             <div>
-              <label className="block mb-2 text-[#155daf] text-sm font-bold">
+              <label className="block mb-1 text-[#155daf] text-sm font-bold">
                 Password
               </label>
               <input
                 type="password"
                 name="password"
+                autoComplete="current-password"
                 value={formData.password}
                 onChange={handleChange}
                 placeholder="Enter your Password"

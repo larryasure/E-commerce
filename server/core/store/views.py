@@ -335,13 +335,12 @@ def initialize_payment(request):
 @permission_classes([IsAuthenticated])
 
 def verify_payment(request):
-  print("VERIFY PAYMENT VIEW REACHED")
   transaction_id = request.data.get("transaction_id")
   order_number= request.data.get("order_number")
   
   
   if not transaction_id or not order_number:
-    return Response({"error:", "Transaction ID and order number are required"}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({"error": "Transaction ID and order number are required"}, status=status.HTTP_400_BAD_REQUEST)
   
   order = get_object_or_404(
     Order,

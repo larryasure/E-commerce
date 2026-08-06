@@ -36,7 +36,7 @@ export default function WishList() {
               Your Wishlist is empty
             </p>
 
-            <Link className="inline-block bg-[#155daf] text-white px-4 py-2.5 rounded-lg hover:bg-[#13315C] transition-all duration-300 transform hover:scale-105 font-semibold">
+            <Link to={"/products"} className="inline-block bg-[#155daf] text-white px-4 py-2.5 rounded-lg hover:bg-[#13315C] transition-all duration-300 transform hover:scale-105 font-semibold">
               Start Adding Items
             </Link>
           </div>
@@ -51,7 +51,7 @@ export default function WishList() {
         <div className="max-w-6xl  w-full mx-auto  ">
           <div className="border-b border-gray-200 pb-1 my-4">
             <div className="items-center justify-between flex ">
-              <h1 className="text-xl md:text-2xl font-bold text-[#13315c]">
+              <h1 className="text-xl sm:text-3xl font-bold text-[#13315c]">
                 My Wishlists
               </h1>
 

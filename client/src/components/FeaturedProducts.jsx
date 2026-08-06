@@ -5,6 +5,8 @@ import "swiper/css/pagination";
 import { Autoplay, Navigation } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { formatCurrency } from "../utils/formatCurrency";
+import { useWishlist } from "../context/WishlistContext";
+
 
 export default function FeaturedProducts({
   featuredProducts = [],
@@ -13,6 +15,7 @@ export default function FeaturedProducts({
   decreaseCart,
   addCart,
 }) {
+  const { isWishlisted, toggleWishlist } = useWishlist();
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8">
@@ -76,8 +79,10 @@ export default function FeaturedProducts({
                         </span>
                       </div>
                     )}
-                    <div className="absolute top-3 right-3 bg-gray-50 p-1 rounded-lg">
-                      <Heart size={18} />
+                    <div
+                      onClick={() => toggleWishlist(product.id)}
+                      className="absolute top-3 right-3 bg-gray-50 p-1 rounded-lg">
+                      <Heart size={18} strokeWidth={.5} fill={isWishlisted(product.id) ? "#ef4544": "none"} />
                     </div>
                   </div>
 

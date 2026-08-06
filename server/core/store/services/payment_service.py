@@ -1,96 +1,105 @@
-import requests
+import logging
 from django.conf import settings
-from django.db import transaction
+from django.db import transaction as db_transaction
+from django.utils import timezone
+import requests
 from rest_framework.exceptions import ValidationError
+from ..models import Order
 
-from .. models import Order
+logger = logging.getLogger(__name__)
 
-
-class PaymentService():
-  BASE_URL = settings.FLUTTERWAVE_BASE_URL
+class PaymentService:
+  BASE_URL = settings.FLUTTERWAVE_BASE_URL.rstrip("/")
+  
   
   @staticmethod
   def _headers():
     return {
-      "Authorization" : f"Bearer {settings.FLUTTERWAVE_SECRET_KEY}",
+      "Authorization": f"Bearer {settings.FLUTTERWAVE_SECRET_KEY}",
       "Content-Type": "application/json",
     }
     
-  
-  
-  
+    
   @staticmethod
   def initialize_payment(order):
-    # Initialize payment with flutterwave and return payment link back. 
-    print("REDIRECT URL:", settings.FLUTTERWAVE_REDIRECT_URL)
-    payload= {
-      "tx_ref": f"Order-{order.order_number}",
+    tx_ref = f"Order-{order.order_number}-{int(timezone.now().timestamp())}"
+    
+    payload = {
+      "tx_ref" : tx_ref,
       "amount": str(order.total_price),
       "currency": "NGN",
       "redirect_url": settings.FLUTTERWAVE_REDIRECT_URL,
-      
       "customer": {
-        "email": order.user.email,
-        "username": order.user.username,
+        "email":order.user.email,
+        "name": order.user.get_full_name() or order.user.user.username,
       },
       
-      "customizations": {
+      "customizations":{
         "title": "Prime Pack",
-        "description": f"Payment for Order {order.order_number}",
-      },
+        "description": f"Payment for Order{order.order_number}",
+      } ,
     }
-
+    
     response = requests.post(
       f"{PaymentService.BASE_URL}/payments",
       json=payload,
-      headers=PaymentService._headers()
+      headers= PaymentService._headers(),
+      timeout=15
     )
     
     data = response.json()
     
     if response.status_code != 200:
-      raise ValidationError(
-        data.get("message", "Unable to initialize payment")
-      )
+      raise ValidationError(data.get("message", "Unable to initialize payment!"))
+    
+    order.tx_ref = tx_ref
+    order.save(update_fields=["tx_ref"])
+
     return data["data"]["link"]
-
-
+  
+  
+  
   @staticmethod
   def verify_payment(transaction_id):
     response = requests.get(
-      f"{PaymentService.BASE_URL}transactions/{transaction_id}/verify",
-      headers= PaymentService._headers()
-    )
+      f"{PaymentService.BASE_URL}/transactions/{transaction_id}/verify",
+      headers=PaymentService._headers(),
+      timeout=15
+    )    
     
-    data = response.json()
-    
-    if response.status_code != 200:
-      raise ValidationError(
-        data.get("message", "Unable to verify payment.")
+    try:
+     data =  response.json()
+    except ValueError:
+      logger.error(
+        "Flutterwave verify returned non-json (%s): %s",
+        response.status_code, response.text[:500],
       )
-      
+      raise ValidationError("Unable to verify payment -  bad response from flutterwave")
+    
+    if response.status_code != 200 or data.get("status") != "success":
+      raise ValidationError(data.get("message", "Unable to verify payment!"))
+    
     return data["data"]
-  
   
   
   @staticmethod
   def complete_payment(order, transaction_id):
-    payment = PaymentService.verify_payment(transaction_id)
-    
-    if payment["status"] != "successful":
-      order.payment_status = "FAILED"
-      order.save()
+    with db_transaction.atomic():
+      order = Order.objects.select_for_update().get(pk=order.id)
       
-      raise ValidationError("Payment not successful!")
-    
-    order.payment_status = "PAID"
-    order.payment_intent_id= str(payment["id"])
-    order.save()
-    
-    
-    return order
-    
+      if order.payment_status == "PAID":
+        return order
+      
+      payment = PaymentService.verify_payment(transaction_id)
+      
+      is_valid = (
+        payment["status"] == "successful" 
+        and payment["tx_ref"] == order.tx_ref 
+        and str(payment["amount"])  == str(order.total_price)
+        and payment["currency"] == "NGN"
+      )
+      
+      
+      
       
     
-
-

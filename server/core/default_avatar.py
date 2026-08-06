@@ -8,4 +8,3 @@ draw.text((85, 80), 'A', fill='black')
 
 os.makedirs('backend/media/avatars/', exist_ok=True)
 img.save('backend/media/avatars/default-avatar.png')
-print("✅ Default avatar created at backend/media/avatars/default-avatar.png")

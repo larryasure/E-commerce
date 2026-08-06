@@ -69,7 +69,8 @@ export default function Orders() {
   return (
     <div className="py-12 min-h-screen">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <h2 className="text-lg font-bold text-[#13315c] my-10">My Orders</h2>
+        <h2 className="text-xl sm:text-3xl font-bold text-[#13315c] mt-10">My Orders</h2>
+    <h2 className="text-gray-600 mb-5 ">Check all your orders!</h2>
         <div className="space-y-8">
           {orders.map((order, index) => (
             <div

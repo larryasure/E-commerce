@@ -1,5 +1,5 @@
 import { Heart, ShoppingCart, X } from "lucide-react";
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { NavLink } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
@@ -8,19 +8,20 @@ export default function Navbar() {
   const { isAuthenticated, user, logout } = useContext(AuthContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isdropDownOpen, setIsDropDownOpen] = useState(false);
+  const dropDownRef = useRef(null);
 
-
-  
   useEffect(() => {
-    const closeDropDown = () => setIsDropDownOpen(false)
-    
-    document.addEventListener("click", closeDropDown)
+    function handleClickOutside(event) {
+      if (dropDownRef.current && !dropDownRef.current.contains(event.target)) {
+        setIsDropDownOpen(false);
+      }
+    }
+    document.addEventListener("click", handleClickOutside);
 
     return () => {
-      document.removeEventListener("click", closeDropDown)
-    }
-  }, [])
-  
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
 
   const { cart } = useCart();
 
@@ -105,11 +106,11 @@ export default function Navbar() {
               </div>
             </NavLink>
             {isAuthenticated ? (
-              <div
-                className="relative "
-                onClick={() => { setIsDropDownOpen(!isdropDownOpen);  (e) => e.stopProgation()}}
-              >
-                <button className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-full transition-colors">
+              <div ref={dropDownRef} className="relative ">
+                <button
+                  onClick={() => setIsDropDownOpen((prev) => !prev)}
+                  className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-full transition-colors"
+                >
                   <div className="w-8 h-8 rounded-full bg-[#155daf] text-white flex items-center justify-center text-sm font-bold shadow-sm">
                     {userInitial}
                   </div>
@@ -126,6 +127,7 @@ export default function Navbar() {
                   }`}
                 >
                   <NavLink
+                    onClick={() => setIsDropDownOpen(false)}
                     to="/profile"
                     className="block px-4 py-2.5 text-sm text-slate-700 hover:bg-slate-50 hover:text-[#155daf]"
                   >
@@ -133,7 +135,10 @@ export default function Navbar() {
                   </NavLink>
 
                   <button
-                    onClick={() => setIsModalOpen(true)}
+                    onClick={() => {
+                      setIsModalOpen(true)
+                      setIsDropDownOpen(false);
+                    }}
                     className="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors"
                   >
                     Logout

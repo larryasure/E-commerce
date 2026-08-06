@@ -87,7 +87,7 @@ export default function Checkout() {
   if (cartItems.length === 0) {
     return (
       <div className="min-h-screen py-12 ">
-        <div className="max-w-6xl mx-auto px-4 md:px-6 lg:px-8 my-10">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 lg:px-8 my-13">
           <p className="text-center text-gray-600 text-lg font-semibold">
             Cart is empty
           </p>

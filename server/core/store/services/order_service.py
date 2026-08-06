@@ -1,9 +1,15 @@
 from decimal import Decimal 
 from ..models import Cart, Order, OrderItem
+from rest_framework.exceptions import ValidationError
+
 
 
 def create_order(user, validated_data):
   cart = Cart.objects.get(user=user)
+  
+  if not cart.items.exists():
+    raise ValidationError("Your cart is Empty!")
+  
   subtotal= Decimal("0.00")
   order = Order.objects.create(user=user,
                               shipping_address= validated_data.get("shipping_address", ""),
@@ -29,11 +35,7 @@ def create_order(user, validated_data):
   order.save()
   
   
-  print("=" * 50)
-  print("SUBTOTAL:", subtotal)
-  print("SHIPPING:", shipping)
-  print("TOTAL BEFORE RETURN:", order.total_price)
-  print("=" * 50)
+
   
   cart.items.all().delete()
   
