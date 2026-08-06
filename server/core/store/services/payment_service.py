@@ -31,7 +31,7 @@ class PaymentService:
       "redirect_url": settings.FLUTTERWAVE_REDIRECT_URL,
       "customer": {
         "email":order.user.email,
-        "name": order.user.get_full_name() or order.user.user.username,
+        "name": order.user.get_full_name() or order.user.username,
       },
       
       "customizations":{
@@ -84,13 +84,14 @@ class PaymentService:
   
   @staticmethod
   def complete_payment(order, transaction_id):
+    payment = PaymentService.verify_payment(transaction_id)
+    
     with db_transaction.atomic():
-      order = Order.objects.select_for_update().get(pk=order.id)
+      order = Order.objects.select_for_update().get(pk=order.pk)
       
       if order.payment_status == "PAID":
         return order
       
-      payment = PaymentService.verify_payment(transaction_id)
       
       is_valid = (
         payment["status"] == "successful" 
@@ -98,6 +99,18 @@ class PaymentService:
         and str(payment["amount"])  == str(order.total_price)
         and payment["currency"] == "NGN"
       )
+      
+      if not is_valid:
+        order.payment_status = "FAILED"
+        order.save(update_fields=["payment_status"])
+        raise ValidationError("Payment could not be verified for this order!")
+      
+      
+      order.payment_status = "PAID"
+      order.payment_intent_id = str(payment["id"])
+      order.save(update_fields = ["payment_status", "payment_intent_id"])
+      
+    return order 
       
       
       
