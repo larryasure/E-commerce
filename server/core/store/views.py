@@ -1,25 +1,34 @@
+import hmac
 from rest_framework import viewsets, permissions, generics
-from rest_framework.decorators import api_view , action, permission_classes
+from rest_framework.exceptions import ValidationError
+from rest_framework.decorators import api_view , action, permission_classes, authentication_classes
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from django.shortcuts import get_object_or_404
+
 
 from django.contrib.auth.models import User
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-from .emails import send_password_reset_email, send_order_confirmation_email, send_welcome_email
+
+from django.conf import settings
+from .emails import send_password_reset_email, send_welcome_email
+
 
 
 from .serializers import CategorySerializer, OrderSerializer, ProductSerializer, UserProfileSerializer, UserSerializer, WishListSerializer, CartSerializer
-from .models import Cart, CartItem, OrderItem, UserProfile, Product, Category, Order, Wishlist
+from .models import Cart, UserProfile, Product, Category, Order, Wishlist
 
 from .services.cart_service import CartService
 from .services.user_service import UserService
 from .services.order_service import create_order
 from .services.payment_service import PaymentService
 
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 
@@ -333,32 +342,78 @@ def initialize_payment(request):
     
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
-
 def verify_payment(request):
-  transaction_id = request.data.get("transaction_id")
-  order_number= request.data.get("order_number")
+  transaction_id = request.get("transaction_id")
+  tx_ref = request.get("tx_ref")
   
+  if not transaction_id or not tx_ref:
+    return Response(
+      {"error": "Transaction ID and tx_ref are required!"},
+      status=status.HTTP_400_BAD_REQUEST
+    )
+    
   
-  if not transaction_id or not order_number:
-    return Response({"error": "Transaction ID and order number are required"}, status=status.HTTP_400_BAD_REQUEST)
-  
-  order = get_object_or_404(
-    Order,
-    user= request.user,
-    order_number= order_number,
-  )
+  order = get_object_or_404(Order, user= request.user, tx_ref= tx_ref)
   
   if order.payment_status == "PAID":
-    serializer= OrderSerializer(order)
-    return Response(serializer.data)
+    serializer = OrderSerializer(order)
+    
+    return Response({"status": "PAID",
+                     "message": "Payment already verified.",
+                     "order" : serializer.data})
+  order = PaymentService.complete_payment(order, transaction_id)
   
-  order = PaymentService.complete_payment(
-    order,
-    transaction_id,
-  )
+  serializer = OrderSerializer(order)
   
-  send_order_confirmation_email(request.user, order)
+  return Response({
+    "status": "PAID",
+    "message": "Payment already verified",
+    "order": serializer.data,
+  }, status= status.HTTP_200_OK)
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+@authentication_classes([])
+
+def flutterwave_webhook(request):
+  received_signature = request.headers.get("verif-hash") or request.data.get("flutterwave-signature")
   
-  serializer= OrderSerializer(order)
+  if not received_signature or not hmac.compare_digest(received_signature, settings.FLUTTERWAVE_SECRET_HASH):
+    logger.warning("Rejected Webhook with invalid or missing signature.")
+    return Response(status=status.HTTP_400_BAD_REQUEST)
   
-  return Response(serializer.data, status=status.HTTP_200_OK)
+  payload = request.data.get("data", {}) or {}
+  tx_ref = payload.get("tx_ref") or payload.get("reference")
+  transaction_id = payload.get("id")
+  
+  if not tx_ref or not transaction_id:
+    logger.warning("Webhook payload missing tx_ref/id: %s", payload)
+    
+    return Response(status=status.HTTP_200_OK)
+  
+  
+  try:
+    order = Order.objects.get(tx_ref=tx_ref)
+  except Order.DoesNotExist:
+    logger.warning("Webhook for unknown tx_ref=%s", tx_ref)
+    return Response(status=status.HTTP_200_OK)
+  
+  if order.payment_status =="PAID":
+    return Response(status=status.HTTP_200_OK)
+  
+  
+  try:
+    PaymentService.complete_payment(order, transaction_id)
+  except ValidationError as exc:
+    logger.warning("Webhook verification failed for tx_ref=%s: %s", tx_ref ,exc)
+  except Exception:
+    logger.exception("Unexpected error processing webhook for tx_ref=%s", tx_ref)
+    
+  return Response(status=status.HTTP_200_OK)
+
+
+  
+  
+  
+    
+      

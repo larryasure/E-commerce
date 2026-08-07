@@ -37,5 +37,7 @@ urlpatterns = [
   path("payments/verify/", views.verify_payment, name='verify-payment')
 ]
 
+path("payments/webhook/", views.flutterwave_webhook, name="flutterwave-webhook"),
+
 
 

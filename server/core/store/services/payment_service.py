@@ -4,6 +4,7 @@ from django.db import transaction as db_transaction
 from django.utils import timezone
 import requests
 from rest_framework.exceptions import ValidationError
+from ..emails import send_order_confirmation_email
 from ..models import Order
 
 logger = logging.getLogger(__name__)
@@ -109,6 +110,10 @@ class PaymentService:
       order.payment_status = "PAID"
       order.payment_intent_id = str(payment["id"])
       order.save(update_fields = ["payment_status", "payment_intent_id"])
+      just_completed= True 
+      
+      if just_completed:
+          return send_order_confirmation_email(order.user, order)
       
     return order 
       

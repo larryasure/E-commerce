@@ -52,7 +52,6 @@ class UserProfile(models.Model):
   address= models.TextField(blank=True)
   is_verified= models.BooleanField(default=False)
   customer_id = models.CharField(max_length=20, editable=False, blank=True, unique=False)
-  full_name= models.CharField(max_length=255, blank=True)
   
   
   
@@ -69,8 +68,8 @@ class Order(models.Model):
     ("FAILED", 'failed'),
   ]
   
-  # Shipping tracking 
   
+  # Shipping tracking 
   STATUS_CHOICES = [
     ("PROCESSING", 'processing'),
     ("SHIPPED", 'shipped'),
@@ -166,12 +165,11 @@ def create_user_profile(sender, instance, created, **kwargs):
   if created:
     UserProfile.objects.create(user=instance)
 
-
-
-
 @receiver(post_save, sender=User)
 def save_user_profile(sender, instance , **kwargs):
   instance.profile.save()
+
+
 
 
  
