@@ -4,7 +4,7 @@ import axiosInstance from "../api/axiosConfig";
 
 export default function PaymentCallback() {
   console.log("PaymentCallback rendered");
-  
+
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState("");
@@ -19,14 +19,14 @@ export default function PaymentCallback() {
 
         if (!transaction_id || !tx_ref) {
           setStatus("failed");
-          setMessage("Invalid payment information.");
+          setMessage("Invalid Payment Information.");
           setLoading(false);
-          return;
+          return false;
         }
-        const order_number = tx_ref.replace("Order-", "");
+
         const response = await axiosInstance.post("payments/verify/", {
           transaction_id,
-          order_number,
+          tx_ref,
         });
 
         setStatus(response.data.status);
@@ -34,11 +34,12 @@ export default function PaymentCallback() {
         setLoading(false);
       } catch (error) {
         console.error(error);
-        setStatus("Failed");
+        setStatus("failed");
         setMessage("Unable to verify payment");
         setLoading(false);
       }
     };
+
     verifyPayment();
   }, [searchParams]);
 
@@ -58,9 +59,7 @@ export default function PaymentCallback() {
     );
   }
 
-
-
-  if (status === "successful") {
+  if (status === "PAID" || status === "success") {
     return (
       <div className="min-h-screen flex items-center justify-center ">
         <div className="max-w-md bg-white shadow-lg rounded-xl  p-8 text-center">
@@ -80,13 +79,15 @@ export default function PaymentCallback() {
     );
   }
 
-  if (status === "failed") {
+  if (status === "failed" || status === "PAID") {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="bg-white shadow-lg p-8 text-center rounded-xl">
           <h1 className="text-3xl font-bold text-red-500">Payment Failed</h1>
           <p className="text-gray-600 mt-4">{message}</p>
-          <button className="py-2 px-4 bg-[#13315c] text-white hover:bg-[#155daf] mt-2 rounded-lg ">
+          <button
+          onClick={() => window.location.reload()}
+            className="py-2 px-4 bg-[#13315c] text-white hover:bg-[#155daf] mt-2 rounded-lg ">
             Retry{" "}
           </button>
         </div>
@@ -94,7 +95,7 @@ export default function PaymentCallback() {
     );
   }
 
-  if (status === "pending") {
+  if (status === "pending" || status == "PENDING") {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="bg-white rounded-lg shadow-xl p-8 text-center max-w-md">

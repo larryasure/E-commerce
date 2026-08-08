@@ -151,7 +151,9 @@ export default function Home() {
                       <div className="relative">
                         <div className="overflow-hidden rounded-t-lg h-40">
                           <img
+                            loading="lazy"
                             src={category.image}
+
                             alt={category.name}
                             className="w-full h-full object-cover  hover:scale-110 transition-all duration-300"
                           />

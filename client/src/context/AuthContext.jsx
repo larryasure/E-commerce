@@ -23,6 +23,8 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(true);
       } catch (error) {
         console.log("Auth check failed, maybe token expired");
+        console.error(error);
+        localStorage.removeItem("access_token");
       }
       setLoading(false);
     };

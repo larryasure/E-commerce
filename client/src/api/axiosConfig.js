@@ -37,9 +37,6 @@ axiosInstance.interceptors.response.use(
         if (!refreshToken) {
           localStorage.removeItem("refresh_token");
           localStorage.removeItem("access_token");
-          // setTimeout(() => {
-          //   window.location.href = "/login";
-          // }, 2000);
           return Promise.reject(error);
         }
         const response = await refreshApi.post(`token/refresh/`, {
@@ -54,7 +51,7 @@ axiosInstance.interceptors.response.use(
       } catch (refreshError) {
         localStorage.removeItem("refresh_token");
         localStorage.removeItem("access_token");
-        
+
         setTimeout(() => {
           window.location.href = "/login";
         }, 2000);

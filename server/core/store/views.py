@@ -343,8 +343,8 @@ def initialize_payment(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def verify_payment(request):
-  transaction_id = request.get("transaction_id")
-  tx_ref = request.get("tx_ref")
+  transaction_id = request.data.get("transaction_id")
+  tx_ref = request.data.get("tx_ref")
   
   if not transaction_id or not tx_ref:
     return Response(

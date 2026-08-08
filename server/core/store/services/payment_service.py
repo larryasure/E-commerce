@@ -6,6 +6,7 @@ import requests
 from rest_framework.exceptions import ValidationError
 from ..emails import send_order_confirmation_email
 from ..models import Order
+from decimal import Decimal
 
 logger = logging.getLogger(__name__)
 
@@ -97,11 +98,12 @@ class PaymentService:
       is_valid = (
         payment["status"] == "successful" 
         and payment["tx_ref"] == order.tx_ref 
-        and str(payment["amount"])  == str(order.total_price)
-        and payment["currency"] == "NGN"
+        and Decimal(str(payment["amount"]))  == Decimal(str(order.total_price))
+        and payment["currency"].upper() == "NGN"
       )
       
-      if not is_valid:
+      if not is_valid: 
+        logger.warning("Verification mismatched for order %s: payment=%s | expected tx_ref=%s amount=%s currency=NGN", order.order_number, payment, order.tx_ref, order.total_price)
         order.payment_status = "FAILED"
         order.save(update_fields=["payment_status"])
         raise ValidationError("Payment could not be verified for this order!")
@@ -113,7 +115,7 @@ class PaymentService:
       just_completed= True 
       
       if just_completed:
-          return send_order_confirmation_email(order.user, order)
+          send_order_confirmation_email(order.user, order)
       
     return order 
       

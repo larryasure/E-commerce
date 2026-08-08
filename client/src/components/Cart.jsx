@@ -11,12 +11,13 @@ export default function Cart() {
   const { cart, increaseCart, decreaseCart, removeCart } = useCart();
   const shipping = cart?.shipping || 0
   const subtotal = cart?.subtotal || 0
-  const totalPrice = cart?.total_price || 0
+  const grandTotal = cart?.grand_total || 0
+
   
   // console.log(grandTotal);
   console.log(`Subtotal: ${subtotal}`);
   console.log(`Shipping: ${shipping}`);
-  console.log(`Total Price: ${totalPrice}`);
+  console.log(`Total Price: ${grandTotal}`);
   
   
 
@@ -133,7 +134,7 @@ export default function Cart() {
               <div className="flex justify-between items-center">
                 <span className="font-bold text-[#13315C]">Total</span>
                 <span className="text-lg font-bold text-[#155daf] tracking-wider">
-                  {formatCurrency(totalPrice)}
+                  {formatCurrency(grandTotal)}
                 </span>
               </div>
 
