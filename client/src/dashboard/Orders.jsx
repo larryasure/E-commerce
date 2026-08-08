@@ -23,23 +23,23 @@ export default function Orders() {
   }, []);
 
   const filteredOrders = useMemo(() => {
-    return orders.filter(
-      (order) => {
-        const matchesTab =
-          activeTab === "All" || order.order_status === activeTab.toUpperCase();
-
-        const matchesSearch = order.order_number
-          ?.toString()
-          .toLowerCase()
-          .includes(search.toLowerCase());
-        return matchesTab && matchesSearch;
-      },
-      [orders, activeTab, search],
-    );
-  });
+    return orders.filter((order) => {
+      const matchesTab =
+        activeTab === "All" || order.order_status === activeTab.toUpperCase();
+      const matchesSearch = order.order_number
+        ?.toString()
+        .toLowerCase()
+        .includes(search.toLowerCase());
+      return matchesTab && matchesSearch;
+    });
+  }, [orders, activeTab, search]);
 
   if (loading) {
-    return <div className="flex items-center justify-center h-96"></div>;
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="w-12 h-12 border-b-4 border-[#13315c] rounded-full animate-spin"></div>
+      </div>
+    );
   }
 
   return <div>Orders</div>;
