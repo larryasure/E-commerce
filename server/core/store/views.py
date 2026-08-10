@@ -44,7 +44,7 @@ class ProductViewSet(viewsets.ModelViewSet):
     queryset = Product.objects.all().select_related('category')
     serializer_class = ProductSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
-    pagination_class = None
+    # pagination_class = None
 
     def get_queryset(self):
         return Product.objects.all()

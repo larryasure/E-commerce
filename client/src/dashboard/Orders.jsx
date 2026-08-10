@@ -1,5 +1,10 @@
-import { CheckCircle2, Package, Truck, Wallet } from "lucide-react";
+import { CheckCircle2, Package, Search, Truck, Wallet } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { NavLink } from "react-router-dom";
+import axiosInstance from "../api/axiosConfig";
+import OrderTicketCard from "../components/OrderTicketCard";
 import { formatCurrency } from "../utils/formatCurrency";
+
 const STAMP_STYLES = {
   PROCESSING: { color: "#ffb055", label: "Processing" },
   SHIPPED: { color: "#155daf", label: "Shipped" },
@@ -7,22 +12,24 @@ const STAMP_STYLES = {
   CANCELED: { color: "#ff3939", label: "Void" },
 };
 
-function StatusStamp({ status }) {
-  const stamp = STAMP_STYLES[status] || {
-    color: "text-gray-600",
-    label: status,
+export const StatusStamp = ({ status }) => {
+  const normalizedStatus = status?.toUpperCase();
+  const stamp = STAMP_STYLES[normalizedStatus] || {
+    color: "#4B5563",
+    label: status || "UNKNOWN",
   };
+
   return (
     <div
-      className="inline-flex items-center justify-center px-3  py-1 border-2 rounded-sm  text-xs font-bold uppercase tracking-widest -rotate-3 select-none"
+      className="inline-flex items-center justify-center px-3 py-1 border-2 rounded-sm text-xs font-bold uppercase tracking-widest -rotate-3 select-none"
       style={{ color: stamp.color, borderColor: stamp.color }}
     >
       {stamp.label}
     </div>
   );
-}
+};
 
-function OrderStats({ orders }) {
+function OrderStats({ orders = [] }) {
   const total = orders.length;
   const inTransit = orders.filter((o) => o.order_status === "SHIPPED").length;
   const delivered = orders.filter((o) => o.order_status === "DELIVERED").length;
@@ -36,13 +43,13 @@ function OrderStats({ orders }) {
     { label: "Total Orders", value: total, icon: Package, color: "#155daf" },
     { label: "In Transit", value: inTransit, icon: Truck, color: "#13315c" },
     {
-      label: "Total Orders",
+      label: "Delivered",
       value: delivered,
       icon: CheckCircle2,
       color: "#16A34A",
     },
     {
-      label: "Total Orders",
+      label: "Total Spent",
       value: formatCurrency(totalSpent),
       icon: Wallet,
       color: "#155daf",
@@ -50,17 +57,20 @@ function OrderStats({ orders }) {
   ];
 
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 ">
+    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
       {stats.map(({ label, value, icon: Icon, color }) => (
         <div
-          className="bg-white rounded-2xl border border-gray-200 p-5 "
+          className="bg-white rounded-2xl border border-gray-200 p-5"
           key={label}
         >
-          <div className="flex items-center gap-2 mb-3 ">
+          <div className="flex items-center gap-2 mb-3">
             <Icon size={16} style={{ color }} />
-
-            <p className="text-2xl font-bold text-[#13315c]">{value}</p>
+       
+            <p className="text-xs text-gray-400 font-medium ml-auto uppercase tracking-wider">
+              {label}
+            </p>
           </div>
+          <p className="text-2xl font-bold text-[#13315c]">{value}</p>
         </div>
       ))}
     </div>
@@ -82,7 +92,6 @@ function OrderFilterTabs({ active, onChange }) {
             className={`relative px-4 py-2.5 text-sm font-medium whitespace-nowrap transition-all ${isActive ? "text-[#13315c]" : "text-gray-400 hover:text-[#13315c]"} `}
           >
             {tab}
-
             {isActive && (
               <span className="absolute left-0 right-0 -bottom-px h-[2px] bg-[#155daf]" />
             )}
@@ -93,8 +102,110 @@ function OrderFilterTabs({ active, onChange }) {
   );
 }
 
-
-
 export default function Orders() {
-  return <div>Orders</div>;
+  const [loading, setLoading] = useState(false);
+  const [orders, setOrders] = useState([]);
+  const [activeTab, setActiveTab] = useState("All");
+  const [search, setSearch] = useState("");
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      setLoading(true);
+      try {
+        const response = await axiosInstance.get("orders/");
+        setOrders(Array.isArray(response.data) ? response.data : []);
+      } catch (error) {
+        console.error("Failed to load orders", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchOrders();
+  }, []);
+
+  const filteredOrders = useMemo(() => {
+    const ordersList = Array.isArray(orders) ? orders : [];
+    return ordersList.filter((order) => {
+      const matchesTab =
+        activeTab === "All" || order.order_status === activeTab.toUpperCase();
+      const matchesSearch = order.order_number
+        ?.toString()
+        .toLowerCase()
+        .includes(search.toLowerCase());
+      return matchesTab && matchesSearch;
+    });
+  }, [orders, activeTab, search]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-96 bg-gray-50">
+        <div className="w-10 h-10 border-2 border-gray-200 border-t-[#13315c] rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!orders || orders.length === 0) {
+    return (
+      <div className="min-h-screen py-22 bg-gray-50">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+          <h1 className="text-3xl font-bold text-[#13315c] mb-8">My Orders</h1>
+          <div className="bg-white border border-gray-200 rounded-2xl p-12 text-center">
+            <p className="text-gray-600 text-lg mb-6">
+              You haven't placed any orders yet
+            </p>
+            <NavLink
+              to="/products"
+              className="inline-block bg-[#155daf] text-white px-6 py-3 rounded-lg hover:bg-[#13315c] transition-colors font-semibold"
+            >
+              Start Shopping
+            </NavLink>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="py-12 min-h-screen bg-gray-50">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mt-10 mb-8">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.2em] text-gray-400 font-semibold mb-1">
+              Account
+            </p>
+            <h2 className="text-2xl sm:text-3xl font-bold text-[#13315c]">
+              My Orders
+            </h2>
+          </div>
+          <div className="relative w-full sm:w-64">
+            <Search
+              size={16}
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"
+            />
+            <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search order number..."
+              className="w-full pl-9 pr-3 py-2.5 rounded-lg border border-gray-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#155daf]/25"
+            />
+          </div>
+        </div>
+
+        <OrderStats orders={orders} />
+        <OrderFilterTabs active={activeTab} onChange={setActiveTab} />
+
+        {filteredOrders.length === 0 ? (
+          <div className="bg-white rounded-2xl border border-gray-200 p-12 text-center text-gray-500">
+            No orders match this filter.
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {filteredOrders.map((order) => (
+              <OrderTicketCard key={order.id} order={order} />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
 }

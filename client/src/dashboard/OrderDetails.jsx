@@ -4,9 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import axiosInstance from "../api/axiosConfig";
 import { formatCurrency } from "../utils/formatCurrency";
 
-// ── local bits used only on this page ──────────────────────────────
-// Same palette rule as Orders.jsx: structural color is #13315c / #155daf,
-// status colors stay because they already existed in your project.
+
 
 const STAMP_STYLES = {
   PROCESSING: { color: "#CA8A04", label: "Processing" },
@@ -41,7 +39,7 @@ function reached(status, key) {
 }
 
 function Barcode() {
-  const bars = "2,1,3,1,1,2,4,1,2,3,1,1,2,1,3,2,1,4,1,2,1,3,2,1";
+  const bars = "2,1,3,1,1,2,4,1,2,3,1,1,2,1,3,2,1,3,1,2,1,3,2,1";
   return (
     <div className="flex items-end gap-[2px] h-8 mt-3">
       {bars.split(",").map((w, i) => (
@@ -51,9 +49,9 @@ function Barcode() {
   );
 }
 
-// ── the page ────────────────────────────────────────────────────────
 
-export default function OrderDetail() {
+
+export default function OrderDetails() {
   const { id } = useParams();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);

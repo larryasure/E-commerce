@@ -31,6 +31,7 @@ import "./index.css";
 import AdminProtectedRoutes from "./protectionRoutes/AdminProtectedRoutes.jsx";
 import ProtectedRoutes from "./protectionRoutes/ProtectedRoutes.jsx";
 import RootLayout from "./root/RootLayout.jsx";
+import OrderDetails from "./dashboard/OrderDetails.jsx";
 
 const router = createBrowserRouter([
   {
@@ -70,11 +71,23 @@ const router = createBrowserRouter([
           </ProtectedRoutes>
         ),
       },
+
+
       {
         path: "orders",
         element: (
           <ProtectedRoutes>
             <Orders />
+          </ProtectedRoutes>
+        ),
+      },
+
+        {
+        path: "orders/:id",
+        element: (
+          <ProtectedRoutes>
+            <OrderDetails
+             />
           </ProtectedRoutes>
         ),
       },
