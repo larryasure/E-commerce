@@ -3,13 +3,14 @@ import { useEffect, useMemo, useState } from "react";
 import { NavLink } from "react-router-dom";
 import axiosInstance from "../api/axiosConfig";
 import OrderTicketCard from "../components/OrderTicketCard";
+import Pagination from "../components/Pagination";
 import { formatCurrency } from "../utils/formatCurrency";
 
 const STAMP_STYLES = {
-  PROCESSING: { color: "#ffb055", label: "Processing" },
-  SHIPPED: { color: "#155daf", label: "Shipped" },
-  DELIVERED: { color: "#00a93e", label: "Delivered" },
-  CANCELED: { color: "#ff3939", label: "Void" },
+  PROCESSING: { color: "#D97706", label: "Processing" },
+  SHIPPED: { color: "#2563EB", label: "Shipped" },
+  DELIVERED: { color: "#16A34A", label: "Delivered" },
+  CANCELED: { color: "#DC2626", label: "Void" },
 };
 
 export const StatusStamp = ({ status }) => {
@@ -29,17 +30,13 @@ export const StatusStamp = ({ status }) => {
   );
 };
 
-function OrderStats({ orders = [] }) {
-  const total = orders.length;
-  const inTransit = orders.filter((o) => o.order_status === "SHIPPED").length;
-  const delivered = orders.filter((o) => o.order_status === "DELIVERED").length;
+function OrderStats({ stats }) {
+  const total = stats?.total_orders || 0;
+  const inTransit = stats?.in_transit || 0;
+  const delivered = stats?.delivered || 0;
+  const totalSpent = stats?.total_spent || 0;
 
-  const totalSpent = orders.reduce(
-    (sum, o) => sum + Number(o.total_price || 0),
-    0,
-  );
-
-  const stats = [
+  const statsList = [
     { label: "Total Orders", value: total, icon: Package, color: "#155daf" },
     { label: "In Transit", value: inTransit, icon: Truck, color: "#13315c" },
     {
@@ -58,14 +55,13 @@ function OrderStats({ orders = [] }) {
 
   return (
     <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
-      {stats.map(({ label, value, icon: Icon, color }) => (
+      {statsList.map(({ label, value, icon: Icon, color }) => (
         <div
           className="bg-white rounded-2xl border border-gray-200 p-5"
           key={label}
         >
           <div className="flex items-center gap-2 mb-3">
             <Icon size={16} style={{ color }} />
-       
             <p className="text-xs text-gray-400 font-medium ml-auto uppercase tracking-wider">
               {label}
             </p>
@@ -107,21 +103,34 @@ export default function Orders() {
   const [orders, setOrders] = useState([]);
   const [activeTab, setActiveTab] = useState("All");
   const [search, setSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [nextPage, setNextPage] = useState(null);
+  const [previousPage, setPreviousPage] = useState(null);
+  const [totalPages, setTotalPages] = useState(0)
+  const [stats, setStats] = useState(null)
+
 
   useEffect(() => {
     const fetchOrders = async () => {
       setLoading(true);
+
       try {
-        const response = await axiosInstance.get("orders/");
-        setOrders(Array.isArray(response.data) ? response.data : []);
+        const response = await axiosInstance.get(`orders/?page=${currentPage}`);
+
+        setOrders(response.data.results || []);
+        setNextPage(response.data.next);
+        setPreviousPage(response.data.previous);
+        setTotalPages(response.data.total_pages)
+        setStats(response.data.stats)
       } catch (error) {
         console.error("Failed to load orders", error);
       } finally {
         setLoading(false);
       }
     };
+
     fetchOrders();
-  }, []);
+  }, [currentPage]);
 
   const filteredOrders = useMemo(() => {
     const ordersList = Array.isArray(orders) ? orders : [];
@@ -191,7 +200,7 @@ export default function Orders() {
           </div>
         </div>
 
-        <OrderStats orders={orders} />
+        <OrderStats stats={stats} />
         <OrderFilterTabs active={activeTab} onChange={setActiveTab} />
 
         {filteredOrders.length === 0 ? (
@@ -206,6 +215,14 @@ export default function Orders() {
           </div>
         )}
       </div>
+
+      <Pagination
+        currentPage={currentPage}
+        nextPage={nextPage}
+        previousPage={previousPage}
+        onPageChange={setCurrentPage}
+        totalPages={totalPages}
+      />
     </div>
   );
 }

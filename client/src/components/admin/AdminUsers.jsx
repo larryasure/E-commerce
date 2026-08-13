@@ -14,7 +14,7 @@ export default function AdminUsers() {
       setLoading(true);
       try {
         const response = await axiosInstance.get("users/");
-        setUsers(response.data);
+        setUsers(response.data.results);
       } catch (error) {
         console.error("Failed to Load Users", error);
       } finally {

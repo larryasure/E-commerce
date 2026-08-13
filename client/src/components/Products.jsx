@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import axiosInstance from "../api/axiosConfig";
+import Pagination from "./Pagination";
 import ProductCard from "./ProductCard";
 
 export default function Products() {
@@ -11,6 +12,9 @@ export default function Products() {
   const [searchTerm, setSearchTerm] = useState("");
   const [searchParams] = useSearchParams();
   const categoryFromUrl = searchParams.get("category");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [previousPage, setPreviousPage] = useState(null);
+  const [nextPage, setNextPage] = useState(null);
 
   useEffect(() => {
     if (categoryFromUrl) {
@@ -22,11 +26,14 @@ export default function Products() {
     const fetchData = async () => {
       try {
         const [categoriesRes, productRes] = await Promise.all([
-          axiosInstance.get("categories/"),
-          axiosInstance.get("products/"),
+          axiosInstance.get(`categories/`),
+          axiosInstance.get(`products/?page=${currentPage}`),
         ]);
-        setCategories(categoriesRes.data);
-        setProducts(productRes.data);
+
+        categoriesRes.data.results || categoriesRes.data;
+        setProducts(productRes.data.results);
+        setNextPage(productRes.data.next);
+        setPreviousPage(productRes.data.previous);
       } catch (error) {
         console.error("Failed to load homepage", error);
       } finally {
@@ -34,7 +41,7 @@ export default function Products() {
       }
     };
     fetchData();
-  }, []);
+  }, [currentPage]);
 
   const filteredProducts = products.filter((product) => {
     const matchesCategory =
@@ -85,6 +92,13 @@ export default function Products() {
                 ))}
               </select>
             </div>
+
+            <Pagination
+              currentPage={currentPage}
+              nextPage={nextPage}
+              previousPage={previousPage}
+              onPageChange={setCurrentPage}
+            />
           </div>
 
           {loading ? (
@@ -92,14 +106,9 @@ export default function Products() {
               <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#155daf]"></div>
             </div>
           ) : filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {filteredProducts.map((product, index) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  index={index}
-                  variant="list"
-                />
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4 items-start auto-rows-max">
+              {products.map((product, index) => (
+                <ProductCard key={product.id} product={product} index={index} />
               ))}
             </div>
           ) : (

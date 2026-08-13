@@ -35,10 +35,10 @@ export default function AdminDashboard() {
         ]);
 
         setStats({
-          totalProducts: productRes.data.length,
-          totalCategories: categoryRes.data.length,
-          totalOrders: orderRes.data.length,
-          totalUsers: userRes.data.length,
+          totalProducts: productRes.data.results.length,
+          totalCategories: categoryRes.data.results.length,
+          totalOrders: orderRes.data.results.length,
+          totalUsers: userRes.data.results.length,
         });
       } catch (error) {
         console.error("Failed to load Stats", error)

@@ -1,4 +1,5 @@
 import hmac
+from django.db.models.aggregates import Sum
 from rest_framework import viewsets, permissions, generics
 from rest_framework.exceptions import ValidationError
 from rest_framework.decorators import api_view , action, permission_classes, authentication_classes
@@ -62,21 +63,50 @@ class UserProfileViewSet(viewsets.ModelViewSet):
     serializer.save(user= self.request.user)
       
 
-class OrderViewSet(viewsets.ModelViewSet):
-  serializer_class=OrderSerializer
-  permission_classes=[permissions.IsAuthenticatedOrReadOnly]  
+class OrderViewset(viewsets.ModelViewSet):
+  serializer_class = OrderSerializer
+  permission_classes= [permissions.IsAuthenticated]
+  
   
   def get_queryset(self):
-    return Order.objects.filter(user=self.request.user)
+    return Order.objects.filter(user=self.request.user).order_by("-created_at")
   
-  def create(self, request, *args, **kwargs):  
-    order = create_order(user=self.request.user, validated_data=request.data)    
-    serializer = self.get_serializer(order)
+  def create(self, request, *args, **kwargs):
+    order= create_order(user=self.request.user, validated_data=request.data)
+    serializer= self.get_serializer(order)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+  
+  
+  def list(self, request, *args, **kwargs):
+    queryset = self.get_queryset()
     
-    return Response(serializer.data, status=status.HTTP_201_CREATED)
+    total_orders = queryset.count()
+    in_transit = queryset.filter(order_status = "SHIPPED").count()
+    delivered = queryset.filter(order_status= "DELIVERED").count()
+    
+    total_spent = queryset.aggregate(total = Sum('total_price'))['total'] or 0 
+    
+    
+    page = self.paginate_queryset(queryset)
+    
+    if page is not None:
+      serializer = self.get_serializer(page, many=True )
+      response = self.get_paginated_response(serializer.data)
+      
+    else:
+      serializer = self.get_serializer(queryset, many=True)
+      response = Response(serializer.data)
+      
+      
+    response.data["stats"] = {
+      "total_orders": total_orders,
+      "in_transit": in_transit,
+      "delivered": delivered,
+      "total_spent": float(total_spent)
+    }
+    
+    return response
   
-  
-
 class UserProfileUpdateView(generics.UpdateAPIView):
   serializer_class= UserProfileSerializer
   permission_classes= [permissions.IsAuthenticated]

@@ -19,7 +19,7 @@ export default function OrderSuccess() {
       setLoading(true);
       try {
         const response = axiosInstance.get(`orders/${orderId}/`);
-        setOrder((await response).data);
+        setOrder((await response).data.results);
       } catch (error) {
         console.error("Failed to load ordes", error);
       } finally {

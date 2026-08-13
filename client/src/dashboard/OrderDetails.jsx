@@ -17,7 +17,7 @@ function StatusStamp({ status }) {
   const stamp = STAMP_STYLES[status] || { color: "#6B7280", label: status };
   return (
     <div
-      className="inline-flex items-center justify-center px-3 py-1 border-2 rounded-sm font-mono text-[11px] font-bold uppercase tracking-[0.15em] -rotate-3 select-none"
+      className="inline-flex items-center justify-center px-3 py-1 border-2 rounded-sm  text-[11px] font-bold uppercase tracking-[0.15em] -rotate-3 select-none"
       style={{ color: stamp.color, borderColor: stamp.color }}
     >
       {stamp.label}
@@ -38,16 +38,16 @@ function reached(status, key) {
   return false;
 }
 
-function Barcode() {
-  const bars = "2,1,3,1,1,2,4,1,2,3,1,1,2,1,3,2,1,3,1,2,1,3,2,1";
-  return (
-    <div className="flex items-end gap-[2px] h-8 mt-3">
-      {bars.split(",").map((w, i) => (
-        <span key={i} className="bg-[#13315c]" style={{ width: `${w}px`, height: "100%" }} />
-      ))}
-    </div>
-  );
-}
+// function Barcode() {
+//   const bars = "2,1,3,1,1,2,4,1,2,3,1,1,2,1,3,2,1,3,1,2,1,3,2,1";
+//   return (
+//     <div className="flex items-end gap-[2px] h-8 mt-3">
+//       {bars.split(",").map((w, i) => (
+//         <span key={i} className="bg-[#13315c]" style={{ width: `${w}px`, height: "100%" }} />
+//       ))}
+//     </div>
+//   );
+// }
 
 
 
@@ -89,7 +89,7 @@ export default function OrderDetails() {
 
   const subtotal =
     order.subtotal ?? order.items?.reduce((sum, i) => sum + i.price * i.quantity, 0) ?? 0;
-  const shippingFee = order.shipping_fee ?? 0;
+  const shippingFee = order.shipping ?? 0;
   const tax = order.tax ?? 0;
 
   return (
@@ -110,7 +110,7 @@ export default function OrderDetails() {
                 <p className="text-[11px] uppercase tracking-[0.2em] text-gray-400 font-semibold mb-1">
                   Order No.
                 </p>
-                <h1 className="font-mono text-2xl font-bold text-[#13315c] tracking-tight">
+                <h1 className=" text-2xl font-bold text-[#13315c] tracking-tight">
                   {order.order_number}
                 </h1>
                 <p className="text-sm text-gray-400 mt-1">
@@ -121,7 +121,6 @@ export default function OrderDetails() {
                     day: "numeric",
                   })}
                 </p>
-                <Barcode />
               </div>
               <StatusStamp status={order.order_status} />
             </div>
@@ -173,7 +172,7 @@ export default function OrderDetails() {
                     {item.quantity}× {item.product?.name}
                   </span>
                   <span className="flex-1 border-b border-dotted border-gray-300 translate-y-[-4px]" />
-                  <span className="font-mono text-sm text-[#13315c] whitespace-nowrap">
+                  <span className=" text-sm text-[#13315c] whitespace-nowrap">
                     {formatCurrency(item.price * item.quantity)}
                   </span>
                 </div>
@@ -188,7 +187,8 @@ export default function OrderDetails() {
               </p>
               <p className="text-[#13315c] font-medium leading-relaxed">{order.order_address}</p>
             </div>
-            <div className="font-mono text-sm">
+
+            <div className="text-sm">
               <div className="flex justify-between text-gray-500 mb-2">
                 <span>Subtotal</span>
                 <span>{formatCurrency(subtotal)}</span>

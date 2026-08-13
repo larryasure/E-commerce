@@ -2,7 +2,7 @@ import axiosInstance from "../api/axiosConfig.js"
 
 export const getWishlist = async () => {
   const response = await axiosInstance.get("wishlist/")
-  return response.data
+  return response.data.results || []
 }
 
 

@@ -4,6 +4,9 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.db.models.signals import post_save
 from django.dispatch import receiver 
+from django.core.validators import MaxValueValidator, MinValueValidator
+import random
+
 
 # Create your models here.
 
@@ -19,7 +22,10 @@ class Category(models.Model):
     return self.name
   
   class Meta:
-    verbose_name = "Categorie"
+    verbose_name = "Category"
+    verbose_name_plural = "Categories"
+    
+    
     
   
   
@@ -36,9 +42,25 @@ class Product(models.Model):
   featured = models.BooleanField(default=False,
                                  help_text="Display this product on the homepage of the featured product")
   
-    
+  original_price = models.DecimalField(max_digits=10, decimal_places=2, null=True , blank=True,
+                                       help_text="Set Higher than price to trigger discount badge in the frontend")
+  
+  
+  rating = models.DecimalField(max_digits=3, decimal_places=2, default=0, validators=[MinValueValidator(0), MaxValueValidator(5)])
+  
+  rating_count= models.PositiveIntegerField(default=0)
+  
+  
+
   def __str__(self):
     return self.name
+  
+  @property
+  def discount_percentage(self):
+    if self.original_price and self.original_price > self.price:
+      return round((self.original_price - self.price) / self.original_price * 100)
+    return 0 
+  
   
   
   class Meta: 
@@ -94,11 +116,20 @@ class Order(models.Model):
   order_number= models.CharField(unique=True, max_length=20, editable=False, blank=True)
   
   
-  import random
   def save(self, *args, **kwargs):
     if not self.order_number:
-      self.order_number= f"{self.random.randint(10000000 , 99999999 )}"
-    super().save(*args , **kwargs)
+      while True:
+        potential_number = f"PP{random.randint(10000000, 99999999)}"
+        
+        if not Order.objects.filter(order_number=potential_number).exists():
+          self.order_number = potential_number
+          break
+      
+    super().save(*args, **kwargs)
+    
+    
+        
+      
    
   
   def __str__(self):
@@ -163,15 +194,16 @@ class CartItem(models.Model):
     return f"{self.quantity} x {self.product.name}"
   
     
-@receiver(post_save, sender=User) 
+@receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
-  if created:
+  if created: 
     UserProfile.objects.create(user=instance)
 
 @receiver(post_save, sender=User)
-def save_user_profile(sender, instance , **kwargs):
+def save_user_profile(sender, instance, **kwargs):
   instance.profile.save()
-
+  
+  
 
 
 

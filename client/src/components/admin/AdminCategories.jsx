@@ -25,7 +25,7 @@ export default function AdminCategories() {
   const fetchCategories = async () => {
     try {
       const response = await axiosInstance.get("categories/");
-      setCategories(response.data);
+      setCategories(response.data.results || []);
     } catch (error) {
       console.error(error);
       setError("Failed to load categories");

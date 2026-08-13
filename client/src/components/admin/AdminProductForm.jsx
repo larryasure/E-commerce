@@ -24,7 +24,7 @@ export default function AdminProductForm() {
     const fetchData = async () => {
       try {
         const categoriesRes = await axiosInstance.get("/categories/");
-        setCategories(categoriesRes.data);
+        setCategories(categoriesRes.data.results);
 
         if (id) {
           const productRes = await axiosInstance.get(`/products/${id}/`);

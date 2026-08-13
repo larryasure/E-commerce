@@ -20,7 +20,7 @@ export default function AdminOrderDetail() {
   const fetchOrder = async () => {
     try {
       const response = await axiosInstance.get(`/orders/${id}/`);
-      setOrder(response.data);
+      setOrder(response.data.results);
       setNewStatus(response.data.order_status);
     } catch (error) {
       console.error("Failed to load order", error);

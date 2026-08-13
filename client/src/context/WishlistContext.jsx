@@ -55,11 +55,10 @@ export function WishlistProvider({ children }) {
   };
 
 
-  const isWishlisted = (productId) => {
-    if (!wishlists) return false
-
-     return wishlists.some((item) => item.product?.id === productId)
-  }
+const isWishlisted = (productId) => {
+  if (!Array.isArray(wishlists)) return false;
+  return wishlists.some((item) => item?.product?.id === productId);
+};
   
   const toggleWishlist = async (productId) => {
     const existing = wishlists.find((item) => item.product?.id === productId);

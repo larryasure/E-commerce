@@ -65,6 +65,7 @@ export default function WishList() {
           <div className="my-4  bg-white  shadow-sm p-6 rounded-xl">
             {wishlists.map((wishlistItem) => {
               const item = wishlistItem.product;
+              if (!item) return null
               const cartItem = cart?.items?.find((c) => c.product.id === item.id)
               const quantity = cartItem ? cartItem.quantity : 0
               

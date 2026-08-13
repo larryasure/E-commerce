@@ -16,7 +16,7 @@ export default function AdminOrders() {
 
       try {
         const response = await axiosInstance.get("orders/");
-        setOrders(response.data);
+        setOrders(response.data.results);
       } catch (error) {
         console.error("Failed to load Orders", error);
       } finally {

@@ -13,7 +13,7 @@ export default function AdminProducts() {
     const fetchProducts = async () => {
       try {
         const response = await axiosInstance.get("products/");
-        setProducts(response.data);
+        setProducts(response.data.results);
       } catch (error) {
         console.error("Failed to load products", error);
       } finally {
