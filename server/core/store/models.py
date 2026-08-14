@@ -98,6 +98,8 @@ class Order(models.Model):
         ("FAILED", "failed"),
     ]
 
+
+
     # Shipping tracking
     STATUS_CHOICES = [
         ("PROCESSING", "processing"),
