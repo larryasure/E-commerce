@@ -78,7 +78,7 @@ export default function OrderDetails() {
       </div>
     );
   }
-
+  
   if (!order) {
     return (
       <div className="min-h-screen py-22 bg-gray-50 text-center">
