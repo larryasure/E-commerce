@@ -67,7 +67,21 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework_simplejwt.token_blacklist",
     'django_extensions',
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+    'dj_rest_auth',
+    'dj_rest_auth.registration',
+    'rest_framework.authtoken',
+    
 ]
+
+SITE_ID = 1
+
+
+ 
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -78,6 +92,19 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    'allauth.account.middleware.AccountMiddleware',
+]
+
+
+
+REST_USE_JWT = True
+JWT_AUTH_COOKIE = "store-auth"
+JWT_AUTH_REFRESH_COOKIE = "my_refresh_token"
+
+
+AUTHENTICATION_BACKEND = [
+    'django.contrib.auth.backends.ModelBackend',
+    'allauth.account.auth_backends.AuthenticationBackend',
 ]
 
 ROOT_URLCONF = "core.urls"

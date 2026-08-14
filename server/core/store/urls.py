@@ -2,6 +2,7 @@ from django.urls import path, include
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenBlacklistView
 from rest_framework.routers import DefaultRouter
 from . import views 
+from store.auth_views import GoogleLogin
 
 router = DefaultRouter()
 router.register('categories', views.CategoryViewSet)
@@ -34,10 +35,12 @@ urlpatterns = [
   
   
   path("payments/initialize/", views.initialize_payment, name="initialize-payment"),
-  path("payments/verify/", views.verify_payment, name='verify-payment')
+  path("payments/verify/", views.verify_payment, name='verify-payment'),
+  path("payments/webhook/", views.flutterwave_webhook, name="flutterwave-webhook"),
+
+
+  path('auth/', include('dj_rest_auth.urls')),
+  path('auth/registration/', include('dj_rest_auth.registration.urls')),
+  path('auth/google/', GoogleLogin.as_view(), name='google_login'),
 ]
-
-path("payments/webhook/", views.flutterwave_webhook, name="flutterwave-webhook"),
-
-
 

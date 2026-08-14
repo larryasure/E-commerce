@@ -30,8 +30,8 @@ export default function Products() {
           axiosInstance.get(`products/?page=${currentPage}`),
         ]);
 
-        categoriesRes.data.results || categoriesRes.data;
-        setProducts(productRes.data.results);
+        setCategories(categoriesRes.data.results || categoriesRes.data || []);
+        setProducts(productRes.data.results || []);
         setNextPage(productRes.data.next);
         setPreviousPage(productRes.data.previous);
       } catch (error) {
@@ -107,7 +107,7 @@ export default function Products() {
             </div>
           ) : filteredProducts.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 p-4 items-start auto-rows-max">
-              {products.map((product, index) => (
+              {filteredProducts.map((product, index) => (
                 <ProductCard key={product.id} product={product} index={index} />
               ))}
             </div>
