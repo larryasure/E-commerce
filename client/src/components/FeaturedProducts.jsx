@@ -79,11 +79,13 @@ export default function FeaturedProducts({
                         </span>
                       </div>
                     )}
+
                     <div
                       onClick={() => toggleWishlist(product.id)}
                       className="absolute top-3 right-3 bg-gray-50 p-1 rounded-lg">
                       <Heart size={18} strokeWidth={.5} fill={isWishlisted(product.id) ? "#ef4544": "none"} />
                     </div>
+                    
                   </div>
 
                   {/* Content */}

@@ -97,6 +97,7 @@ class Order(models.Model):
         ("PAID", "paid"),
         ("FAILED", "failed"),
     ]
+    
 
 
 
