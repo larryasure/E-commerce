@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import { GoogleLogin } from "@react-oauth/google";
 
 export default function Login() {
   const [loading, setLoading] = useState(false);
@@ -11,7 +12,7 @@ export default function Login() {
     password: "",
   });
   const navigate = useNavigate();
-  const { login } = useContext(AuthContext);
+  const { login, googleLogin } = useContext(AuthContext);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,6 +21,16 @@ export default function Login() {
 
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }));
+    }
+  };
+
+  const handleGoogleLogin = async (credentialResponse) => {
+    const result = await googleLogin(credentialResponse.credential);
+
+    console.log("Google Login result", JSON.stringify(result, null, 2));
+
+    if (result.success) {
+      navigate("/products");
     }
   };
 
@@ -79,8 +90,8 @@ export default function Login() {
       setErrors({ submit: "An unexpected error occured", error });
     } finally {
       setLoading(false);
-    
-        setTimeout(() => setErrors({}), 3000);
+
+      setTimeout(() => setErrors({}), 3000);
     }
   };
 
@@ -153,6 +164,13 @@ export default function Login() {
               {loading ? "Logging in ..." : "Log in "}
             </button>
           </form>
+
+          <div className="text-center my-4">OR</div>
+
+          <GoogleLogin
+            onSuccess={handleGoogleLogin}
+            onError={() => console.error("Google login failed!")}
+          />
         </div>
       </div>
     </>

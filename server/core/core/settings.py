@@ -102,7 +102,7 @@ JWT_AUTH_COOKIE = "store-auth"
 JWT_AUTH_REFRESH_COOKIE = "my_refresh_token"
 
 
-AUTHENTICATION_BACKEND = [
+AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',
     'allauth.account.auth_backends.AuthenticationBackend',
 ]

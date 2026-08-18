@@ -1,9 +1,11 @@
 import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import { GoogleLogin } from "@react-oauth/google";
 
 export default function Register() {
-  const { register } = useContext(AuthContext);
+  const { register, googleLogin } = useContext(AuthContext);
+
 
   const [formData, setFormData] = useState({
     username: "",
@@ -30,6 +32,14 @@ export default function Register() {
       setErrors((prev) => ({...prev, [name]: ""}))
     }
   };
+
+  const handleGoogleLogin = async (credentialResponse) => {
+    const result = await googleLogin(credentialResponse.credential)
+
+    if (result.success) {
+      navigate("/")
+    }
+  }
 
   const validateForm = () => {
     const newErrors = {};
@@ -232,6 +242,14 @@ export default function Register() {
               </Link>
             </p>
           </form>
+
+          <div>
+            <div className="text-center my-3">OR</div>
+            <GoogleLogin
+              onSuccess={handleGoogleLogin}
+              onError={() => console.error("Google Registration failed") }
+            />
+          </div>
         </div>
       </div>
     </>

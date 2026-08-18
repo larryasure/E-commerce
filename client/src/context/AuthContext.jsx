@@ -30,6 +30,27 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
+  const googleLogin = async (accessToken) => {
+    try {
+      const response = await axiosInstance.post("auth/google/", {
+      access_token: accessToken,
+      });
+
+      const access = response.data.access || response.data.access_token;
+      const refresh =response.data.refresh || response.data.refresh_token;
+
+      localStorage.setItem("access_token", access);
+      localStorage.setItem("refresh_token", refresh);
+
+      const userReponse = await axiosInstance.get("me/");
+      setUser(userReponse.data);
+      setIsAuthenticated(true);
+      return { success: true };
+    } catch (error) {
+      return { success: false, error: error.response?.data };
+    }
+  };
+
   const login = async (username, password) => {
     try {
       const response = await axiosInstance.post("token/", {
@@ -86,6 +107,7 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated,
         logout,
         register,
+        googleLogin,
       }}
     >
       {children}
