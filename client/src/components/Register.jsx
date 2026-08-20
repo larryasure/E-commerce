@@ -1,11 +1,9 @@
 import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import { GoogleLogin } from "@react-oauth/google";
 
 export default function Register() {
-  const { register, googleLogin } = useContext(AuthContext);
-
+  const { register } = useContext(AuthContext);
 
   const [formData, setFormData] = useState({
     username: "",
@@ -27,19 +25,10 @@ export default function Register() {
       [name]: value,
     }));
 
-
     if (errors[name]) {
-      setErrors((prev) => ({...prev, [name]: ""}))
+      setErrors((prev) => ({ ...prev, [name]: "" }));
     }
   };
-
-  const handleGoogleLogin = async (credentialResponse) => {
-    const result = await googleLogin(credentialResponse.credential)
-
-    if (result.success) {
-      navigate("/")
-    }
-  }
 
   const validateForm = () => {
     const newErrors = {};
@@ -212,17 +201,17 @@ export default function Register() {
               )}
             </div>
 
-                   {success && (
-          <div className="mb-6 p-2 bg-green-50 border border-green-200 rounded-lg">
-            <p className="text-green-500 text-sm">{success}</p>
-          </div>
-        )}
+            {success && (
+              <div className="mb-6 p-2 bg-green-50 border border-green-200 rounded-lg">
+                <p className="text-green-500 text-sm">{success}</p>
+              </div>
+            )}
 
-        {errors.submit && (
-          <div className="mb-6 p-2 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-red-500 text-sm">{errors.submit}</p>
-          </div>
-        )}
+            {errors.submit && (
+              <div className="mb-6 p-2 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-red-500 text-sm">{errors.submit}</p>
+              </div>
+            )}
 
             <button
               type="submit"
@@ -238,18 +227,11 @@ export default function Register() {
                 to="/login"
                 className="text-blue-600 hover:text-blue-700 font-semibold"
               >
-                { " "}Login here
+                {" "}
+                Login here
               </Link>
             </p>
           </form>
-
-          <div>
-            <div className="text-center my-3">OR</div>
-            <GoogleLogin
-              onSuccess={handleGoogleLogin}
-              onError={() => console.error("Google Registration failed") }
-            />
-          </div>
         </div>
       </div>
     </>

@@ -8,6 +8,8 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+// const baseUrl= import.meta.env.VITE_BASE_URL
+
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem("access_token");
@@ -30,26 +32,7 @@ export const AuthProvider = ({ children }) => {
     checkAuth();
   }, []);
 
-  const googleLogin = async (accessToken) => {
-    try {
-      const response = await axiosInstance.post("auth/google/", {
-      access_token: accessToken,
-      });
 
-      const access = response.data.access || response.data.access_token;
-      const refresh =response.data.refresh || response.data.refresh_token;
-
-      localStorage.setItem("access_token", access);
-      localStorage.setItem("refresh_token", refresh);
-
-      const userReponse = await axiosInstance.get("me/");
-      setUser(userReponse.data);
-      setIsAuthenticated(true);
-      return { success: true };
-    } catch (error) {
-      return { success: false, error: error.response?.data };
-    }
-  };
 
   const login = async (username, password) => {
     try {
@@ -107,7 +90,7 @@ export const AuthProvider = ({ children }) => {
         isAuthenticated,
         logout,
         register,
-        googleLogin,
+        // googleLogin,
       }}
     >
       {children}

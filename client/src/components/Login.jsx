@@ -24,15 +24,7 @@ export default function Login() {
     }
   };
 
-  const handleGoogleLogin = async (credentialResponse) => {
-    const result = await googleLogin(credentialResponse.credential);
 
-    console.log("Google Login result", JSON.stringify(result, null, 2));
-
-    if (result.success) {
-      navigate("/products");
-    }
-  };
 
   const handleValidForm = () => {
     const newErrors = {};
@@ -167,10 +159,7 @@ export default function Login() {
 
           <div className="text-center my-4">OR</div>
 
-          <GoogleLogin
-            onSuccess={handleGoogleLogin}
-            onError={() => console.error("Google login failed!")}
-          />
+     
         </div>
       </div>
     </>

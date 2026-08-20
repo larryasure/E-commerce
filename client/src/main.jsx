@@ -32,7 +32,6 @@ import AdminProtectedRoutes from "./protectionRoutes/AdminProtectedRoutes.jsx";
 import ProtectedRoutes from "./protectionRoutes/ProtectedRoutes.jsx";
 import RootLayout from "./root/RootLayout.jsx";
 import OrderDetails from "./dashboard/OrderDetails.jsx";
-import {GoogleOAuthProvider} from "@react-oauth/google";
 
 
 const router = createBrowserRouter([
@@ -133,9 +132,7 @@ createRoot(document.getElementById("root")).render(
     <AuthProvider>
       <WishlistProvider>
         <CartProvider>
-          <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>  
             <RouterProvider router={router} />
-          </GoogleOAuthProvider>
           <ToastContainer position="top-center" autoClose={2000} theme="dark" />
         </CartProvider>
       </WishlistProvider>
