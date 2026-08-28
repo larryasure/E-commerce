@@ -63,7 +63,6 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework_simplejwt.token_blacklist",
     "django_extensions",
-    "django.contrib.sites",
 ]
 
 
@@ -79,12 +78,8 @@ MIDDLEWARE = [
 ]
 
 
-
-
-
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
-    # "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
 ROOT_URLCONF = "core.urls"

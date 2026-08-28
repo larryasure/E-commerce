@@ -6,6 +6,10 @@ from rest_framework import serializers
 from rest_framework.validators import UniqueValidator
 from datetime import timedelta
 from django.utils import timezone
+from django_typomatic import ts_interface
+
+
+@ts_interface()
 class CategorySerializer(serializers.ModelSerializer):
   
   class Meta:
@@ -14,6 +18,7 @@ class CategorySerializer(serializers.ModelSerializer):
     
     
     
+@ts_interface()    
 class ProductSerializer(serializers.ModelSerializer):
   category= CategorySerializer(read_only=True)
   category_id = serializers.PrimaryKeyRelatedField(
@@ -45,11 +50,7 @@ class ProductSerializer(serializers.ModelSerializer):
   class Meta:
     model=Product
     fields= ['id', 'category', 'category_id', 'name', 'slug', 'description', 'price', 'image', 'created_at', 'stock', 'is_active', 'featured', 'is_new', "is_in_wishlist", 'discount_percentage', 'original_price', 'rating', 'rating_count' ]
-
-    
-
-    
-    
+@ts_interface()        
 class UserProfileSerializer(serializers.ModelSerializer):
   
   class Meta:
@@ -64,13 +65,8 @@ class UserProfileSerializer(serializers.ModelSerializer):
         return request.build_absolute_uri(obj.avatar.url)
       return obj.avatar.url
     return 'https://ui-avatars.com/api/?name=User&background=cccccc&color=ffffff'
-  
-  
-    
-  
       
-  
-  
+@ts_interface()    
 class UserSerializer(serializers.ModelSerializer):
   profile= UserProfileSerializer(read_only=True)
   password= serializers.CharField(write_only=True)
@@ -108,16 +104,16 @@ class UserSerializer(serializers.ModelSerializer):
       
     instance.save()
     return instance
-    
+
+@ts_interface()        
 class OrderItemSerializer(serializers.ModelSerializer):
   product = ProductSerializer(read_only=True)
   
   class Meta:
     model = OrderItem
-    fields= "__all__"
+    fields= "__all__" 
     
-    
-    
+@ts_interface()        
 class OrderSerializer(serializers.ModelSerializer):
   items = OrderItemSerializer(many=True, read_only=True)
   user= UserSerializer(read_only=True)
@@ -127,7 +123,7 @@ class OrderSerializer(serializers.ModelSerializer):
     fields= "__all__"
     
     
-    
+@ts_interface()        
 class WishListSerializer(serializers.ModelSerializer):
   product = ProductSerializer(read_only=True)
   product_id = serializers.PrimaryKeyRelatedField(
@@ -140,7 +136,7 @@ class WishListSerializer(serializers.ModelSerializer):
     model = Wishlist
     fields = ["id", "product", "product_id", "created_at"]
     
-    
+@ts_interface()        
 class CartItemSerializer(serializers.ModelSerializer):
   product = ProductSerializer(read_only= True)
   product_id = serializers.PrimaryKeyRelatedField(queryset= Product.objects.all(), source="product", write_only= True)
@@ -154,7 +150,7 @@ class CartItemSerializer(serializers.ModelSerializer):
   def get_subtotal(self, obj):
     return obj.product.price * obj.quantity
   
-  
+@ts_interface()    
 class CartSerializer(serializers.ModelSerializer):
   items = CartItemSerializer(read_only=True, many=True)
   subtotal = serializers.SerializerMethodField()

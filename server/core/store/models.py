@@ -97,9 +97,6 @@ class Order(models.Model):
         ("PAID", "paid"),
         ("FAILED", "failed"),
     ]
-    
-
-
 
     # Shipping tracking
     STATUS_CHOICES = [
@@ -115,7 +112,7 @@ class Order(models.Model):
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
     payment_status = models.CharField(
-        max_length=100, choices=PAYMENT_CHOICES, default="PENDING"                      
+        max_length=100, choices=PAYMENT_CHOICES, default="PENDING"
     )
     order_status = models.CharField(
         max_length=200, choices=STATUS_CHOICES, default="PROCESSING"
