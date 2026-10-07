@@ -1,29 +1,29 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import MainContent from "@/components/MainContent";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
-  title: "PrimePack",
-  description: "E-Commerce Websites",
+  title: "PrimePack - Premium Shopping",
+  description: "Shop premium products with PrimePack",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="en" data-scroll-behaviour="smooth">
+      <body
+        className="bg-linear-to-br from-white via-blue-50 to-blue-100"
+        suppressHydrationWarning={true}
+      >
+        <MainContent>
+          {children}
+          <Toaster position="top-center" richColors />
+        </MainContent>
+      </body>
     </html>
   );
 }

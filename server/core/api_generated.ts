@@ -11,7 +11,7 @@ export interface ProductSerializer {
     category?: CategorySerializer;
     category_id: number;
     name: string;
-    slug: string;
+    slug?: string;
     description?: string;
     price: number;
     image?: File | null;

@@ -3,28 +3,33 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-"generate-types": "cd ../server && venv\\Scripts\\activate && cd core && python manage.py generate_types && node -e \"const fs = require('fs'); fs.mkdirSync('../../client-next/lib/types', { recursive: true }); fs.copyFileSync('./api_generated.ts', '../../client-next/lib/types/api.ts')\"",
-
+    "generate-types": "cd ../server && venv\\Scripts\\activate && cd core && python manage.py generate_types && node -e \"const fs = require('fs'); fs.mkdirSync('../../client-next/lib/types', { recursive: true }); fs.copyFileSync('./api_generated.ts', '../../client-next/lib/types/api.ts')\"",
     "dev": "npm run generate-types && next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint"
   },
   "dependencies": {
+    "axios": "^1.20.0",
     "clsx": "^2.1.1",
     "js-cookie": "^3.0.8",
+    "lucide-react": "^1.38.0",
     "next": "16.3.3",
     "next-auth": "^4.24.15",
     "react": "19.2.8",
     "react-dom": "19.2.8",
+    "sonner": "^2.0.8",
+    "swiper": "^14.2.0",
     "tailwind-merge": "^3.6.0",
     "zustand": "^5.0.15"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/js-cookie": "^3.0.6",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "daisyui": "^5.7.43",
     "eslint": "^9",
     "eslint-config-next": "16.3.3",
     "tailwindcss": "^4",

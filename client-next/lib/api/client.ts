@@ -1,71 +1,99 @@
-import { ApiResponse } from "@/lib/types"; 
+import axios from "axios";
+import Cookies from "js-cookie";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
-const TOKEN_KEY = process.env.NEXT_PUBLIC_JWT_STORAGE_KEY || "token"; 
 
-interface FetchOptions extends RequestInit {
-  token?: string;
-}
+const TOKEN_KEY =
+  process.env.NEXT_PUBLIC_JWT_STORAGE_KEY || "auth_token";
 
-export async function apiCall<T>(
-  endpoint: string,
-  options: FetchOptions = {},
-): Promise<T> {
-  const { token, ...fetchOptions } = options;
-  const url = `${API_URL}${endpoint}`;
+const REFRESH_TOKEN_KEY = "refresh_token";
 
-  const requestHeaders = new Headers({
+export const axiosInstance = axios.create({
+  baseURL: API_URL,
+  headers: {
     "Content-Type": "application/json",
-    ...fetchOptions.headers,
-  });
+  },
+});
 
-  let activeToken = token;
+// Attach access token to every request
+axiosInstance.interceptors.request.use((config) => {
+  if (typeof window !== "undefined") {
+    const token = Cookies.get(TOKEN_KEY);
 
-  if (!activeToken && typeof window === "undefined") {
-    const { cookies } = await import("next/headers");
-    activeToken = (await cookies()).get(TOKEN_KEY)?.value;
-  } else if (!activeToken && typeof document !== "undefined") {
-    activeToken = document.cookie
-      .split("; ")
-      .find((cookie) => cookie.startsWith(`${TOKEN_KEY}=`))
-      ?.split("=")[1];
+    // console.log(
+    //   `🔐 ${config.method?.toUpperCase()} ${config.url} | Token:`,
+    //   token ? "YES" : "NO",
+    // );
+
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
   }
 
-  if (activeToken) {
-    requestHeaders.set("Authorization", `Bearer ${activeToken}`);
-  }
+  return config;
+});
 
-  const response = await fetch(url, {
-    ...fetchOptions,
-    headers: requestHeaders,
-  });
+// Refresh expired access token
+axiosInstance.interceptors.response.use(
+  (response) => response,
 
-  if (!response.ok) {
-    throw new Error(`API request failed: ${response.status}`);
-  }
+  async (error) => {
+    const originalRequest = error.config;
 
-  const result: ApiResponse<T> = await response.json();
-  return result.data;
-}
+    if (
+      error.response?.status !== 401 ||
+      originalRequest?._retry ||
+      originalRequest?.url === "/token/" ||
+      originalRequest?.url === "/token/refresh/"
+    ) {
+      return Promise.reject(error);
+    }
 
-export const api = {
-  get: <T>(endpoint: string, option?: FetchOptions) =>
-    apiCall<T>(endpoint, { method: "GET", ...option }),
+    originalRequest._retry = true;
 
-  post: <T>(endpoint: string, body: unknown, options?: FetchOptions) =>
-    apiCall<T>(endpoint, {
-      method: "POST",
-      body: JSON.stringify(body),
-      ...options,
-    }),
+    const refreshToken = Cookies.get(REFRESH_TOKEN_KEY);
 
-  patch: <T>(endpoint: string, body: unknown, options?: FetchOptions) =>
-    apiCall<T>(endpoint, {
-      method: "PATCH",
-      body: JSON.stringify(body),
-      ...options,
-    }),
+    if (!refreshToken) {
+      Cookies.remove(TOKEN_KEY);
+      Cookies.remove(REFRESH_TOKEN_KEY);
 
-  delete: <T>(endpoint: string, options?: FetchOptions) =>
-    apiCall<T>(endpoint, { method: "DELETE", ...options }),
-};
+      return Promise.reject(error);
+    }
+
+    try {
+      const response = await axios.post(
+        `${API_URL}/token/refresh/`,
+        {
+          refresh: refreshToken,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
+
+      const newAccessToken = response.data.access;
+
+      if (!newAccessToken) {
+        throw new Error("No access token returned");
+      }
+
+      Cookies.set(TOKEN_KEY, newAccessToken, {
+        expires: 7,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+      });
+
+      originalRequest.headers.Authorization =
+        `Bearer ${newAccessToken}`;
+
+      return axiosInstance(originalRequest);
+    } catch (refreshError) {
+      Cookies.remove(TOKEN_KEY);
+      Cookies.remove(REFRESH_TOKEN_KEY);
+
+      return Promise.reject(refreshError);
+    }
+  },
+);

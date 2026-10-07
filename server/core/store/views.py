@@ -1,120 +1,123 @@
 import hmac
-from django.db.models.aggregates import Sum
-from rest_framework import viewsets, permissions, generics
-from rest_framework.exceptions import ValidationError
-from rest_framework.decorators import api_view , action, permission_classes, authentication_classes
-from rest_framework.response import Response
-from rest_framework import status
-from rest_framework.permissions import IsAuthenticated, AllowAny
-from django.shortcuts import get_object_or_404
-
-
-from django.contrib.auth.models import User
-from django.contrib.auth.tokens import default_token_generator
-from django.utils.encoding import force_bytes, force_str
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+import logging
 
 from django.conf import settings
+from django.contrib.auth.models import User
+from django.contrib.auth.tokens import default_token_generator
+from django.db.models.aggregates import Sum
+from django.shortcuts import get_object_or_404
+from django.utils.encoding import force_bytes, force_str
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
+from rest_framework import generics, permissions, status, viewsets
+from rest_framework.decorators import (
+    action,
+    api_view,
+    authentication_classes,
+    permission_classes,
+)
+from rest_framework.exceptions import ValidationError
+from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.response import Response
+
 from .emails import send_password_reset_email, send_welcome_email
-
-
-
-from .serializers import CategorySerializer, OrderSerializer, ProductSerializer, UserProfileSerializer, UserSerializer, WishListSerializer, CartSerializer
-from .models import Cart, UserProfile, Product, Category, Order, Wishlist
-
+from .models import Cart, Category, Order, Product, UserProfile, Wishlist
+from .serializers import (
+    CartSerializer,
+    CategorySerializer,
+    OrderSerializer,
+    ProductSerializer,
+    UserProfileSerializer,
+    UserSerializer,
+    WishListSerializer,
+)
 from .services.cart_service import CartService
-from .services.user_service import UserService
 from .services.order_service import create_order
 from .services.payment_service import PaymentService
-
-import logging
+from .services.user_service import UserService
 
 logger = logging.getLogger(__name__)
 
 
-
-
 # Create your views here.
 
+
 class CategoryViewSet(viewsets.ModelViewSet):
-  queryset= Category.objects.all()
-  serializer_class= CategorySerializer
-  permission_classes=[permissions.IsAuthenticatedOrReadOnly]
-  
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+
 class ProductViewSet(viewsets.ModelViewSet):
-    queryset = Product.objects.all().select_related('category')
+    queryset = Product.objects.all().select_related("category")
     serializer_class = ProductSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     # pagination_class = None
 
     def get_queryset(self):
         return Product.objects.all()
+
+
 class UserProfileViewSet(viewsets.ModelViewSet):
-  queryset= UserProfile.objects.all()
-  serializer_class= UserProfileSerializer
-  permission_classes= [permissions.IsAuthenticated]
-  
-  
-  def get_queryset(self):
-    return UserProfile.objects.filter(user=self.request.user)
-  
-  
-  def perform_update(self, serializer):
-    serializer.save(user= self.request.user)
-      
+    queryset = UserProfile.objects.all()
+    serializer_class = UserProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return UserProfile.objects.filter(user=self.request.user)
+
+    def perform_update(self, serializer):
+        serializer.save(user=self.request.user)
+
 
 class OrderViewset(viewsets.ModelViewSet):
-  serializer_class = OrderSerializer
-  permission_classes= [permissions.IsAuthenticated]
-  
-  
-  def get_queryset(self):
-    return Order.objects.filter(user=self.request.user).order_by("-created_at")
-  
-  def create(self, request, *args, **kwargs):
-    order= create_order(user=self.request.user, validated_data=request.data)
-    serializer= self.get_serializer(order)
-    return Response(serializer.data, status=status.HTTP_200_OK)
-  
-  
-  def list(self, request, *args, **kwargs):
-    queryset = self.get_queryset()
-    
-    total_orders = queryset.count()
-    in_transit = queryset.filter(order_status = "SHIPPED").count()
-    delivered = queryset.filter(order_status= "DELIVERED").count()
-    
-    total_spent = queryset.aggregate(total = Sum('total_price'))['total'] or 0 
-    
-    
-    page = self.paginate_queryset(queryset)
-    
-    if page is not None:
-      serializer = self.get_serializer(page, many=True )
-      response = self.get_paginated_response(serializer.data)
-      
-    else:
-      serializer = self.get_serializer(queryset, many=True)
-      response = Response(serializer.data)
-      
-      
-    response.data["stats"] = {
-      "total_orders": total_orders,
-      "in_transit": in_transit,
-      "delivered": delivered,
-      "total_spent": float(total_spent)
-    }
-    
-    return response
-  
+    serializer_class = OrderSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user).order_by("-created_at")
+
+    def create(self, request, *args, **kwargs):
+        order = create_order(user=self.request.user, validated_data=request.data)
+        serializer = self.get_serializer(order)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+
+        total_orders = queryset.count()
+        in_transit = queryset.filter(order_status="SHIPPED").count()
+        delivered = queryset.filter(order_status="DELIVERED").count()
+
+        total_spent = queryset.aggregate(total=Sum("total_price"))["total"] or 0
+
+        page = self.paginate_queryset(queryset)
+
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            response = self.get_paginated_response(serializer.data)
+
+        else:
+            serializer = self.get_serializer(queryset, many=True)
+            response = Response(serializer.data)
+
+        response.data["stats"] = {
+            "total_orders": total_orders,
+            "in_transit": in_transit,
+            "delivered": delivered,
+            "total_spent": float(total_spent),
+        }
+
+        return response
+
+
 class UserProfileUpdateView(generics.UpdateAPIView):
-  serializer_class= UserProfileSerializer
-  permission_classes= [permissions.IsAuthenticated]
-  
-  def get_object(self):
-    return self.request.user.profile
-  
-   
+    serializer_class = UserProfileSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_object(self):
+        return self.request.user.profile
+
+
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -127,323 +130,328 @@ class UserViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         UserService.create_user(serializer.validated_data)
-        
 
-    
 
-@api_view(['GET'])
+@api_view(["GET"])
 def get_current_user(request):
-  if not request.user.is_authenticated:
-    return Response(
-      {'error': 'Not authenticated'},
-      status= status.HTTP_401_UNAUTHORIZED
-    )
-    
-  serializer= UserSerializer(request.user)
-  return Response(serializer.data)
-    
-class WishlistViewSet(viewsets.ModelViewSet):
-  serializer_class = WishListSerializer
-  permission_classes = [permissions.IsAuthenticated]
+    if not request.user.is_authenticated:
+        return Response(
+            {"error": "Not authenticated"}, status=status.HTTP_401_UNAUTHORIZED
+        )
 
-  def get_queryset(self):
-    return Wishlist.objects.filter(
-      user=self.request.user
-    ).select_related("user", "product")
-  def perform_create(self, serializer):
-    serializer.save(user=self.request.user)
+    serializer = UserSerializer(request.user)
+    return Response(serializer.data)
+
+
+class WishlistViewSet(viewsets.ModelViewSet):
+    serializer_class = WishListSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Wishlist.objects.filter(user=self.request.user).select_related(
+            "user", "product"
+        )
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
 
 
 class CartViewSet(viewsets.ModelViewSet):
-  serializer_class = CartSerializer
-  permission_classes = [permissions.IsAuthenticated]
-  def get_queryset(self):
-      return Cart.objects.filter(
-          user=self.request.user
-      ).prefetch_related(
-          "items__product",
-          "items__product__category"
-      )
-      
-  def list(self , request):
-    cart = CartService.get_cart(request.user)
-    serializer = self.get_serializer(cart)
-    return Response(serializer.data)
-          
+    serializer_class = CartSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Cart.objects.filter(user=self.request.user).prefetch_related(
+            "items__product", "items__product__category"
+        )
+
+    def list(self, request):
+        cart = CartService.get_cart(request.user)
+        serializer = self.get_serializer(cart)
+        return Response(serializer.data)
+
+    @action(detail=False, methods=["POST"])
+    def add(self, request):
+        cart = CartService.add_item(
+            request.user,
+            request.data.get("product_id"),
+            int(request.data.get("quantity", 1)),
+        )
+        return Response(CartSerializer(cart).data)
+
+    @action(detail=True, methods=["PATCH"])
+    def increase(self, request, pk=None):
+        cart = CartService.increase_quantity(request.user, pk)
+        return Response(CartSerializer(cart).data)
+
+    @action(detail=True, methods=["PATCH"])
+    def decrease(self, request, pk=None):
+        cart = CartService.decrease_quantity(request.user, pk)
+        return Response(CartSerializer(cart).data)
+
+    @action(detail=True, methods=["DELETE"])
+    def remove(self, request, pk=None):
+        cart = CartService.remove_item(request.user, pk)
+        return Response(CartSerializer(cart).data)
+
+    @action(detail=False, methods=["DELETE"])
+    def clear(self, request):
+        cart = CartService.clear_cart(request.user)
+        return Response(CartSerializer(cart).data)
 
 
-  @action(detail=False, methods=["POST"])
-  def add(self, request):
-    cart = CartService.add_item(request.user, request.data.get("product_id"), int(request.data.get("quantity",  1)))
-    return Response(CartSerializer(cart).data)
-
-
-  @action(detail=True, methods=["PATCH"])
-  def increase(self, request, pk=None):
-    cart = CartService.increase_quantity(request.user, pk)
-    return Response(CartSerializer(cart).data)
-
-  @action(detail=True, methods=["PATCH"])
-  def decrease(self, request, pk=None):
-    cart = CartService.decrease_quantity(request.user, pk)
-    return Response(CartSerializer(cart).data)
-  
-
-  @action(detail=True, methods=["DELETE"])
-  def remove(self, request, pk=None):
-    cart = CartService.remove_item(request.user, pk)
-    return Response(CartSerializer(cart).data)
-
-
-  @action(detail=False, methods=["DELETE"])
-  def clear(self, request):
-    cart = CartService.clear_cart(request.user)  
-    return Response(CartSerializer(cart).data)
-  
-  
-  
-@api_view(['GET'])
+@api_view(["GET"])
 def verify_email(request, uid, token):
-  try:
-    user_pk=force_str(urlsafe_base64_decode(uid))
-    user = User.objects.get(pk=user_pk)
-    
-  except (User.DoesNotExist, ValueError, TypeError):
+    try:
+        user_pk = force_str(urlsafe_base64_decode(uid))
+        user = User.objects.get(pk=user_pk)
+
+    except (User.DoesNotExist, ValueError, TypeError):
+        return Response(
+            {"error": "Invalid verification Link"}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+    if not default_token_generator.check_token(user, token):
+        return Response(
+            {"error": "Verification Link has expired or is invalid"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    if user.profile.is_verified:
+        return Response({"message": "Email is verified"}, status=status.HTTP_200_OK)
+
+    user.profile.is_verified = True
+    user.profile.save()
+    send_welcome_email(user)
+
     return Response(
-      {'error': 'Invalid verification Link'},
-      status=status.HTTP_400_BAD_REQUEST
+        {"message": "Email verified successfully!, Welcome to PrimePack"},
+        status=status.HTTP_200_OK,
     )
-    
-  if not default_token_generator.check_token(user, token):
-    return Response(
-      {'error': "Verification Link has expired or is invalid"},
-      status=status.HTTP_400_BAD_REQUEST,)
-    
-  if user.profile.is_verified:
-    return Response(
-      {'message': 'Email is verified'},
-      status=status.HTTP_200_OK
-    )
-    
-  user.profile.is_verified = True
-  user.profile.save()
-  send_welcome_email(user)
-  
-  return Response(
-      {'message': 'Email verified successfully!, Welcome to PrimePack'},
-      status=status.HTTP_200_OK
-    )
-  
-  
-@api_view(['POST'])
+
+
+@api_view(["POST"])
 def request_password_reset(request):
-  email = request.data.get('email')
-  
-  try:
-    user = User.objects.get(email=email)
-  except User.DoesNotExist:
+    email = request.data.get("email")
+
+    try:
+        user = User.objects.get(email=email)
+    except User.DoesNotExist:
+        return Response(
+            {
+                "message": "If an account exists with this email, You will receive a password reset link"
+            },
+            status=status.HTTP_200_OK,
+        )
+
+    token = default_token_generator.make_token(user)
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+    reset_url = f"http://localhost:3000/reset-password/{uid}/{token}/"
+
+    send_password_reset_email(user, reset_url)
+
     return Response(
-      {'message': 'If an account exists with this email, You will receive a password reset link'},
-      status=status.HTTP_200_OK
+        {"message": "Password Reset link sent to your email."},
+        status=status.HTTP_200_OK,
     )
-    
-    
-    
-  token = default_token_generator.make_token(user)
-  uid= urlsafe_base64_encode(force_bytes(user.pk))
-  
-  reset_url = f"http://localhost:3000/reset-password/{uid}/{token}/"
-  
-  send_password_reset_email(user, reset_url)
-  
-  return Response(
-    {'message': 'Password Reset link sent to your email.'},
-    status=status.HTTP_200_OK
-  )
-  
-@api_view(['POST'])
+
+
+@api_view(["POST"])
 def confirm_password_reset(request, uid, token):
-  password = request.data.get('password')
-  confirm_password= request.data.get('confirm_password')
-  
-  if password != confirm_password:
+    password = request.data.get("password")
+    confirm_password = request.data.get("confirm_password")
+
+    if password != confirm_password:
+        return Response(
+            {"error": "Passwords do not match"}, status=status.HTTP_400_BAD_REQUEST
+        )
+
+    if len(password) < 8:
+        return Response(
+            {"error": "Password must be at least 8 characters"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    try:
+        user_pk = force_str(urlsafe_base64_decode(uid))
+        user = User.objects.get(pk=user_pk)
+
+    except (User.DoesNotExist, TypeError, ValueError):
+        return Response(
+            {"error": "Invalid Password reset link "},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    if not default_token_generator.check_token(user, token):
+        return Response(
+            {"error": "Password reset link has expired or is invalid"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    user.set_password(password)
+    user.save()
+
     return Response(
-      {'error': 'Passwords do not match'},
-      status=status.HTTP_400_BAD_REQUEST
+        {
+            "message": "Password reset Successfully! You can now login with your new password"
+        },
+        status=status.HTTP_200_OK,
     )
-    
-  if len(password) < 8:
-    return Response(
-      {"error": "Password must be at least 8 characters"},
-      status= status.HTTP_400_BAD_REQUEST
-      
-    )
-    
-    
-  try:
-    user_pk= force_str(urlsafe_base64_decode(uid))
-    user = User.objects.get(pk= user_pk)
-    
-  except (User.DoesNotExist, TypeError, ValueError):
-    return Response(
-      {"error": "Invalid Password reset link "},
-      status=status.HTTP_400_BAD_REQUEST
-    )
-    
-  if not default_token_generator.check_token(user, token):
-    return Response(
-      {"error": "Password reset link has expired or is invalid"},
-      status= status.HTTP_400_BAD_REQUEST
-    )
-    
-  user.set_password(password)
-  user.save()
-  
-  return Response(
-    {"message": "Password reset Successfully! You can now login with your new password"},
-    status= status.HTTP_200_OK
-  )
-  
+
+
 @api_view(["POST"])
 def change_password(request):
-  if not request.user.is_authenticated:
+    if not request.user.is_authenticated:
+        return Response(
+            {"error": "Not Authenticated"}, status=status.HTTP_401_UNAUTHORIZED
+        )
+
+    old_password = request.data.get("old_password")
+    new_password = request.data.get("new_password")
+    confirm_password = request.data.get("confirm_password")
+
+    if not request.user.check_password(old_password):
+        return Response(
+            {"error": "Old password Incorrect"}, status=status.HTTP_401_UNAUTHORIZED
+        )
+
+    if new_password != confirm_password:
+        return Response(
+            {"error": "New passwords do not match"}, status=status.HTTP_401_UNAUTHORIZED
+        )
+
+    if len(new_password) < 8:
+        return Response(
+            {"error": "Password must be at least 8 characters"},
+            status=status.HTTP_401_UNAUTHORIZED,
+        )
+
+    request.user.set_password(new_password)
+    request.user.save()
+
     return Response(
-      {"error": "Not Authenticated"},
-      status= status.HTTP_401_UNAUTHORIZED
+        {"message": "Password changed successfully"}, status=status.HTTP_200_OK
     )
-    
-  old_password= request.data.get('old_password')
-  new_password= request.data.get('new_password')
-  confirm_password= request.data.get('confirm_password')
-  
-  
-  if not request.user.check_password(old_password):
-    return Response(
-      {'error': "Old password Incorrect"},
-      status= status.HTTP_401_UNAUTHORIZED
-    )
-    
-  if new_password != confirm_password:
-    return Response(
-      {"error": "New passwords do not match"},
-      status= status.HTTP_401_UNAUTHORIZED
-    )
-    
-  if len(new_password) < 8:
-    return Response(
-      {"error": "Password must be at least 8 characters"},
-      status= status.HTTP_401_UNAUTHORIZED
-    )
-    
-  request.user.set_password(new_password)
-  request.user.save()
-  
-  
-  return Response(
-    {"message": "Password changed successfully"},
-    status= status.HTTP_200_OK
-  )
-  
-  
-  # Payment service Logic------
+
+
+# Payment service Logic------
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def initialize_payment(request):
+    print("\n========== INITIALIZE PAYMENT ==========")
+    print("REQUEST DATA:", request.data)
+    print("USER:", request.user)
+
     order_number = request.data.get("order_number")
+
+    print("ORDER NUMBER:", order_number)
+
+    print(
+        "ORDER EXISTS:",
+        Order.objects.filter(
+            order_number=order_number,
+            user=request.user,
+        ).exists(),
+    )
+
     try:
         order = Order.objects.get(
             order_number=order_number,
-            user=request.user
+            user=request.user,
         )
-
     except Order.DoesNotExist:
+        print("❌ ORDER NOT FOUND")
         return Response(
-            {"error": "Order does not exist"},
-            status=404
+            {
+                "error": "Order does not exist",
+                "received_order_number": order_number,
+            },
+            status=404,
         )
 
+    print("✅ ORDER FOUND:", order.id, order.order_number)
 
     payment_link = PaymentService.initialize_payment(order)
 
-    return Response({
-        "payment_link": payment_link
-    })
-    
-    
+    return Response({"payment_link": payment_link})
+
+
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def verify_payment(request):
-  transaction_id = request.data.get("transaction_id")
-  tx_ref = request.data.get("tx_ref")
-  
-  if not transaction_id or not tx_ref:
-    return Response(
-      {"error": "Transaction ID and tx_ref are required!"},
-      status=status.HTTP_400_BAD_REQUEST
-    )
-    
-  
-  order = get_object_or_404(Order, user= request.user, tx_ref= tx_ref)
-  
-  if order.payment_status == "PAID":
+    transaction_id = request.data.get("transaction_id")
+    tx_ref = request.data.get("tx_ref")
+
+    if not transaction_id or not tx_ref:
+        return Response(
+            {"error": "Transaction ID and tx_ref are required!"},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    order = get_object_or_404(Order, user=request.user, tx_ref=tx_ref)
+
+    if order.payment_status == "PAID":
+        serializer = OrderSerializer(order)
+
+        return Response(
+            {
+                "status": "PAID",
+                "message": "Payment already verified.",
+                "order": serializer.data,
+            }
+        )
+    order = PaymentService.complete_payment(order, transaction_id)
+
     serializer = OrderSerializer(order)
-    
-    return Response({"status": "PAID",
-                     "message": "Payment already verified.",
-                     "order" : serializer.data})
-  order = PaymentService.complete_payment(order, transaction_id)
-  
-  serializer = OrderSerializer(order)
-  
-  return Response({
-    "status": "PAID",
-    "message": "Payment already verified",
-    "order": serializer.data,
-  }, status= status.HTTP_200_OK)
+
+    return Response(
+        {
+            "status": "PAID",
+            "message": "Payment already verified",
+            "order": serializer.data,
+        },
+        status=status.HTTP_200_OK,
+    )
+
 
 @api_view(["POST"])
 @permission_classes([AllowAny])
 @authentication_classes([])
-
 def flutterwave_webhook(request):
-  received_signature = request.headers.get("verif-hash") or request.data.get("flutterwave-signature")
-  
-  if not received_signature or not hmac.compare_digest(received_signature, settings.FLUTTERWAVE_SECRET_HASH):
-    logger.warning("Rejected Webhook with invalid or missing signature.")
-    return Response(status=status.HTTP_400_BAD_REQUEST)
-  
-  payload = request.data.get("data", {}) or {}
-  tx_ref = payload.get("tx_ref") or payload.get("reference")
-  transaction_id = payload.get("id")
-  
-  if not tx_ref or not transaction_id:
-    logger.warning("Webhook payload missing tx_ref/id: %s", payload)
-    
-    return Response(status=status.HTTP_200_OK)
-  
-  
-  try:
-    order = Order.objects.get(tx_ref=tx_ref)
-  except Order.DoesNotExist:
-    logger.warning("Webhook for unknown tx_ref=%s", tx_ref)
-    return Response(status=status.HTTP_200_OK)
-  
-  if order.payment_status =="PAID":
-    return Response(status=status.HTTP_200_OK)
-  
-  
-  try:
-    PaymentService.complete_payment(order, transaction_id)
-  except ValidationError as exc:
-    logger.warning("Webhook verification failed for tx_ref=%s: %s", tx_ref ,exc)
-  except Exception:
-    logger.exception("Unexpected error processing webhook for tx_ref=%s", tx_ref)
-    
-  return Response(status=status.HTTP_200_OK)
+    received_signature = request.headers.get("verif-hash") or request.data.get(
+        "flutterwave-signature"
+    )
 
+    if not received_signature or not hmac.compare_digest(
+        received_signature, settings.FLUTTERWAVE_SECRET_HASH
+    ):
+        logger.warning("Rejected Webhook with invalid or missing signature.")
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
-  
-  
-  
-    
-      
+    payload = request.data.get("data", {}) or {}
+    tx_ref = payload.get("tx_ref") or payload.get("reference")
+    transaction_id = payload.get("id")
+
+    if not tx_ref or not transaction_id:
+        logger.warning("Webhook payload missing tx_ref/id: %s", payload)
+
+        return Response(status=status.HTTP_200_OK)
+
+    try:
+        order = Order.objects.get(tx_ref=tx_ref)
+    except Order.DoesNotExist:
+        logger.warning("Webhook for unknown tx_ref=%s", tx_ref)
+        return Response(status=status.HTTP_200_OK)
+
+    if order.payment_status == "PAID":
+        return Response(status=status.HTTP_200_OK)
+
+    try:
+        PaymentService.complete_payment(order, transaction_id)
+    except ValidationError as exc:
+        logger.warning("Webhook verification failed for tx_ref=%s: %s", tx_ref, exc)
+    except Exception:
+        logger.exception("Unexpected error processing webhook for tx_ref=%s", tx_ref)
+
+    return Response(status=status.HTTP_200_OK)
